@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="VersionOne"
+            id="com.versionone.taskview">
+      </category>
+      <view
+            name="Task View"
+            icon="icons/sample.gif"
+            category="com.versionone.taskview"
+            class="com.versionone.taskview.views.TaskView"
+            id="com.versionone.taskview.views.TaskView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.versionone.taskview.preferences.PreferencePage"
+            id="com.versionone.taskview.preferences.PreferencePage"
+            name="VersionOne">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.versionone.taskview.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

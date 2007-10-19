@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Taskview Plug-in
+Bundle-SymbolicName: com.versionone.taskview; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: com.versionone.taskview.Activator
+Bundle-Vendor: VersionOne
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ com.versionone.apiclient
+Eclipse-LazyStart: true
+Export-Package: com.versionone.taskview.views, com.versionone.taskview.preferences
+Bundle-ClassPath: .

@@ -7,7 +7,8 @@ Bundle-Activator: com.versionone.taskview.test.Activator
 Bundle-Vendor: VERSIONONE
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.versionone.apiclient,
+ com.versionone.common,
  com.versionone.taskview,
+ com.versionone.apiclient,
  org.junit4
 Eclipse-LazyStart: true

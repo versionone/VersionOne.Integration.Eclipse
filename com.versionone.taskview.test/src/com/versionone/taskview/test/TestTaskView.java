@@ -17,8 +17,9 @@ import org.junit.Test;
 import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.Services;
-import com.versionone.taskview.preferences.PreferenceConstants;
-import com.versionone.taskview.preferences.PreferencePage;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
+import com.versionone.common.sdk.V1Server;
 import com.versionone.taskview.views.TaskView;
 
 public class TestTaskView {
@@ -59,7 +60,7 @@ public class TestTaskView {
 		FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
 		MetaModel metaModel = new MetaModel(metaConnector);
 		Services services = new Services(metaModel, dataConnector);		
-		TaskView.initializeForTesting(services, metaModel);
+		V1Server.initialize(services, metaModel);
 	}
 	
 	@Before

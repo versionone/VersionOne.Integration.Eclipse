@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.versionone.taskview.preferences.PreferenceConstants;
-import com.versionone.taskview.preferences.PreferencePage;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 
 /**
  * Test the preference store

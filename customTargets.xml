@@ -26,7 +26,6 @@
 	<!-- Replace values for mapsCheckoutTag as desired. -->
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
-		<fail>Get the Map Files?</fail>
 		<property name="mapsCheckoutTag" value="HEAD"/>
    		<svn javahl="false">
    			<export srcurl="${maps.URL}" revision="${maps.revision}" destpath="${buildDirectory}/maps" force="true"/>

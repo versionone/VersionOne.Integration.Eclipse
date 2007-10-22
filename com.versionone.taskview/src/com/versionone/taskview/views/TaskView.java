@@ -25,15 +25,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
-import com.versionone.apiclient.IMetaModel;
-import com.versionone.apiclient.IServices;
-import com.versionone.apiclient.V1Exception;
+import com.versionone.common.sdk.IProjectTreeNode;
+import com.versionone.common.sdk.ProjectTreeNode;
+import com.versionone.common.sdk.Task;
+import com.versionone.common.sdk.V1Server;
 import com.versionone.taskview.Activator;
-import com.versionone.taskview.internal.IProjectTreeNode;
-import com.versionone.taskview.internal.ProjectTreeNode;
-import com.versionone.taskview.internal.Task;
-import com.versionone.taskview.internal.V1Server;
-import com.versionone.taskview.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 
 /**
  * VersionOne Task View
@@ -53,7 +51,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * The constructor.
 	 */
 	public TaskView() {
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		PreferencePage.getPreferences().addPropertyChangeListener(this);
 	}
 	
 	/**
@@ -193,7 +191,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			public void run() {
 				IProjectTreeNode root = getProjectTreeNode();
 				IProjectTreeNode selectNode = null;
-				String projectToken = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PROJECT_TOKEN); 
+				String projectToken = PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN); 
 				if(!projectToken.equals("")) {
 					selectNode = new ProjectTreeNode("", projectToken);
 				}
@@ -247,25 +245,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	public TableViewer getViewer() {return this.viewer;}
 
 	/**
-	 * This method added for testability.  It initializes the underlying V1Server
-	 * with the IServices and IMetamodel provided. 
-	 * 
-	 * NOTE: This method _must_ be called prior to asking Eclipse for this control
-	 *       otherwise Eclipse will also initialize the data
-	 * 
-	 * @param services  - Services to use for testing
-	 * @param metaModel - MetaModel to use for testing.
-	 */
-	public static void initializeForTesting(IServices services, IMetaModel metaModel) {
-		V1Server.initialize(services, metaModel);
-	}
-
-	/**
 	 * Determine if VersionOne Task List is tracking effort
 	 * @return
 	 */
 	private boolean isTrackEffort() {
-		return Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_TRACK_EFFORT);
+		return PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_TRACK_EFFORT);
 	}
 	
 	/**
@@ -273,7 +257,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * @return
 	 */
 	private boolean isEnabled() {
-		return Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED);
+		return PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ENABLED);
 	}
 	
 	/**
@@ -386,7 +370,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private IProjectTreeNode getProjectTreeNode() {
 		try {
 			return V1Server.getInstance().getProjects();
-		} catch (V1Exception e) {
+		} catch (Exception e) {
 			Activator.logError(e);
 			MessageDialog.openError(viewer.getControl().getShell(), "Project View Error", "Error Occurred Retrieving Projects. Check ErrorLog for more Details");			
 			return new ProjectTreeNode("root", "0");
@@ -399,7 +383,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private void loadTable() {
 		try {
 			viewer.setInput(V1Server.getInstance().getTasks());
-		} catch (V1Exception e) {
+		} catch (Exception e) {
 			Activator.logError(e);
 			MessageDialog.openError(viewer.getControl().getShell(), "Task View Error", "Error Occurred Retrieving Task. Check ErrorLog for more Details");
 		}

@@ -15,9 +15,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import com.versionone.taskview.Activator;
-import com.versionone.taskview.internal.IProjectTreeNode;
-import com.versionone.taskview.preferences.PreferenceConstants;
+import com.versionone.common.sdk.IProjectTreeNode;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 
 /**
  * Dialog box used to select projects.
@@ -148,6 +148,6 @@ public class ProjectSelectDialog extends Dialog  implements SelectionListener {
 	@Override
 	protected void okPressed() {
 		super.okPressed();
-		Activator.getDefault().getPreferenceStore().setValue(PreferenceConstants.P_PROJECT_TOKEN, _selectedProjectTreeNode.getToken());
+		PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN, _selectedProjectTreeNode.getToken());
 	}
 }

@@ -16,19 +16,4 @@
             id="com.versionone.taskview.views.TaskView">
       </view>
    </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.versionone.taskview.preferences.PreferencePage"
-            id="com.versionone.taskview.preferences.PreferencePage"
-            name="VersionOne">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.versionone.taskview.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-
 </plugin>

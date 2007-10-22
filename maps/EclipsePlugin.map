@@ -1,0 +1,4 @@
+feature@com.versionone.v1.feature=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.v1.feature
+plugin@com.versionone.apiclient=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.apiclient
+plugin@com.versionone.common=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.common
+plugin@com.versionone.taskview=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.taskview

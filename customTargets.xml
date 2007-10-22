@@ -28,8 +28,10 @@
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
 		<fail>Get the Map Files?</fail>
 		<property name="mapsCheckoutTag" value="HEAD"/>
-		<cvs cvsRoot="${mapsRepo}" package="${mapsRoot}" dest="${buildDirectory}/maps"
-			tag="${mapsCheckoutTag}"/>
+   		<svn javahl="false">
+   			<export srcurl="${maps.URL}" revision="${maps.revision}" destpath="${buildDirectory}/maps" force="true"/>
+   		</svn>	
+		
 	</target>
 
 	<target name="checkLocalMaps">
@@ -37,7 +39,7 @@
 	</target>
 
 	<target name="tagMapFiles" if="tagMaps">
-		<cvs dest="${buildDirectory}/maps/${mapsRoot}" command="tag ${mapsTagTag}"/>
+<!--		<cvs dest="${buildDirectory}/maps/${mapsRoot}" command="tag ${mapsTagTag}"/> -->
 	</target>
 
 	<!-- ===================================================================== -->

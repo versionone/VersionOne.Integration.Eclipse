@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WARNING: Eclipse auto-generated file.
+    Any modifications will be overwritten.
+    To include a user specific buildfile here, simply create one in the same
+    directory with the processing instruction <?eclipse.ant.import?>
+    as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="EclipsePlugin">
+    <property environment="env"/>
+    <property name="eclipse.home" value="c:/eclipse"/>
+    <target name="build">
+
+        <java jar="${eclipse.home}/plugins/org.eclipse.equinox.launcher_1.0.1.R33x_v20070828.jar" fork="true" failonerror="true">
+            <arg line="-application org.eclipse.ant.core.antRunner -buildfile ${eclipse.home}/plugins/org.eclipse.pde.build_3.3.1.v20070828/scripts/build.xml> -Dbuilder=${basedir}"/>
+        </java>
+    </target>
+</project>

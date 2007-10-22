@@ -3,9 +3,14 @@
 <!--    <property environment="env"/> -->
     <property name="eclipse.home" value="c:/eclipse"/>
     <target name="build">
-
         <java jar="${eclipse.home}/plugins/org.eclipse.equinox.launcher_1.0.1.R33x_v20070828.jar" fork="true" failonerror="true">
             <arg line="-application org.eclipse.ant.core.antRunner -buildfile ${eclipse.home}/plugins/org.eclipse.pde.build_3.3.1.v20070828/scripts/build.xml> -Dbuilder=${basedir}"/>
         </java>
     </target>
+
+	<target name="clean">
+		<delete dir="features"/>
+		<delete dir="plugins"/>
+		<delete dir="." includes="**/assemble*, **/final*, **/package*, directory.txt, pluginVersions.properties, fetch_com.versionone.v1.feature.xml, featureVersions.properties"/>
+	</target>
 </project>

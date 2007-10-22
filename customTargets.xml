@@ -125,8 +125,8 @@
 	<!-- ===================================================================== -->
 	<target name="postPackage">
 		<property name="dist.filename" value="EclipsePlugin.zip"/>
-		<move file="${buildLabel}/com.versionone.v1.feature-${buildId}.zip" tofile="${buildLabel}/${dist.filename}"/>
-		<copy file="${buildLabel}/${dist.filename}" tofile="${publish.dir}/${ver.build}/${dest.filename}"/>
+		<move file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip" tofile="${builder}/${buildLabel}/${dist.filename}"/>
+		<copy file="${builder}/${buildLabel}/${dist.filename}" tofile="${publish.dir}/${ver.build}/${dest.filename}"/>
 	</target>
 
 	<!-- ===================================================================== -->

@@ -123,7 +123,11 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do after  running package. -->
 	<!-- ===================================================================== -->
-	<target name="postPackage"> </target>
+	<target name="postPackage">
+		<property name="dist.filename" value="EclipsePlugin.zip"/>
+		<move file="${buildLabel}/com.versionone.v1.feature-${buildId}.zip" tofile="${buildLabel}/${dist.filename}"/>
+		<copy file="${buildLabel}/${dist.filename}" tofile="${publish.dir}/${ver.build}/${dest.filename}"/>
+	</target>
 
 	<!-- ===================================================================== -->
 	<!-- Steps to do after the build is done. -->

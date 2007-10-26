@@ -38,9 +38,9 @@ public class TestTaskView {
 	static final boolean TRACKING = false;
 		
 	// column indexes
-	static final int STORY_COLUMN_INDEX = 0;
-	static final int NAME_COLUMN_INDEX = 1;
-	static final int ID_COLUMN_INDEX = 2;
+	static final int ID_COLUMN_INDEX = 0;
+	static final int STORY_COLUMN_INDEX = 1;
+	static final int NAME_COLUMN_INDEX = 2;
 	static final int ESTIMATE_COLUMN_INDEX = 3;
 	static final int TODO_COLUMN_INDEX = 4;
 	static final int STATUS_COLUMN_INDEX = 5;

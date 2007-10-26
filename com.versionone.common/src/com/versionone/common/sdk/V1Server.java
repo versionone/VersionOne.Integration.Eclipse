@@ -187,6 +187,27 @@ public class V1Server {
 		return rc;
 	}
 
+	/**
+	 * Return a collection of all valid Task Status Values
+	 * @return String[] of valid TaskStatus Values
+	 */
+	public String[] getTaskStatusValues() throws Exception {
+		IAssetType statusType = _metaModel.getAssetType("TaskStatus");
+		IAttributeDefinition name = statusType.getAttributeDefinition("Name");
+
+		Query query = new Query(statusType);
+		query.getSelection().add(name);
+		QueryResult queryResults = _services.retrieve(query);
+		Asset[] results = queryResults.getAssets();
+		
+		String[] rc = new String[results.length];
+		for(int i =0; i < rc.length; ++i) {
+			rc[i] = results[i].getAttribute(name).getValue().toString();
+		}
+		return rc;
+	}
+	
+	
 	private void addTaskSelection(Query query, IAssetType taskType) throws MetaException {		
 		String[] attributes = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ATTRIBUTE_SELECTION).split(",");
 		for(String oneAttribute : attributes) {
@@ -209,6 +230,5 @@ public class V1Server {
 		Task rc = new Task(asset.getOid().getToken());
 		rc.setAttributeValues(attributes);
 		return rc;
-	}
-	
+	}	
 }

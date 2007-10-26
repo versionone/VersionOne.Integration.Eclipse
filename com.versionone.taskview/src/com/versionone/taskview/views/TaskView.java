@@ -1,37 +1,30 @@
 package com.versionone.taskview.views;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.IProjectTreeNode;
 import com.versionone.common.sdk.ProjectTreeNode;
 import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.V1Server;
 import com.versionone.taskview.Activator;
-import com.versionone.common.preferences.PreferenceConstants;
-import com.versionone.common.preferences.PreferencePage;
 
 /**
  * VersionOne Task View
@@ -40,8 +33,6 @@ import com.versionone.common.preferences.PreferencePage;
  *
  */
 public class TaskView extends ViewPart implements IPropertyChangeListener {
-	
-	public static final String EFFORT_COLUMN_PROPERTY = "Effort";	
 	
 	private TableViewer viewer;
 	private Action selectProjectAction = null;
@@ -80,16 +71,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		selectProjectAction.setEnabled(isEnabled);
 		refreshAction.setEnabled(isEnabled);
 		viewer.getTable().setEnabled(isEnabled);
+		viewer.setContentProvider(new ViewContentProvider());
 		
-		if(isEnabled) {
-			viewer.setContentProvider(new ViewContentProvider());
-			viewer.setLabelProvider(new ViewLabelProvider());				
+		if(isEnabled) {		
 			loadTable();
 		}
 		else {
 			viewer.getTable().clearAll();
-			viewer.setLabelProvider(new ErrorLabelProvider());
-			viewer.setContentProvider(new ErrorContentProvider("Enable VersionOne Task List"));
 			viewer.setSorter(null);
 			viewer.setInput(getViewSite());
 		}
@@ -99,67 +87,101 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * Configure the table
 	 */
 	private void configureTable() {
-		final Table table = viewer.getTable();
-		table.setLinesVisible(true);
-		table.setHeaderVisible(true);
-		table.setEnabled(isEnabled());
+
+		createTableViewerColumn("ID", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getID();
+			}
+			
+			@Override
+			public Image getImage(Object element) {
+				return Activator.getDefault().getImageRegistry().get(Activator.TASK_IMAGE_ID);
+			}			
+		});
 		
-		final String[] columnNames = new String[] {"Story", "Task Name", "ID", "Detail Estimate", "To Do", "Status"};		
-		// column properties are the Attribute names in the DOM document
-		final String[] columnProperties = new String[] {"Parent.Name", "Name", "Number", "DetailEstimate", "ToDo", "Status.Name"};		
-		int[] columnWidth     = {200, 150, 70, 100, 50, 100};
-		int[] columnAlignment = {SWT.LEFT, SWT.LEFT,SWT.LEFT,SWT.CENTER,SWT.CENTER,SWT.LEFT};
+		createTableViewerColumn("Story", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getStoryName();
+			}
+		});
 		
-		for(int i = 0; i < columnNames.length; ++i) {
-			TableColumn tc = new TableColumn(table, columnAlignment[i]);
-			tc.setText(columnNames[i]);
-			tc.setWidth(columnWidth[i]);
+		TableViewerColumn column = createTableViewerColumn("Task Name", 150, SWT.LEFT);
+		column.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getName();
+			}
+		});
+		column.setEditingSupport(new TaskEditor.NameEditor(viewer));
+
+		column = createTableViewerColumn("Detail Estimate", 100, SWT.CENTER);
+		column.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getEstimate();
+			}			
+		});
+		column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
+		
+		column = createTableViewerColumn("To Do", 50, SWT.CENTER);
+		column.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getToDo();
+			}			
+		});
+		column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
+		
+		column = createTableViewerColumn("Status", 100, SWT.LEFT);
+		column.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getStatus();
+			}			
+		});
+		
+		try {
+			column.setEditingSupport(new StatusEditor(viewer, V1Server.getInstance().getTaskStatusValues()));
+		}
+		catch(Exception e) {
+			Activator.logError(e);
+			showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
+			column.setEditingSupport(new StatusEditor(viewer, new String[]{}));
 		}
 		
-		viewer.setColumnProperties(columnProperties);
-		viewer.setCellEditors(new CellEditor[] { new TextCellEditor(viewer.getTable()),
-				new TextCellEditor(viewer.getTable()),
-				new TextCellEditor(viewer.getTable()),
-				new TextCellEditor(viewer.getTable()),
-				new TextCellEditor(viewer.getTable()),
-				new TextCellEditor(viewer.getTable())});
-		
-//		viewer.setCellModifier(new TextCellModifier(viewer));
-		
+		viewer.getTable().setLinesVisible(true);
+		viewer.getTable().setHeaderVisible(true);
+		viewer.getTable().setEnabled(isEnabled());
+
 		if(this.isTrackEffort()) {
 			addEffortColumns();
-		}
+		}		
 	}
 
 	/**
 	 * Adds the columns needed to track effort
 	 */
 	private void addEffortColumns() {
-		// Add Cell Editors
-		ArrayList<CellEditor> editorList = new ArrayList<CellEditor>(Arrays.asList(viewer.getCellEditors()));
-		editorList.add(4, new TextCellEditor(viewer.getTable()));
-		editorList.add(4, new TextCellEditor(viewer.getTable()));
-		CellEditor[] editors = new CellEditor[editorList.size()];
-		editorList.toArray(editors);
-		viewer.setCellEditors(editors);		
-		
-		// Add Properties
-		ArrayList<String> propertyList = new ArrayList<String>(Arrays.asList((String[])viewer.getColumnProperties()));
-		propertyList.add(4, "Actuals.Value.@Sum");
-		propertyList.add(5, EFFORT_COLUMN_PROPERTY);		
-		String[] columnProperties = new String[propertyList.size()];
-		propertyList.toArray(columnProperties);
-		viewer.setColumnProperties(columnProperties);
 
-		// Columns
-		TableColumn doneColumn = new TableColumn(viewer.getTable(), SWT.CENTER, 4);
-		doneColumn.setText("Done");
-		doneColumn.setWidth(50);
-		
-		TableColumn todoColumn = new TableColumn(viewer.getTable(), SWT.CENTER, 5);
-		todoColumn.setText("Effort");
-		todoColumn.setWidth(50);
+		createTableViewerColumn("Done", 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
 
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getDone();
+			}			
+		});
+		
+		TableViewerColumn column = createTableViewerColumn("Effort", 50, SWT.CENTER, 5);
+		column.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Task)element).getEffort();
+			}			
+		});
+		column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
+		
 		viewer.refresh();
 	}
 
@@ -167,22 +189,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * removes the columns needed when tracking effort
 	 */
 	private void removeEffortColumns() {
-		
-		ArrayList<CellEditor> editorList = new ArrayList<CellEditor>(Arrays.asList(viewer.getCellEditors()));
-		editorList.remove(5);
-		editorList.remove(4);
-		CellEditor[] editors = new CellEditor[editorList.size()];
-		editorList.toArray(editors);
-		viewer.setCellEditors(editors);
-		
-		ArrayList<String> propertyList = new ArrayList<String>(Arrays.asList((String[])viewer.getColumnProperties()));
-		propertyList.remove(5);
-		propertyList.remove(4);
-		String[] columnProperties = new String[propertyList.size()];
-		propertyList.toArray(columnProperties);
-		viewer.setColumnProperties(columnProperties);
+
 		viewer.getTable().getColumn(5).dispose();
-		viewer.getTable().getColumn(4).dispose();
+		viewer.getTable().getColumn(4).dispose();		
 		viewer.refresh();
 	}
 	
@@ -259,46 +268,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private boolean isEnabled() {
 		return PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ENABLED);
 	}
-	
-	/**
-	 * This content provider is used when there is an error creating the view (i.e, it's not enabled)
-	 * @author Jerry D. Odenwelder Jr.
-	 */
-	class ErrorContentProvider implements IStructuredContentProvider {
-		String message;
-		ErrorContentProvider(String text) {
-			message = text;
-		}
-		public Object[] getElements(Object inputElement) {
-			return new String[] {message};
-		}
-
-		public void dispose() {		
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-	}
-
-	/**
-	 * This label provider is used when there is an error creating the view (i.e. It's not enabed)
-	 * @author Jerry D. Odenwelder Jr.
-	 */
-	class ErrorLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(Object element, int columnIndex) {
-			if(0 == columnIndex) {
-				return element.toString();
-			}
-			else {
-				return "";
-			}
-		}
-	}
 
 	/**
 	 * ContentProvider for VersionOne Task
@@ -313,35 +282,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			} else {
 				return new Object[]{};
 			}
-		}
-	}
-	
-	/**
-	 * LabelProvider for VersionOne Task
-	 * @author jerry
-	 */
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-		
-		public String getColumnText(Object obj, int index) {
-			if( (null != obj) && (obj instanceof Task)) { 
-				String[] properties = (String[])viewer.getColumnProperties();
-				Task task = (Task) obj;
-				return task.getValue(properties[index]);
-			} else {
-				return "";
-			}
-		}
-		
-		public Image getColumnImage(Object obj, int index) {
-			Image rc = null;
-			if(0 == index) {
-				rc = getImage(obj);
-			}
-			return rc;
-		}
-		
-		public Image getImage(Object obj) {
-			return Activator.getDefault().getImageRegistry().get(Activator.TASK_IMAGE_ID);
 		}
 	}
 	
@@ -389,6 +329,44 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		}
 	}
 
+	/**
+	 * Create a TableViewerColumn with specified properties and append it to the end of the table
+	 * 
+	 * Calls createTableViewerColumn(String label, int width, int alignment, int index) with a -1 as the index
+	 * 
+	 * @param label - Column label
+	 * @param width - Column Width
+	 * @param alignment - Column alignment
+	 * @return new TableViewerColumn 
+	 */
+	TableViewerColumn createTableViewerColumn(String label, int width, int alignment) {
+		return createTableViewerColumn(label, width, alignment, -1);
+	}
+
+	/**
+	 * Create a TableViewerColumn at a specific column location
+	 * 
+	 * @param label - Column label
+	 * @param width - Column Width
+	 * @param alignment - Column alignment 
+	 * @param index - location for column.  -1 indicates the column goes at the end
+	 * @return new TableViewerColumn
+	 */
+	TableViewerColumn createTableViewerColumn(String label, int width, int alignment, int index) {
+		TableViewerColumn rc = null;
+		if(-1 == index) {
+			rc = new TableViewerColumn(viewer,SWT.NONE);	
+		}
+		else {
+			rc = new TableViewerColumn(viewer,SWT.NONE, index);
+		}		
+		rc.getColumn().setWidth(width);
+		rc.getColumn().setAlignment(alignment);
+		rc.getColumn().setText(label);
+		return rc;
+	}
+	
+	
 //	private void hookContextMenu() {
 //		MenuManager menuMgr = new MenuManager("#PopupMenu");
 //		menuMgr.setRemoveAllWhenShown(true);
@@ -417,8 +395,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 //		});
 //	}
 //
-//	private void showMessage(String message) {
-//		MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
-//	}
+	private void showMessage(String message) {
+		MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
+	}
 	
 }

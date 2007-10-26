@@ -21,6 +21,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.IProjectTreeNode;
+import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.ProjectTreeNode;
 import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.V1Server;
@@ -98,7 +99,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public Image getImage(Object element) {
 				return Activator.getDefault().getImageRegistry().get(Activator.TASK_IMAGE_ID);
-			}			
+			}
 		});
 		
 		createTableViewerColumn("Story", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
@@ -143,15 +144,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}			
 		});
 		
-		try {
-			statusEditor = new StatusEditor(viewer, V1Server.getInstance().getTaskStatusValues()); 
-			column.setEditingSupport(statusEditor);
-		}
-		catch(Exception e) {
-			Activator.logError(e);
-			showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
-			column.setEditingSupport(new StatusEditor(viewer, null));
-		}
+		statusEditor = new StatusEditor(viewer, getStatusValues()); 
+		column.setEditingSupport(statusEditor);
 		
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -219,6 +213,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		refreshAction = new Action() {
 			public void run() {
 				loadTable();
+				statusEditor.setStatusCodes(getStatusValues());
 			}
 		};
 		refreshAction.setText("Refresh");
@@ -330,6 +325,38 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			MessageDialog.openError(viewer.getControl().getShell(), "Task View Error", "Error Occurred Retrieving Task. Check ErrorLog for more Details");
 		}
 	}
+	
+
+	/**
+	 * Retrieve the StatusCodes from the server 
+	 * @return StatusCodes from the server or an empty collection
+	 */
+	private IStatusCodes getStatusValues() {
+		try {
+			return V1Server.getInstance().getTaskStatusValues();
+		} catch (Exception e) {
+			Activator.logError(e);
+			showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
+			return new IStatusCodes() {
+				String[] _data = new String[]{}; 
+				@Override
+				public String getDisplayValue(int index) {
+					return "";
+				}
+
+				@Override
+				public String[] getDisplayValues() {
+					return _data;
+				}
+
+				@Override
+				public int getIndex(String value) {
+					return 0;
+				}				
+			};
+		}
+	}
+	
 
 	/**
 	 * Create a TableViewerColumn with specified properties and append it to the end of the table

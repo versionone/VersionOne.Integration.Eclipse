@@ -8,6 +8,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.Task;
 
+/**
+ * Support editing the Task Status
+ * @author jerry
+ *
+ */
 public class StatusEditor extends EditingSupport {
 
 	private ComboBoxCellEditor _editor;
@@ -16,12 +21,7 @@ public class StatusEditor extends EditingSupport {
 	public StatusEditor(TableViewer viewer, IStatusCodes codes) {
 		super(viewer);
 		_statusCodes = codes;
-		if(null != codes) {
-			_editor = new ComboBoxCellEditor(viewer.getTable(), _statusCodes.getDisplayValues());
-		}
-		else {
-			_editor = new ComboBoxCellEditor(viewer.getTable(), new String[]{});
-		}
+		_editor = new ComboBoxCellEditor(viewer.getTable(), _statusCodes.getDisplayValues());
 	}
 
 	@Override

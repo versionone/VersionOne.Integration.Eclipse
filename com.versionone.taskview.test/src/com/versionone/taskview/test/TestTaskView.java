@@ -1,11 +1,10 @@
 package com.versionone.taskview.test;
 
-import org.eclipse.swt.widgets.TableColumn;
-
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
@@ -165,9 +164,43 @@ public class TestTaskView {
 	}
 
 	/**
+	 * Check each column and verify if edits are allowed
+	 */
+	@Test
+	public void testEditability() {
+		enableEffortTracking();
+		Object selectedElement = testView.getViewer().getElementAt(0);		
+		checkEditor(selectedElement, ID_COLUMN_INDEX, false);
+		checkEditor(selectedElement, STORY_COLUMN_INDEX, false);
+		checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
+		checkEditor(selectedElement, ESTIMATE_COLUMN_INDEX, true);
+		checkEditor(selectedElement, DONE_COLUMN_INDEX, false);
+		checkEditor(selectedElement, EFFORT_COLUMN_INDEX, true);
+		checkEditor(selectedElement, TRACKED_TODO_COLUMN_INDEX , true);
+		checkEditor(selectedElement, TRACKED_STATUS_COLUMN_INDEX, true);		
+	}
+
+	/**
+	 * verify that the used can edit fields
+	 * @param editors - viewer editors
+	 * @param columnIndex - index of column to be considered
+	 * @param expected - expected result of isActivated() method
+	 */
+	private void checkEditor(Object selectedElement, int columnIndex, boolean expected) {
+		testView.getViewer().editElement(selectedElement, columnIndex);
+		delay(1000);
+		if(expected) {
+			Assert.assertTrue(testView.getViewer().isCellEditorActive());	
+		}
+		else {
+			Assert.assertFalse(testView.getViewer().isCellEditorActive());
+		}
+	}
+	
+	/**
 	 * Validate one row in the table
 	 */	
-	private void validateRow(TableItem row, String story, String name, String number, String estimate, String todo, String status) {		
+	private void validateRow(TableItem row, String story, String name, String number, String estimate, String todo, String status) {
 		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));
@@ -194,7 +227,7 @@ public class TestTaskView {
 	/**
 	 * Validate one row in the table
 	 */	
-	private void validateRow(TableItem row, String story, String name, String number, String estimate, String done, String effort, String todo, String status) {		
+	private void validateRow(TableItem row, String story, String name, String number, String estimate, String done, String effort, String todo, String status) {
 		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));

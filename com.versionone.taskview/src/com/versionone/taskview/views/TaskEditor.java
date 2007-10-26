@@ -125,6 +125,5 @@ abstract public class TaskEditor extends EditingSupport {
 		protected void setValue(Task element, Object value) {
 			element.setToDo(value.toString());
 		}
-	}
-	
+	}	
 }

@@ -28,12 +28,20 @@ public class StatusEditor extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		return _editor.getValue();
+		String status = ((Task)element).getStatus();
+		String[] values = _editor.getItems();
+		Integer index = 0;
+		for(int i=0;i<values.length; ++i) {
+			if(status.equals(values[i])) {
+				index = i;
+			}
+		}
+		return index;
 	}
 
 	@Override
-	protected void setValue(Object element, Object value) {		
-		((Task)element).setStatus(_editor.getValue().toString());
+	protected void setValue(Object element, Object value) {
+		((Task)element).setStatus(_editor.getItems()[(Integer)value]);
 		_editor.setValue(value);
 		getViewer().update(element, null);
 	}

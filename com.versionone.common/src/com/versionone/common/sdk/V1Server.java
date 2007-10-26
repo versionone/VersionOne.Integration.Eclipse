@@ -218,5 +218,10 @@ public class V1Server {
 		Task rc = new Task(asset.getOid().getToken());
 		rc.setAttributeValues(attributes);
 		return rc;
+	}
+
+	public static void save(Task data) {
+		// TODO Auto-generated method stub
+		
 	}	
 }

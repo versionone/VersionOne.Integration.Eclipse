@@ -121,4 +121,8 @@ public class Task {
 	public void setEffort(String value) {
 		_newValues.put(EFFORT_PROPERTY, value);
 	}
+
+	public boolean isDirty() {
+		return 0 != _newValues.size();
+	}
 }

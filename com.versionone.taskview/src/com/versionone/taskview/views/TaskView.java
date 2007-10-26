@@ -35,6 +35,7 @@ import com.versionone.taskview.Activator;
 public class TaskView extends ViewPart implements IPropertyChangeListener {
 	
 	private TableViewer viewer;
+	private StatusEditor statusEditor;
 	private Action selectProjectAction = null;
 	private Action refreshAction = null;
 		
@@ -143,12 +144,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		
 		try {
-			column.setEditingSupport(new StatusEditor(viewer, V1Server.getInstance().getTaskStatusValues()));
+			statusEditor = new StatusEditor(viewer, V1Server.getInstance().getTaskStatusValues()); 
+			column.setEditingSupport(statusEditor);
 		}
 		catch(Exception e) {
 			Activator.logError(e);
 			showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
-			column.setEditingSupport(new StatusEditor(viewer, new String[]{}));
+			column.setEditingSupport(new StatusEditor(viewer, null));
 		}
 		
 		viewer.getTable().setLinesVisible(true);

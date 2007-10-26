@@ -5,15 +5,23 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 
+import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.Task;
 
 public class StatusEditor extends EditingSupport {
 
 	private ComboBoxCellEditor _editor;
+	private IStatusCodes _statusCodes; 
 	
-	public StatusEditor(TableViewer viewer, String[] items) {
+	public StatusEditor(TableViewer viewer, IStatusCodes codes) {
 		super(viewer);
-		_editor = new ComboBoxCellEditor(viewer.getTable(), items);
+		_statusCodes = codes;
+		if(null != codes) {
+			_editor = new ComboBoxCellEditor(viewer.getTable(), _statusCodes.getDisplayValues());
+		}
+		else {
+			_editor = new ComboBoxCellEditor(viewer.getTable(), new String[]{});
+		}
 	}
 
 	@Override
@@ -28,21 +36,19 @@ public class StatusEditor extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		String status = ((Task)element).getStatus();
-		String[] values = _editor.getItems();
-		Integer index = 0;
-		for(int i=0;i<values.length; ++i) {
-			if(status.equals(values[i])) {
-				index = i;
-			}
-		}
-		return index;
+		String currentStatus = ((Task)element).getStatus();
+		return _statusCodes.getIndex(currentStatus);
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((Task)element).setStatus(_editor.getItems()[(Integer)value]);
+		((Task)element).setStatus(_statusCodes.getDisplayValue((Integer)value));
 		_editor.setValue(value);
 		getViewer().update(element, null);
+	}
+
+	public void setStatusCodes(IStatusCodes value) {
+		_statusCodes = value;
+		_editor.setItems(_statusCodes.getDisplayValues());
 	}
 }

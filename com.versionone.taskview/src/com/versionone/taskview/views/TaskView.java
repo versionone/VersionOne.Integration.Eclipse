@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -39,6 +40,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private StatusEditor statusEditor;
 	private Action selectProjectAction = null;
 	private Action refreshAction = null;
+	private Action saveAction = null;
 		
 	/**
 	 * The constructor.
@@ -218,7 +220,27 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		};
 		refreshAction.setText("Refresh");
 		refreshAction.setToolTipText("Refresh");
-		refreshAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.REFRESH_IMAGE_ID));		
+		refreshAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.REFRESH_IMAGE_ID));
+		
+		saveAction = new Action() {
+			public void run() {
+				TableItem[] rows = viewer.getTable().getItems();
+				for(int i = 0; i < rows.length; ++i) {
+					Task data = (Task) rows[i].getData();
+					if(data.isDirty()) {
+						showMessage("Save Item " + data.getID());
+						V1Server.save(data);
+					}
+				}
+				loadTable();
+				statusEditor.setStatusCodes(getStatusValues());
+			}			
+		};
+		saveAction.setText("Save");
+		saveAction.setToolTipText("Save");
+		saveAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));
+		
+		
 	}
 
 	private void contributeToActionBars() {
@@ -230,11 +252,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(selectProjectAction);
 		manager.add(refreshAction);
+		manager.add(saveAction);
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(selectProjectAction);
 		manager.add(refreshAction);
+		manager.add(saveAction);
 	}
 	
 	/**

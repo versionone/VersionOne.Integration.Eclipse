@@ -191,20 +191,8 @@ public class V1Server {
 	 * Return a collection of all valid Task Status Values
 	 * @return String[] of valid TaskStatus Values
 	 */
-	public String[] getTaskStatusValues() throws Exception {
-		IAssetType statusType = _metaModel.getAssetType("TaskStatus");
-		IAttributeDefinition name = statusType.getAttributeDefinition("Name");
-
-		Query query = new Query(statusType);
-		query.getSelection().add(name);
-		QueryResult queryResults = _services.retrieve(query);
-		Asset[] results = queryResults.getAssets();
-		
-		String[] rc = new String[results.length];
-		for(int i =0; i < rc.length; ++i) {
-			rc[i] = results[i].getAttribute(name).getValue().toString();
-		}
-		return rc;
+	public IStatusCodes getTaskStatusValues() throws Exception {
+		return new TaskStatusCodes(_metaModel, _services);
 	}
 	
 	

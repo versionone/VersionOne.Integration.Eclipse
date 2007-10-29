@@ -16,11 +16,26 @@ public interface IStatusCodes {
 	 * Given a name return it's index
 	 * Returns 0 if the value is invalid
 	 */
-	int getIndex(String value);
+	int getOidIndex(String value);
 	
 	/**
 	 * Given an index, return the value
 	 */
 	String getDisplayValue(int index);
+
+	/**
+	 * Return the ID of a status code based on index.
+	 * @param value
+	 * @return ID of a SatusCode element
+	 */
+	String getID(int value);
+
+	
+	/**
+	 * Get the display value from an OID
+	 * @param oid
+	 * @return
+	 */
+	String getDisplayFromOid(String oid);
 	
 }

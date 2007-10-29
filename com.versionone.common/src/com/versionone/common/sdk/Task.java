@@ -1,6 +1,7 @@
 package com.versionone.common.sdk;
 
 import com.versionone.apiclient.Asset;
+import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.MetaException;
 
@@ -15,7 +16,8 @@ public class Task {
 	private static final String PARENT_NAME_PROPERTY     = "Parent.Name";
 	private static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
 	private static final String TO_DO_PROPERTY           = "ToDo";
-	private static final String STATUS_NAME_PROPERTY     = "Status.Name";	
+//	private static final String STATUS_NAME_PROPERTY     = "Status.Name";	
+	private static final String STATUS_ID_PROPERTY     	 = "Status";
 	private static final String EFFORT_PROPERTY          = "Effort";
 	private static final String DONE_PROPERTY            = "Actuals.Value.@Sum";
 
@@ -33,7 +35,7 @@ public class Task {
 		_nameDefinition     = _asset.getAssetType().getAttributeDefinition(NAME_PROPERTY);
 		_estimateDefinition = _asset.getAssetType().getAttributeDefinition(DETAIL_ESTIMATE_PROPERTY);
 		_todoDefinition     = _asset.getAssetType().getAttributeDefinition(TO_DO_PROPERTY);
-		_statusDefinition   = _asset.getAssetType().getAttributeDefinition(STATUS_NAME_PROPERTY);
+		_statusDefinition   = _asset.getAssetType().getAttributeDefinition(STATUS_ID_PROPERTY);
 	}
 	
 	String getValue(String key) throws Exception {		
@@ -68,7 +70,7 @@ public class Task {
 		return getValue(DETAIL_ESTIMATE_PROPERTY);
 	}
 	
-	public void setEstimate(String value) throws Exception {
+	public void setEstimate(float value) throws Exception {
 		_asset.setAttributeValue(_estimateDefinition, value);
 	}
 
@@ -76,12 +78,13 @@ public class Task {
 		return getValue(TO_DO_PROPERTY);
 	}
 
-	public void setToDo(String value) throws Exception {
+	public void setToDo(float value) throws Exception {
 		_asset.setAttributeValue(_todoDefinition, value);
 	}
 	
 	public String getStatus() throws Exception {
-		return getValue(STATUS_NAME_PROPERTY);
+		Attribute attrib = _asset.getAttribute(_statusDefinition);
+		return attrib.getValue().toString();
 	}
 	
 	public void setStatus(String value) throws Exception {
@@ -96,7 +99,7 @@ public class Task {
 		return getValue(EFFORT_PROPERTY);
 	}
 	
-	public void setEffort(String value) throws Exception {
+	public void setEffort(float value) throws Exception {
 
 	}
 

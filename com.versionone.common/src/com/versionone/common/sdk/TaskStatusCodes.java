@@ -73,11 +73,32 @@ public class TaskStatusCodes implements IStatusCodes {
 	}
 
 	@Override
-	public int getIndex(String value) {
+	public int getOidIndex(String oid) {
 		for(int i = 0; i < _status.length; ++i) {
-			if(value.equals(_status[i]._name))
+			if(oid.equals(_status[i]._id))
 				return i;
 		}
 		return 0;
+	}
+
+	@Override
+	public String getID(int index) {
+		if( (index >= 0) && (index < _status.length) ){
+			return _status[index]._id;
+		}
+		throw new IndexOutOfBoundsException();
+	}
+
+	@Override
+	public String getDisplayFromOid(String oid) {
+		String rc = null;
+		for(int i=0; i < _status.length; ++i) {
+			if(oid.equals(_status[i]._id)) {
+				rc = _status[i]._name; 
+			}
+		}
+		if(null == rc)
+			rc = "*** Invalid OID " + oid + "***";
+		return rc;
 	}
 }

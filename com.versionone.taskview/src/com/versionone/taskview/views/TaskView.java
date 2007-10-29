@@ -94,7 +94,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void configureTable() {
 
-		createTableViewerColumn("Number", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("ColumnTitle'ID", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				try {
@@ -111,7 +111,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
 		});
 		
-		createTableViewerColumn("Story", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("ColumnTitle'Parent", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				try {
@@ -123,7 +123,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
 		});
 		
-		TableViewerColumn column = createTableViewerColumn("Task", 150, SWT.LEFT);
+		TableViewerColumn column = createTableViewerColumn("ColumnTitle'Title", 150, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -137,7 +137,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.NameEditor(viewer));
 
-		column = createTableViewerColumn("Detail Estimate", 100, SWT.CENTER);
+		column = createTableViewerColumn("ColumnTitle'DetailEstimate", 100, SWT.CENTER);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -151,7 +151,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
 		
-		column = createTableViewerColumn("To Do", 50, SWT.CENTER);
+		column = createTableViewerColumn("ColumnTitle'ToDo", 50, SWT.CENTER);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -165,7 +165,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
 		
-		column = createTableViewerColumn("Status", 100, SWT.LEFT);
+		column = createTableViewerColumn("ColumnTitle'Status", 100, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -177,7 +177,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				return "*** Error ***";
 			}			
 		});
-		
+
+		if(this.isTrackEffort()) {
+			addEffortColumns();
+		}		
+
 		statusEditor = new StatusEditor(viewer, getStatusValues()); 
 		column.setEditingSupport(statusEditor);
 		
@@ -185,9 +189,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setEnabled(isEnabled());
 
-		if(this.isTrackEffort()) {
-			addEffortColumns();
-		}		
 	}
 
 	/**
@@ -195,7 +196,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void addEffortColumns() {
 
-		createTableViewerColumn("Done", 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("ColumnTitle'Done", 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
 			public String getText(Object element)  {
@@ -208,7 +209,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}			
 		});
 		
-		TableViewerColumn column = createTableViewerColumn("Effort", 50, SWT.CENTER, 5);
+		TableViewerColumn column = createTableViewerColumn("ColumnTitle'Effort", 50, SWT.CENTER, 5);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -451,7 +452,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * @return new TableViewerColumn 
 	 */
 	TableViewerColumn createTableViewerColumn(String label, int width, int alignment) {
-		return createTableViewerColumn(V1Server.getInstance().getLocalString(label), width, alignment, -1);
+		return createTableViewerColumn(label, width, alignment, -1);
 	}
 
 	/**
@@ -473,7 +474,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		}		
 		rc.getColumn().setWidth(width);
 		rc.getColumn().setAlignment(alignment);
-		rc.getColumn().setText(label);
+		rc.getColumn().setText(V1Server.getInstance().getLocalString(label));
 		return rc;
 	}
 	

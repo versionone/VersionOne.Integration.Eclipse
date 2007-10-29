@@ -1,5 +1,6 @@
 package com.versionone.taskview.views;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
@@ -34,9 +35,20 @@ abstract public class TaskEditor extends EditingSupport {
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		setValue((Task)element, value);
-		getViewer().update(element, null);
+		if(validate(value.toString())) {
+			setValue((Task)element, value);
+			getViewer().update(element, null);
+		}
+		else {
+			MessageDialog.openError(this.getViewer().getControl().getShell(), "Task View", errorMessage);
+		}
+		
 	}		
+
+	protected String errorMessage = "Invalid Value";
+	protected boolean validate(String testMe) {
+		return true;
+	}
 
 	/**
 	 * Derived class must update this method and set the appropriate property on the Task
@@ -97,11 +109,24 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setEstimate(value.toString());
+				element.setEstimate(Integer.parseInt(value.toString()));
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
-		}		
+		}
+		
+		@Override
+		protected boolean validate(String testMe) {
+			if(0 == testMe.length()) {
+				errorMessage = "Estimate must contain a value";
+				return false;
+			}
+			else if (0.0 >= Float.parseFloat(testMe.toString())) {
+				errorMessage = "Estimate must be greater than 0";
+				return false;
+			}
+			return true;
+		}
 	}
 	
 	/**
@@ -126,7 +151,9 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setEffort(value.toString());
+				if(0 != value.toString().length()) {
+					element.setEffort(Float.parseFloat(value.toString()));
+				}
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
@@ -155,10 +182,24 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setToDo(value.toString());
+				element.setToDo(Float.parseFloat(value.toString()));
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
 		}
+
+		@Override
+		protected boolean validate(String testMe) {
+			if(0 == testMe.length()) {
+				errorMessage = "To-Do must contain a value";
+				return false;
+			}
+			else if (0.0 >= Float.parseFloat(testMe.toString())) {
+				errorMessage = "To-Do cannot be less than 0";
+				return false;				
+			}
+			return true;
+		}
+		
 	}	
 }

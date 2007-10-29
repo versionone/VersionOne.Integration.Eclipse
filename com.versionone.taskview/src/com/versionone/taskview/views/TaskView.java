@@ -170,7 +170,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					return ((Task)element).getStatus();
+					return getStatusValues().getDisplayFromOid(((Task)element).getStatus());
 				} catch (Exception e) {
 					Activator.logError(e);
 				}
@@ -422,8 +422,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				}
 
 				@Override
-				public int getIndex(String value) {
+				public int getOidIndex(String oid) {
 					return 0;
+				}
+
+				@Override
+				public String getID(int value) {
+					return "";
+				}
+
+				@Override
+				public String getDisplayFromOid(String oid) {
+					return "";
 				}				
 			};
 		}

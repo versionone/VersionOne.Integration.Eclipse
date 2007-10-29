@@ -43,18 +43,18 @@ public class StatusEditor extends EditingSupport {
 		} catch (Exception e) {
 			Activator.logError(e);
 		}
-		return _statusCodes.getIndex(currentStatus);
+		return _statusCodes.getOidIndex(currentStatus);
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
 		try {
-			((Task)element).setStatus(_statusCodes.getDisplayValue((Integer)value));
+			((Task)element).setStatus(_statusCodes.getID((Integer)value));
+			_editor.setValue(value);
+			getViewer().update(element, null);
 		} catch (Exception e) {
 			Activator.logError(e);
 		}
-		_editor.setValue(value);
-		getViewer().update(element, null);
 	}
 
 	public void setStatusCodes(IStatusCodes value) {

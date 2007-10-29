@@ -101,8 +101,10 @@ public class ProjectSelectDialog extends Dialog  implements SelectionListener {
 					populateTree(treeItem, children[childIndex], childIndex);
 				}
 			}
-			if(null == _selectedTreeItem)
+			if(null == _selectedTreeItem) {
 				_selectedTreeItem = projectTree.getItem(0);
+				_selectedProjectTreeNode = (IProjectTreeNode) _selectedTreeItem.getData(); 
+			}
 			projectTree.setSelection(_selectedTreeItem);			
 		}
 	}

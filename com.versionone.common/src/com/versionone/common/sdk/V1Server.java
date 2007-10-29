@@ -12,8 +12,10 @@ import com.versionone.apiclient.AssetState;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
+import com.versionone.apiclient.ILocalizer;
 import com.versionone.apiclient.IMetaModel;
 import com.versionone.apiclient.IServices;
+import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.Query;
@@ -43,10 +45,16 @@ public class V1Server {
 	 */
 	public static final String DATA_URL_SUFFIX = "rest-1.v1/";
 	
+	/**
+	 * Localizer URL
+	 */
+	public static final String LOCALIZER_URL_SUFFIX = "loc.v1/";
+	
 	private static V1Server _instance = null;
 
-	private IServices _services = null;
-	private IMetaModel _metaModel = null;
+	private IServices   _services  = null;
+	private IMetaModel  _metaModel = null;
+	private ILocalizer  _localizer = null;
 
 	/**
 	 * Construct from configuration
@@ -80,12 +88,16 @@ public class V1Server {
 			setMemberToken(config, _services);
 		} catch (V1Exception e) {
 			Activator.logError(e);
-		}		
+		}
+		
+		V1APIConnector localizerConnector = new V1APIConnector(url + LOCALIZER_URL_SUFFIX);
+		_localizer = new Localizer(localizerConnector);
 	}
 
-	public V1Server(IServices services, IMetaModel metaModel) {
-		_services = services;
+	public V1Server(IServices services, IMetaModel metaModel, ILocalizer localize) {
+		_services  = services;
 		_metaModel = metaModel;
+		_localizer  = localize;
 	}
 
 	/**
@@ -115,9 +127,9 @@ public class V1Server {
 	 * @param services
 	 * @param metaModel
 	 */
-	public static void initialize(IServices services, IMetaModel metaModel) {
+	public static void initialize(IServices services, IMetaModel metaModel, ILocalizer localizer) {
 		if(null == _instance) {
-			_instance = new V1Server(services, metaModel);
+			_instance = new V1Server(services, metaModel, localizer);
 		}
 	}
 	
@@ -226,5 +238,14 @@ public class V1Server {
 			assets[i++] = iter.next()._asset;
 		}
 		this._services.save(assets);
-	}	
+	}
+	
+	/**
+	 * Return the local value for the given string
+	 * @param value
+	 * @return
+	 */
+	public String getLocalString(String value) {
+		return _localizer.resolve(value);
+	}
 }

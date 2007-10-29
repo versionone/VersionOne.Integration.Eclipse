@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<TestData>
+
+	<Get path="loc.v1/?Number">
+		<Response>
+			<![CDATA[ID]]>
+		</Response>
+	</Get>
+
+	<Get path="loc.v1/?Story">
+		<Response>
+			<![CDATA[Story]]>
+		</Response>
+	</Get>
+	
+	<Get path="loc.v1/?Status">
+		<Response>
+			<![CDATA[Status]]>
+		</Response>
+	</Get>
+
+	<Get path="loc.v1/?Task">
+		<Response>
+			<![CDATA[Task Name]]>
+		</Response>
+	</Get>	
+	
+	
+</TestData>

@@ -3,15 +3,12 @@ package com.versionone.common.sdk;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.versionone.Oid;
-import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
-import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
@@ -24,8 +21,9 @@ import com.versionone.apiclient.QueryResult;
 import com.versionone.apiclient.Services;
 import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Exception;
-import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.Activator;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 
 /**
  * Singleton class that encapulates all VersionOne Functionality
@@ -169,7 +167,7 @@ public class V1Server {
 	 * @throws V1Exception
 	 */
 	public Task[] getTasks() throws Exception {
-		if(0 == Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_PROJECT_TOKEN).length()) {
+		if(0 == PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN).length()) {
 			return new Task[0];
 		}
 		IAssetType taskType = _metaModel.getAssetType("Task");
@@ -182,8 +180,10 @@ public class V1Server {
 		Asset[] taskAssets = result.getAssets();
 
 		Task[] rc = new Task[taskAssets.length];
-		for(int i = 0; i < taskAssets.length; ++i)
-			rc[i] = createTask(taskAssets[i], taskType);
+		for(int i = 0; i < taskAssets.length; ++i) {
+			rc[i] = new Task(taskAssets[i], PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_TRACK_EFFORT));
+		}
+			
 		return rc;
 	}
 
@@ -212,16 +212,19 @@ public class V1Server {
 		terms[4] = new FilterTerm(taskType.getAttributeDefinition("AssetState"),          FilterTerm.Operator.NotEqual, AssetState.Closed);		
 		query.setFilter(Query.and(terms));
 	}
-		
-	private Task createTask(Asset asset, IAssetType taskType) throws APIException {
-		Map<String, Attribute> attributes = asset.getAttributes();		
-		Task rc = new Task(asset.getOid().getToken());
-		rc.setAttributeValues(attributes);
-		return rc;
-	}
 
-	public static void save(Task data) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Save a Task array
+	 * @param tasks
+	 * @throws Exception
+	 */
+	public void save(List<Task> tasks) throws Exception {
+		Asset[] assets = new Asset[tasks.size()];
+		Iterator<Task> iter = tasks.iterator();
+		int i = 0;
+		while(iter.hasNext()) {
+			assets[i++] = iter.next()._asset;
+		}
+		this._services.save(assets);
 	}	
 }

@@ -94,7 +94,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void configureTable() {
 
-		createTableViewerColumn("ID", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("Number", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				try {
@@ -123,7 +123,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
 		});
 		
-		TableViewerColumn column = createTableViewerColumn("Task Name", 150, SWT.LEFT);
+		TableViewerColumn column = createTableViewerColumn("Task", 150, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -451,7 +451,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * @return new TableViewerColumn 
 	 */
 	TableViewerColumn createTableViewerColumn(String label, int width, int alignment) {
-		return createTableViewerColumn(label, width, alignment, -1);
+		return createTableViewerColumn(V1Server.getInstance().getLocalString(label), width, alignment, -1);
 	}
 
 	/**

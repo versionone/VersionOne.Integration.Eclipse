@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 
 import com.versionone.common.sdk.Task;
+import com.versionone.taskview.Activator;
 
 /**
  * Abstract base class for editing Task Attributes
@@ -55,12 +56,21 @@ abstract public class TaskEditor extends EditingSupport {
 
 		@Override
 		protected Object getValue(Object element) {
-			return ((Task)element).getName();
+			try {
+				return ((Task)element).getName();
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
+			return "*** Error ***"; 
 		}
 
 		@Override
 		protected void setValue(Task element, Object value) {
-			element.setName(value.toString());			
+			try {
+				element.setName(value.toString());
+			} catch (Exception e) {
+				Activator.logError(e);
+			}			
 		}
 
 	}
@@ -76,13 +86,21 @@ abstract public class TaskEditor extends EditingSupport {
 
 		@Override
 		protected Object getValue(Object element) {
-			return ((Task)element).getEstimate();
+			try {
+				return ((Task)element).getEstimate();
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
+			return "*** Error ***";
 		}
 
 		@Override
 		protected void setValue(Task element, Object value) {
-			element.setEstimate(value.toString());
-			
+			try {
+				element.setEstimate(value.toString());
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
 		}		
 	}
 	
@@ -97,14 +115,22 @@ abstract public class TaskEditor extends EditingSupport {
 
 		@Override
 		protected Object getValue(Object element) {
-			return ((Task)element).getEffort();
+			try {
+				return ((Task)element).getEffort();
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
+			return "*** Error ***";
 		}
 
 		@Override
 		protected void setValue(Task element, Object value) {
-			element.setEffort(value.toString());
+			try {
+				element.setEffort(value.toString());
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
 		}
-
 	}
 
 	/**
@@ -118,12 +144,21 @@ abstract public class TaskEditor extends EditingSupport {
 
 		@Override
 		protected Object getValue(Object element) {
-			return ((Task)element).getToDo();
+			try {
+				return ((Task)element).getToDo();
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
+			return "*** Error ***";
 		}
 
 		@Override
 		protected void setValue(Task element, Object value) {
-			element.setToDo(value.toString());
+			try {
+				element.setToDo(value.toString());
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
 		}
 	}	
 }

@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.TableViewer;
 
 import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.Task;
+import com.versionone.taskview.Activator;
 
 /**
  * Support editing the Task Status
@@ -36,13 +37,22 @@ public class StatusEditor extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		String currentStatus = ((Task)element).getStatus();
+		String currentStatus = "";
+		try {
+			currentStatus = ((Task)element).getStatus();
+		} catch (Exception e) {
+			Activator.logError(e);
+		}
 		return _statusCodes.getIndex(currentStatus);
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((Task)element).setStatus(_statusCodes.getDisplayValue((Integer)value));
+		try {
+			((Task)element).setStatus(_statusCodes.getDisplayValue((Integer)value));
+		} catch (Exception e) {
+			Activator.logError(e);
+		}
 		_editor.setValue(value);
 		getViewer().update(element, null);
 	}

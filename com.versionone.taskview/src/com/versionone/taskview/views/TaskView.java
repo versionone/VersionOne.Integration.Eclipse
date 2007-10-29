@@ -1,6 +1,8 @@
 package com.versionone.taskview.views;
 
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -95,7 +97,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		createTableViewerColumn("ID", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getID();
+				try {
+					return ((Task)element).getID();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}
 			
 			@Override
@@ -107,7 +114,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		createTableViewerColumn("Story", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getStoryName();
+				try {
+					return ((Task)element).getStoryName();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}
 		});
 		
@@ -115,7 +127,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getName();
+				try {
+					return ((Task)element).getName();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}
 		});
 		column.setEditingSupport(new TaskEditor.NameEditor(viewer));
@@ -124,7 +141,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getEstimate();
+				try {
+					return ((Task)element).getEstimate();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}			
 		});
 		column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
@@ -133,7 +155,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getToDo();
+				try {
+					return ((Task)element).getToDo();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}			
 		});
 		column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
@@ -142,7 +169,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getStatus();
+				try {
+					return ((Task)element).getStatus();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}			
 		});
 		
@@ -166,8 +198,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		createTableViewerColumn("Done", 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
-			public String getText(Object element) {
-				return ((Task)element).getDone();
+			public String getText(Object element)  {
+				try {
+					return ((Task)element).getDone();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}			
 		});
 		
@@ -175,7 +212,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return ((Task)element).getEffort();
+				try {
+					return ((Task)element).getEffort();
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+				return "*** Error ***";
 			}			
 		});
 		column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
@@ -225,22 +267,28 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		saveAction = new Action() {
 			public void run() {
 				TableItem[] rows = viewer.getTable().getItems();
+				ArrayList<Task> saveUs = new ArrayList<Task>();
 				for(int i = 0; i < rows.length; ++i) {
-					Task data = (Task) rows[i].getData();
-					if(data.isDirty()) {
-						showMessage("Save Item " + data.getID());
-						V1Server.save(data);
+					if(((Task)rows[i].getData()).isDirty()) {
+						saveUs.add((Task) rows[i].getData());
 					}
 				}
-				loadTable();
-				statusEditor.setStatusCodes(getStatusValues());
+				if(0 != saveUs.size()) {
+					try {
+						V1Server.getInstance().save(saveUs);
+					}
+					catch(Exception e) {
+						Activator.logError(e);
+						showMessage("Error saving task. Check Error log for more information.");
+					}		
+					loadTable();
+					statusEditor.setStatusCodes(getStatusValues());
+				}
 			}			
 		};
 		saveAction.setText("Save");
 		saveAction.setToolTipText("Save");
-		saveAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));
-		
-		
+		saveAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));	
 	}
 
 	private void contributeToActionBars() {

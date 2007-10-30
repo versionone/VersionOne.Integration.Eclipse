@@ -295,6 +295,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 					}		
 					loadTable();
 					statusEditor.setStatusCodes(getStatusValues());
+					showMessage(saveUs.size() + " Task Updated");
 				}
 			}			
 		};

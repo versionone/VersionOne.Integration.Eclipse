@@ -35,9 +35,10 @@ public class StatusEditor extends EditingSupport {
 		return _editor;
 	}
 
+	String currentStatus = "";
+	
 	@Override
-	protected Object getValue(Object element) {
-		String currentStatus = "";
+	protected Object getValue(Object element) {	
 		try {
 			currentStatus = ((Task)element).getStatus();
 		} catch (Exception e) {
@@ -49,7 +50,10 @@ public class StatusEditor extends EditingSupport {
 	@Override
 	protected void setValue(Object element, Object value) {
 		try {
-			((Task)element).setStatus(_statusCodes.getID((Integer)value));
+			String newStatus = _statusCodes.getID((Integer)value);
+			if(!newStatus.equals(currentStatus)) {
+				((Task)element).setStatus(newStatus);
+			}
 			_editor.setValue(value);
 			getViewer().update(element, null);
 		} catch (Exception e) {

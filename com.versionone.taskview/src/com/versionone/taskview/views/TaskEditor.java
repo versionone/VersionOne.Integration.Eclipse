@@ -73,7 +73,9 @@ abstract public class TaskEditor extends EditingSupport {
 	 * Edit 'float' type attributes
 	 */
 	public static abstract class FloatEditor extends TaskEditor {
-		
+
+		float oldValue;
+
 		public FloatEditor(TableViewer viewer) {
 			super(viewer);
 		}
@@ -81,10 +83,10 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected Object getValue(Object element) {
 			try {
-				float temp = getValue(((Task)element));
-				if(0 == temp)
+				oldValue = getValue(((Task)element));
+				if(0 == oldValue)
 					return "";
-				return String.valueOf(temp);
+				return String.valueOf(oldValue);
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
@@ -104,6 +106,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 */
 	public static class NameEditor extends TaskEditor {
 		
+		String oldValue;
 		public NameEditor(TableViewer viewer) {
 			super(viewer);
 		}
@@ -111,7 +114,8 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected Object getValue(Object element) {
 			try {
-				return ((Task)element).getName();
+				oldValue = ((Task)element).getName(); 
+				return oldValue;
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
@@ -121,7 +125,10 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setName(value.toString());
+				String newValue = value.toString();
+				if(!oldValue.equals(newValue)) {
+					element.setName(newValue);
+				}
 			} catch (Exception e) {
 				Activator.logError(e);
 			}			
@@ -149,7 +156,9 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setEstimate(Integer.parseInt(value.toString()));
+				float newValue = Float.parseFloat(value.toString());
+				if(oldValue != newValue)
+					element.setEstimate(newValue);
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
@@ -172,7 +181,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 * Edit the Effort
 	 */
 	public static class EffortEditor extends FloatEditor {
-		
+
 		public EffortEditor(TableViewer viewer) {
 			super(viewer);
 		}
@@ -185,7 +194,9 @@ abstract public class TaskEditor extends EditingSupport {
 		protected void setValue(Task element, Object value) {
 			try {
 				if(0 != value.toString().length()) {
-					element.setEffort(Float.parseFloat(value.toString()));
+					float newValue = Float.parseFloat(value.toString());
+					if(oldValue != newValue)
+						element.setEffort(newValue);
 				}
 			} catch (Exception e) {
 				Activator.logError(e);
@@ -197,7 +208,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 * Edit the ToDo
 	 */
 	public static class ToDoEditor extends FloatEditor {
-		
+
 		public ToDoEditor(TableViewer viewer) {
 			super(viewer);
 		}
@@ -214,7 +225,9 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected void setValue(Task element, Object value) {
 			try {
-				element.setToDo(Float.parseFloat(value.toString()));
+				float newValue = Float.parseFloat(value.toString());
+				if(newValue != oldValue)
+					element.setToDo(newValue);
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
@@ -232,28 +245,4 @@ abstract public class TaskEditor extends EditingSupport {
 			return rc;
 		}
 	}
-	
-//	public static class IdCellEditor extends TaskEditor {
-//
-//		public IdCellEditor(TableViewer viewer) {
-//			super(viewer);
-//		}
-//
-//		@Override
-//		protected void setValue(Task element, Object value) {
-//			// TODO Auto-generated method stub
-//		}
-//
-//		@Override
-//		protected Object getValue(Object element) {
-//			try {
-//				return ((Task)element).getID();
-//			}
-//			catch(Exception e) {
-//				Activator.logError(e);
-//			}
-//			return ERROR_VALUE;
-//		}
-//		
-//	}
 }

@@ -141,7 +141,10 @@ abstract public class TaskEditor extends EditingSupport {
 		@Override
 		protected Object getValue(Object element) {
 			try {
-				return ((Task)element).getEffort();
+				float temp = ((Task)element).getEffort();
+				if(0 == temp)
+					return "";
+				return String.valueOf(temp);
 			} catch (Exception e) {
 				Activator.logError(e);
 			}

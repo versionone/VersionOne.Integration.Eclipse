@@ -94,7 +94,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void configureTable() {
 
-		createTableViewerColumn("ColumnTitle'ID", 70, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+		TableViewerColumn column = createTableViewerColumn("ColumnTitle'ID", 70, SWT.LEFT);
+		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				try {
@@ -110,7 +111,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				return Activator.getDefault().getImageRegistry().get(Activator.TASK_IMAGE_ID);
 			}
 		});
-		
+		column.setEditingSupport(new TaskIdEditor(viewer));
+
 		createTableViewerColumn("ColumnTitle'Parent", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -123,7 +125,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
 		});
 		
-		TableViewerColumn column = createTableViewerColumn("ColumnTitle'Title", 150, SWT.LEFT);
+		column = createTableViewerColumn("ColumnTitle'Title", 150, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {

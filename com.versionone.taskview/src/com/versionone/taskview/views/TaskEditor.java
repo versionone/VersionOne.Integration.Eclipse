@@ -21,8 +21,10 @@ import com.versionone.taskview.Activator;
  */
 abstract public class TaskEditor extends EditingSupport {
 
+	static final String ERROR_VALUE = "*** Error ***";
+	
 	// the editor
-	private TextCellEditor _editor;
+	protected TextCellEditor _editor;
 	
 	public TaskEditor(TableViewer viewer) {
 		super(viewer);
@@ -86,7 +88,7 @@ abstract public class TaskEditor extends EditingSupport {
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
-			return "*** Error ***";
+			return ERROR_VALUE;
 		}
 
 		/**
@@ -113,7 +115,7 @@ abstract public class TaskEditor extends EditingSupport {
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
-			return "*** Error ***"; 
+			return ERROR_VALUE; 
 		}
 
 		@Override
@@ -124,7 +126,6 @@ abstract public class TaskEditor extends EditingSupport {
 				Activator.logError(e);
 			}			
 		}
-
 	}
 	
 	/**
@@ -230,6 +231,29 @@ abstract public class TaskEditor extends EditingSupport {
 			}
 			return rc;
 		}
-		
-	}	
+	}
+	
+//	public static class IdCellEditor extends TaskEditor {
+//
+//		public IdCellEditor(TableViewer viewer) {
+//			super(viewer);
+//		}
+//
+//		@Override
+//		protected void setValue(Task element, Object value) {
+//			// TODO Auto-generated method stub
+//		}
+//
+//		@Override
+//		protected Object getValue(Object element) {
+//			try {
+//				return ((Task)element).getID();
+//			}
+//			catch(Exception e) {
+//				Activator.logError(e);
+//			}
+//			return ERROR_VALUE;
+//		}
+//		
+//	}
 }

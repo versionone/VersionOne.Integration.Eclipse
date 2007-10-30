@@ -1,6 +1,7 @@
 package com.versionone.common.sdk;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,6 +57,9 @@ public class V1Server {
 	private IMetaModel  _metaModel = null;
 	private ILocalizer  _localizer = null;
 
+	private IAssetType _actualType = null;
+
+
 	/**
 	 * Construct from configuration
 	 * @param config - Eclipse Preferences
@@ -70,7 +74,7 @@ public class V1Server {
 		
 		String url = config.getString(PreferenceConstants.P_URL);
 		V1APIConnector metaConnector = new V1APIConnector(url + META_URL_SUFFIX);
-		_metaModel = new MetaModel(metaConnector);
+		_metaModel = new MetaModel(metaConnector);		
 		
 		V1APIConnector dataConnector = null;
 		if(config.getBoolean(PreferenceConstants.P_INTEGRATED_AUTH)) {
@@ -86,12 +90,15 @@ public class V1Server {
 
 		try {
 			setMemberToken(config, _services);
+			_actualType = _metaModel.getAssetType("Actual");
 		} catch (V1Exception e) {
 			Activator.logError(e);
 		}
 		
 		V1APIConnector localizerConnector = new V1APIConnector(url + LOCALIZER_URL_SUFFIX);
 		_localizer = new Localizer(localizerConnector);
+		
+		
 	}
 
 	public V1Server(IServices services, IMetaModel metaModel, ILocalizer localize) {
@@ -235,7 +242,14 @@ public class V1Server {
 		Iterator<Task> iter = tasks.iterator();
 		int i = 0;
 		while(iter.hasNext()) {
-			assets[i++] = iter.next()._asset;
+			Task oneTask = iter.next();
+			if(0 != oneTask.getEffort()) {
+				Asset effort = _services.createNew(_actualType, oneTask._asset.getOid());
+				effort.setAttributeValue(_actualType.getAttributeDefinition("Value"), oneTask.getEffort());
+				effort.setAttributeValue(_actualType.getAttributeDefinition("Date"), new Date());
+				oneTask._asset.getNewAssets().put("Actuals", effort);		
+			}
+			assets[i++] = oneTask._asset;
 		}
 		this._services.save(assets);
 	}

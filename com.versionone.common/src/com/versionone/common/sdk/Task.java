@@ -15,10 +15,8 @@ public class Task {
 	private static final String NAME_PROPERTY            = "Name";
 	private static final String PARENT_NAME_PROPERTY     = "Parent.Name";
 	private static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
-	private static final String TO_DO_PROPERTY           = "ToDo";
-//	private static final String STATUS_NAME_PROPERTY     = "Status.Name";	
+	private static final String TO_DO_PROPERTY           = "ToDo";	
 	private static final String STATUS_ID_PROPERTY     	 = "Status";
-	private static final String EFFORT_PROPERTY          = "Effort";
 	private static final String DONE_PROPERTY            = "Actuals.Value.@Sum";
 
 	private static final String TASK_PREFIX = "Task.";
@@ -29,6 +27,7 @@ public class Task {
 	IAttributeDefinition _statusDefinition;
 
 	Asset _asset;
+	Float _effortValue = new Float(0);
 	
 	Task(Asset asset, boolean trackEffort) throws MetaException {
 		_asset = asset;
@@ -95,15 +94,15 @@ public class Task {
 		return getValue(DONE_PROPERTY);
 	}
 
-	public String getEffort() throws Exception {
-		return getValue(EFFORT_PROPERTY);
+	public float getEffort() {
+		return _effortValue;
 	}
 	
 	public void setEffort(float value) throws Exception {
-
+		_effortValue += value;		
 	}
 
 	public boolean isDirty() {
-		return _asset.hasChanged();
+		return (_asset.hasChanged()) || (0 != _effortValue.floatValue());
 	}
 }

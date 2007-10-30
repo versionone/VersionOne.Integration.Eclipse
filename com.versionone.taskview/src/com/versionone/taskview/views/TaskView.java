@@ -424,27 +424,23 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
 			return new IStatusCodes() {
 				String[] _data = new String[]{}; 
-				@Override
+
 				public String getDisplayValue(int index) {
 					return "";
 				}
 
-				@Override
 				public String[] getDisplayValues() {
 					return _data;
 				}
 
-				@Override
 				public int getOidIndex(String oid) {
 					return 0;
 				}
 
-				@Override
 				public String getID(int value) {
 					return "";
 				}
 
-				@Override
 				public String getDisplayFromOid(String oid) {
 					return "";
 				}				

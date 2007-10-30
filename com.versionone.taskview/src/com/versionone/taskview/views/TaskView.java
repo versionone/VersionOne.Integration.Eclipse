@@ -142,7 +142,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					return ((Task)element).getEstimate();
+					float temp = ((Task)element).getEstimate();
+					if(0 == temp)
+						return "";
+					return String.valueOf(temp);
 				} catch (Exception e) {
 					Activator.logError(e);
 				}
@@ -156,7 +159,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					return ((Task)element).getToDo();
+					float temp = ((Task)element).getToDo();
+					if(0 == temp)
+						return "";
+					return String.valueOf(temp);
 				} catch (Exception e) {
 					Activator.logError(e);
 				}

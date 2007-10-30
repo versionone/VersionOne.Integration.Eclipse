@@ -11,11 +11,17 @@ import com.versionone.taskview.Activator;
 
 /**
  * Abstract base class for editing Task Attributes
+ * 
+ * Note: I choose to use my own validation over ICellEditorValidator because
+ *       the latter approach wanted to validate as I typed and I want 
+ *       validation when the user presses enter or tabs out of the field
+ *       
  * @author Jerry D. Odenwelder Jr.
  *
  */
 abstract public class TaskEditor extends EditingSupport {
 
+	// the editor
 	private TextCellEditor _editor;
 	
 	public TaskEditor(TableViewer viewer) {
@@ -35,19 +41,23 @@ abstract public class TaskEditor extends EditingSupport {
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		if(validate(value.toString())) {
+		String errorMessage = validate(value.toString());
+		if(null == errorMessage) {
 			setValue((Task)element, value);
 			getViewer().update(element, null);
 		}
 		else {
 			MessageDialog.openError(this.getViewer().getControl().getShell(), "Task View", errorMessage);
-		}
-		
+		}		
 	}		
 
-	protected String errorMessage = "Invalid Value";
-	protected boolean validate(String testMe) {
-		return true;
+	/**
+	 * Validate the data
+	 * @param testMe string to evaluate
+	 * @return null if everything is okay, otherwise return the message to display
+	 */
+	protected String validate(String testMe) {
+		return null;
 	}
 
 	/**
@@ -56,6 +66,36 @@ abstract public class TaskEditor extends EditingSupport {
 	 * @param value
 	 */
 	abstract protected void setValue(Task element, Object value);
+	
+	/**
+	 * Edit 'float' type attributes
+	 */
+	public static abstract class FloatEditor extends TaskEditor {
+		
+		public FloatEditor(TableViewer viewer) {
+			super(viewer);
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			try {
+				float temp = getValue(((Task)element));
+				if(0 == temp)
+					return "";
+				return String.valueOf(temp);
+			} catch (Exception e) {
+				Activator.logError(e);
+			}
+			return "*** Error ***";
+		}
+
+		/**
+		 * Get the value from the task
+		 * @param task - instance to use
+		 * @return float value or -1 if an error occurs
+		 */
+		abstract float getValue(Task task);
+	}
 	
 	/**
 	 * Edit the Task Name
@@ -90,20 +130,19 @@ abstract public class TaskEditor extends EditingSupport {
 	/**
 	 * Edit the Detail Estimate
 	 */
-	public static class EstimateEditor extends TaskEditor {
+	public static class EstimateEditor extends FloatEditor {
 		
 		public EstimateEditor(TableViewer viewer) {
 			super(viewer);
 		}
 
-		@Override
-		protected Object getValue(Object element) {
+		protected float getValue(Task task) {
 			try {
-				return ((Task)element).getEstimate();
+				return task.getEstimate();
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
-			return "*** Error ***";
+			return -1;
 		}
 
 		@Override
@@ -116,39 +155,29 @@ abstract public class TaskEditor extends EditingSupport {
 		}
 		
 		@Override
-		protected boolean validate(String testMe) {
+		protected String validate(String testMe) {
+			String rc = null;
 			if(0 == testMe.length()) {
-				errorMessage = "Estimate must contain a value";
-				return false;
+				rc = "Estimate must contain a value";
 			}
 			else if (0.0 >= Float.parseFloat(testMe.toString())) {
-				errorMessage = "Estimate must be greater than 0";
-				return false;
+				rc = "Estimate must be greater than 0";
 			}
-			return true;
+			return rc;
 		}
 	}
 	
 	/**
 	 * Edit the Effort
 	 */
-	public static class EffortEditor extends TaskEditor {
+	public static class EffortEditor extends FloatEditor {
 		
 		public EffortEditor(TableViewer viewer) {
 			super(viewer);
 		}
 
-		@Override
-		protected Object getValue(Object element) {
-			try {
-				float temp = ((Task)element).getEffort();
-				if(0 == temp)
-					return "";
-				return String.valueOf(temp);
-			} catch (Exception e) {
-				Activator.logError(e);
-			}
-			return "*** Error ***";
+		protected float getValue(Task element) {
+			return element.getEffort();
 		}
 
 		@Override
@@ -166,20 +195,19 @@ abstract public class TaskEditor extends EditingSupport {
 	/**
 	 * Edit the ToDo
 	 */
-	public static class ToDoEditor extends TaskEditor {
+	public static class ToDoEditor extends FloatEditor {
 		
 		public ToDoEditor(TableViewer viewer) {
 			super(viewer);
 		}
 
-		@Override
-		protected Object getValue(Object element) {
+		protected float getValue(Task element) {
 			try {
-				return ((Task)element).getToDo();
+				return element.getToDo();
 			} catch (Exception e) {
 				Activator.logError(e);
 			}
-			return "*** Error ***";
+			return -1;
 		}
 
 		@Override
@@ -192,16 +220,15 @@ abstract public class TaskEditor extends EditingSupport {
 		}
 
 		@Override
-		protected boolean validate(String testMe) {
+		protected String validate(String testMe) {
+			String rc = null;
 			if(0 == testMe.length()) {
-				errorMessage = "To-Do must contain a value";
-				return false;
+				rc = "To-Do must contain a value";
 			}
 			else if (0.0 >= Float.parseFloat(testMe.toString())) {
-				errorMessage = "To-Do cannot be less than 0";
-				return false;				
+				rc = "To-Do cannot be less than 0";				
 			}
-			return true;
+			return rc;
 		}
 		
 	}	

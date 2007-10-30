@@ -78,12 +78,10 @@ public class TaskIdEditor extends EditingSupport {
 			copyItem.setText("Copy");
 			copyItem.addSelectionListener(new SelectionListener() {
 
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					text.copy();
 				}
 
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					text.copy();
 				}

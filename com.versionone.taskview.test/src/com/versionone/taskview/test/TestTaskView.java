@@ -173,7 +173,7 @@ public class TestTaskView {
 	public void testEditability() {
 		enableEffortTracking();
 		Object selectedElement = testView.getViewer().getElementAt(0);		
-		checkEditor(selectedElement, ID_COLUMN_INDEX, false);
+		checkEditor(selectedElement, ID_COLUMN_INDEX, true);
 		checkEditor(selectedElement, STORY_COLUMN_INDEX, false);
 		checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
 		checkEditor(selectedElement, ESTIMATE_COLUMN_INDEX, true);

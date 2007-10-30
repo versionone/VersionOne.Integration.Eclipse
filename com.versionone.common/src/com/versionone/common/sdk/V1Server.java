@@ -200,7 +200,7 @@ public class V1Server {
 
 		Task[] rc = new Task[taskAssets.length];
 		for(int i = 0; i < taskAssets.length; ++i) {
-			rc[i] = new Task(taskAssets[i], PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_TRACK_EFFORT));
+			rc[i] = new Task(taskAssets[i]);
 		}
 			
 		return rc;

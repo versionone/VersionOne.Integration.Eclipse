@@ -29,24 +29,17 @@ public class Task {
 	Asset _asset;
 	Float _effortValue = new Float(0);
 	
-	Task(Asset asset, boolean trackEffort) throws MetaException {
+	/**
+	 * Create  
+	 * @param asset - Task asset 
+	 * @throws MetaException
+	 */
+	Task(Asset asset) throws MetaException {
 		_asset = asset;
 		_nameDefinition     = _asset.getAssetType().getAttributeDefinition(NAME_PROPERTY);
 		_estimateDefinition = _asset.getAssetType().getAttributeDefinition(DETAIL_ESTIMATE_PROPERTY);
 		_todoDefinition     = _asset.getAssetType().getAttributeDefinition(TO_DO_PROPERTY);
 		_statusDefinition   = _asset.getAssetType().getAttributeDefinition(STATUS_ID_PROPERTY);
-	}
-	
-	String getValue(String key) throws Exception {		
-		if(_asset.getAttributes().containsKey(TASK_PREFIX + key)) {
-			Object value = _asset.getAttributes().get(TASK_PREFIX + key).getValue();
-			if(null == value) {
-				return "";
-			}
-			return value.toString();
-		}
-		// if this was a 'real' sdk, then you'd go back to the server and retrieve the attribute
-		return "";
 	}
 	
 	public String getStoryName() throws Exception {
@@ -65,18 +58,18 @@ public class Task {
 		return getValue(ID_NUMBER_PROPERTY);
 	}
 
-	public String getEstimate() throws Exception {
-		return getValue(DETAIL_ESTIMATE_PROPERTY);
+	public float getEstimate() throws Exception {		
+		return getFloatValue(_estimateDefinition);
 	}
 	
 	public void setEstimate(float value) throws Exception {
 		_asset.setAttributeValue(_estimateDefinition, value);
 	}
 
-	public String getToDo() throws Exception {
-		return getValue(TO_DO_PROPERTY);
+	public float getToDo() throws Exception {
+		return getFloatValue(_todoDefinition);
 	}
-
+	
 	public void setToDo(float value) throws Exception {
 		_asset.setAttributeValue(_todoDefinition, value);
 	}
@@ -99,10 +92,49 @@ public class Task {
 	}
 	
 	public void setEffort(float value) throws Exception {
-		_effortValue += value;		
+		_effortValue = value;		
 	}
 
+	/**
+	 * Has this instance been modified? 
+	 * @return true if a change was made
+	 */
 	public boolean isDirty() {
 		return (_asset.hasChanged()) || (0 != _effortValue.floatValue());
 	}
+
+	/**
+	 * Get the value of an attribute
+	 * @param key - name of attribute
+	 * @return value
+	 * @throws Exception
+	 */
+	String getValue(String key) throws Exception {		
+		if(_asset.getAttributes().containsKey(TASK_PREFIX + key)) {
+			Object value = _asset.getAttributes().get(TASK_PREFIX + key).getValue();
+			if(null == value) {
+				return "";
+			}
+			return value.toString();
+		}
+		// if this was a 'real' sdk, then you'd go back to the server and retrieve the attribute
+		return "";
+	}
+
+	/**
+	 * Return the float value of an attribute definition
+	 * @param attribute
+	 * @return
+	 * @throws Exception
+	 */
+	float getFloatValue(IAttributeDefinition attribute) throws Exception {
+		float rc = 0;
+		Attribute attrib = _asset.getAttribute(attribute);
+		if(null != attrib) {
+			Float value = ((Float)attrib.getValue());
+			if(null != value)
+				rc = value.floatValue(); 
+		}
+		return 	rc;	
+	}	
 }

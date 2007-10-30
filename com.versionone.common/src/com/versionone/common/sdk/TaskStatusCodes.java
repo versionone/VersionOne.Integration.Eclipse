@@ -55,7 +55,6 @@ public class TaskStatusCodes implements IStatusCodes {
 		}
 	}
 
-	@Override
 	public String getDisplayValue(int index) {
 		if( (index >= 0) && (index < _status.length) ){
 			return _status[index]._name;
@@ -63,7 +62,6 @@ public class TaskStatusCodes implements IStatusCodes {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@Override
 	public String[] getDisplayValues() {
 		String[] rc = new String[_status.length];
 		for(int i=0; i < rc.length; ++i) {
@@ -72,7 +70,6 @@ public class TaskStatusCodes implements IStatusCodes {
 		return rc;
 	}
 
-	@Override
 	public int getOidIndex(String oid) {
 		for(int i = 0; i < _status.length; ++i) {
 			if(oid.equals(_status[i]._id))
@@ -81,7 +78,6 @@ public class TaskStatusCodes implements IStatusCodes {
 		return 0;
 	}
 
-	@Override
 	public String getID(int index) {
 		if( (index >= 0) && (index < _status.length) ){
 			return _status[index]._id;
@@ -89,7 +85,6 @@ public class TaskStatusCodes implements IStatusCodes {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@Override
 	public String getDisplayFromOid(String oid) {
 		String rc = null;
 		for(int i=0; i < _status.length; ++i) {

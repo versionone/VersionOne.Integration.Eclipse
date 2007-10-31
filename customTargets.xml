@@ -150,7 +150,7 @@
         <unzip dest="${eclipseAutomatedTestHome}" src="${buildDirectory}/../eclipse/testImage/eclipse-java-europa-fall-win32.zip"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/${dist.filename}"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
-		<copy file="modelTest.xml" tofile="${eclipseAutomatedTestHome}/modelTest.xml"/>
+		<copy file="${buildDirectory}/modelTest.xml" tofile="${eclipseAutomatedTestHome}/modelTest.xml"/>
 
 		<ant antfile="${eclipseAutomatedTestHome}/modelTest.xml" target="runtests" dir="${eclipseAutomatedTestHome}"> 
 			<property name="os" value="${baseos}" />

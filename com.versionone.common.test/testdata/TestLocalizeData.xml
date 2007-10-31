@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<TestData>
+
+	<Get path="loc.v1/?ColumnTitle'ID">
+		<Response>
+			<![CDATA[ID]]>
+		</Response>
+	</Get>
+
+	<Get path="loc.v1/?ColumnTitle'Parent">
+		<Response>
+			<![CDATA[Story]]>
+		</Response>
+	</Get>
+	
+	<Get path="loc.v1/?ColumnTitle'Status">
+		<Response>
+			<![CDATA[Status]]>
+		</Response>
+	</Get>
+
+	<Get path="loc.v1/?ColumnTitle'Title">
+		<Response>
+			<![CDATA[Task Name]]>
+		</Response>
+	</Get>	
+	
+	<Get path="loc.v1/?ColumnTitle'DetailEstimate">
+		<Response>
+			<![CDATA[Detail Estimate]]>
+		</Response>
+	</Get>
+		
+	<Get path="loc.v1/?ColumnTitle'ToDo">
+		<Response>
+			<![CDATA[To Do]]>
+		</Response>
+	</Get>	
+
+	<Get path="loc.v1/?ColumnTitle'Done">
+		<Response>
+			<![CDATA[Done]]>
+		</Response>
+	</Get>	
+	
+	<Get path="loc.v1/?ColumnTitle'Effort">
+		<Response>
+			<![CDATA[Effort]]>
+		</Response>
+	</Get>	
+</TestData>

@@ -156,14 +156,15 @@
 		<unzip dest="${eclipseAutomatedTestHome}"
 			src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
 		<copy file="${buildDirectory}/test.xml" tofile="${eclipseAutomatedTestHome}/test.xml"/>
-		<copy file="${buildDirectory}/test.properties" tofile="${eclipseAutomatedTestHome}/test.properties"/>
-
+		
+		<property file="test.properties"/>
+		
 		<ant antfile="${eclipseAutomatedTestHome}/test.xml" target="runtests"
 			dir="${eclipseAutomatedTestHome}">
 			<property name="os" value="${baseos}"/>
 			<property name="ws" value="${basews}"/>
 			<property name="arch" value="${basearch}"/>
-			<property name="testPlugin" value="com.versionone.common.test"/>
+			<property name="testPlugin" value="${com.versionone.common.test}"/>
 			<property name="report" value="com.versionone.common.test"/>
 			<property name="install" value="${eclipseAutomatedTestHome}"/>
 		</ant>

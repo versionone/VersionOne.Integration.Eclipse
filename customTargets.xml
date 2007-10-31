@@ -156,7 +156,7 @@
 		<unzip dest="${eclipseAutomatedTestHome}"
 			src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
 		<copy file="${buildDirectory}/test.xml" tofile="${eclipseAutomatedTestHome}/test.xml"/>
-		<copy todir="${eclipseAutomatedTestHome}/eclipse/plugins">
+		<copy todir="${eclipseAutomatedTestHome}/eclipse/plugins/org.eclipse.test">
 			<fileset dir="c:/org.eclipse.test" />
 		</copy>
 		

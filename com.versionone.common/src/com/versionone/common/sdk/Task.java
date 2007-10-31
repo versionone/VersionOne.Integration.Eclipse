@@ -19,6 +19,8 @@ public class Task {
 	private static final String STATUS_ID_PROPERTY     	 = "Status";
 	private static final String DONE_PROPERTY            = "Actuals.Value.@Sum";
 
+	private static final float INITIAL_EFFORT = -1;
+	
 	private static final String TASK_PREFIX = "Task.";
 	
 	IAttributeDefinition _nameDefinition;
@@ -27,7 +29,7 @@ public class Task {
 	IAttributeDefinition _statusDefinition;
 
 	Asset _asset;
-	Float _effortValue = new Float(0);
+	Float _effortValue = new Float(INITIAL_EFFORT);
 	
 	/**
 	 * Create  
@@ -58,35 +60,83 @@ public class Task {
 		return getValue(ID_NUMBER_PROPERTY);
 	}
 
+	/**
+	 * Detail Estimate
+	 * @return value of estimate or -1 if the attribute is blank
+	 * @throws Exception
+	 */
 	public float getEstimate() throws Exception {		
 		return getFloatValue(_estimateDefinition);
 	}
-	
+
+	/**
+	 * Sets the Estimate value
+	 * @param value
+	 * New value must be greater than or equal to 0 ( value >= 0 )
+	 * @param value new value for attribute.  
+	 * @throws Exception when an API error occurs
+	 * @throws IllegalArgumentException if the value is less than 0
+	 */
 	public void setEstimate(float value) throws Exception {
+		if(0 > value)
+			throw new IllegalArgumentException("Estimate cannot be negative");
 		_asset.setAttributeValue(_estimateDefinition, value);
 	}
 
+	/**
+	 * Remaining work
+	 * @return value of estimate or -1 if the attribute is blank
+	 * @throws Exception
+	 */
 	public float getToDo() throws Exception {
 		return getFloatValue(_todoDefinition);
 	}
 	
+	/**
+	 * Sets the ToDo value
+	 * New value must be greater than or equal to 0 ( value >= 0 )
+	 * @param value new value for attribute.  
+	 * @throws Exception when an API error occurs
+	 * @throws IllegalArgumentException if the value is less than 0
+	 */
 	public void setToDo(float value) throws Exception {
+		if(0 > value)
+			throw new IllegalArgumentException("ToDo cannot be negative");
 		_asset.setAttributeValue(_todoDefinition, value);
 	}
 	
+	/**
+	 * Object identifier (token) of current status
+	 * @return status token
+	 * @throws Exception
+	 */
 	public String getStatus() throws Exception {
 		Attribute attrib = _asset.getAttribute(_statusDefinition);
 		return attrib.getValue().toString();
 	}
 	
+	/**
+	 * Set the Status value
+	 * @param value - the OID for the desired status value
+	 * @throws Exception
+	 */
 	public void setStatus(String value) throws Exception {
 		_asset.setAttributeValue(_statusDefinition, value);
 	}
 
+	/**
+	 * How much work has been done
+	 * @return
+	 * @throws Exception
+	 */
 	public String getDone() throws Exception {
 		return getValue(DONE_PROPERTY);
 	}
 
+	/**
+	 * Effort on this task
+	 * @return value of estimate or -1 if the attribute is blank
+	 */
 	public float getEffort() {
 		return _effortValue;
 	}
@@ -100,7 +150,7 @@ public class Task {
 	 * @return true if a change was made
 	 */
 	public boolean isDirty() {
-		return (_asset.hasChanged()) || (0 != _effortValue.floatValue());
+		return (_asset.hasChanged()) || (INITIAL_EFFORT != _effortValue.floatValue());
 	}
 
 	/**
@@ -124,11 +174,11 @@ public class Task {
 	/**
 	 * Return the float value of an attribute definition
 	 * @param attribute
-	 * @return
+	 * @return value of attribute or -1 if the attribute does not exist
 	 * @throws Exception
 	 */
 	float getFloatValue(IAttributeDefinition attribute) throws Exception {
-		float rc = 0;
+		float rc = -1;
 		Attribute attrib = _asset.getAttribute(attribute);
 		if(null != attrib) {
 			Float value = ((Float)attrib.getValue());

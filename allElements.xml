@@ -13,6 +13,10 @@
 			<property name="type" value="feature"/>
 			<property name="id" value="com.versionone.v1.feature"/>
 		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature"/>
+			<property name="id" value="com.versionone.v1.feature.test"/>
+		</ant>
 	</target>
 
 	<!-- ===================================================================== -->
@@ -25,4 +29,8 @@
 	<target name="assemble.com.versionone.v1.feature">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}"/>
 	</target>
+	<target name="assemble.com.versionone.v1.feature.test">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}"/>
+	</target>
+
 </project>

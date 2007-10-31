@@ -1,6 +1,7 @@
 package com.versionone.taskview.views;
 
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.eclipse.jface.action.Action;
@@ -10,7 +11,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -19,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.versionone.common.preferences.PreferenceConstants;
@@ -58,13 +63,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		configureTable();
-
 		makeActions();
-		contributeToActionBars();
-		
-//		hookContextMenu();
-//		hookDoubleClickAction();
-		
+		contributeToActionBars();		
+		hookDoubleClickAction();
 		selectProvider();
 	}
 
@@ -246,7 +247,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		viewer.getTable().getColumn(4).dispose();		
 		viewer.refresh();
 	}
-	
+
+	/**
+	 * Create the action menus
+	 */
 	private void makeActions() {
 		selectProjectAction  = new Action() {
 			public void run() {
@@ -304,6 +308,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		saveAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));	
 	}
 
+	// add actions to Action bars and pull down menu
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
@@ -485,36 +490,26 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		rc.getColumn().setText(V1Server.getInstance().getLocalString(label));
 		return rc;
 	}
+
+	private void hookDoubleClickAction() {
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				String oid = null;
+				try {
+					oid = ((Task)selection.getFirstElement()).getToken();
+					StringBuffer v1Url = new StringBuffer(PreferencePage.getPreferences().getString(PreferenceConstants.P_URL));
+					v1Url.append("assetdetail.v1?Oid=");
+					v1Url.append(oid);
+					URL url = new URL(v1Url.toString());
+					PlatformUI.getWorkbench().getBrowserSupport().createBrowser(oid).openURL(url);
+				} catch (Exception e) {
+					Activator.logError(e);
+				}
+			}
+		});
+	}
 	
-	
-//	private void hookContextMenu() {
-//		MenuManager menuMgr = new MenuManager("#PopupMenu");
-//		menuMgr.setRemoveAllWhenShown(true);
-//		menuMgr.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(IMenuManager manager) {
-//				TaskView.this.fillContextMenu(manager);
-//			}
-//		});
-//		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-//		viewer.getControl().setMenu(menu);
-//		getSite().registerContextMenu(menuMgr, viewer);
-//	}
-//
-//	private void fillContextMenu(IMenuManager manager) {
-//		manager.add(action1);
-//		manager.add(action2);
-//		// Other plug-ins can contribute there actions here
-//		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-//	}
-//	
-//	private void hookDoubleClickAction() {
-//		viewer.addDoubleClickListener(new IDoubleClickListener() {
-//			public void doubleClick(DoubleClickEvent event) {
-//				doubleClickAction.run();
-//			}
-//		});
-//	}
-//
 	private void showMessage(String message) {
 		MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
 	}

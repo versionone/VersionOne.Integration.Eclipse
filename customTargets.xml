@@ -142,10 +142,13 @@
 	<!-- ===================================================================== -->
 	<target name="test"> 
 		<echo message="Setting up tests in ${eclipseAutomatedTestHome}"/>
+		<delete dir="${eclipseAutomatedTestHome}"/>
+		<mkdir dir="${eclipseAutomatedTestHome}"/>
+        <unzip dest="${eclipseAutomatedTestHome}" src="${buildDirectory}/../eclipse/testImage/eclipse-java-europa-fall-win32.zip"/>
+        <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"/>
+        <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
 
-<!--		<copy file="${buildDirectory}/${buildLabel}/org.rubypeople.rdt-${buildId}.zip" tofile="${eclipseAutomatedTestHome}/eclipse-SDK-RDT-${buildId}.zip" />
-		<copy file="${buildDirectory}/${buildLabel}/org.rubypeople.rdt-tests-${buildId}.zip" tofile="${eclipseAutomatedTestHome}/eclipse-junit-tests-rdt-${buildId}.zip" />
-
+	<!--
 		<ant antfile="${eclipseAutomatedTestHome}/test.xml" target="runtests" dir="${eclipseAutomatedTestHome}"> 
 		<property name="os" value="${baseos}" />
 		<property name="ws" value="${basews}" />

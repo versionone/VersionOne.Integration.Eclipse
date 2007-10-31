@@ -139,7 +139,20 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to test the build results -->
 	<!-- ===================================================================== -->
-	<target name="test"> </target>
+	<target name="test"> 
+		<echo message="Setting up tests in ${eclipseAutomatedTestHome}"/>
+
+<!--		<copy file="${buildDirectory}/${buildLabel}/org.rubypeople.rdt-${buildId}.zip" tofile="${eclipseAutomatedTestHome}/eclipse-SDK-RDT-${buildId}.zip" />
+		<copy file="${buildDirectory}/${buildLabel}/org.rubypeople.rdt-tests-${buildId}.zip" tofile="${eclipseAutomatedTestHome}/eclipse-junit-tests-rdt-${buildId}.zip" />
+
+		<ant antfile="${eclipseAutomatedTestHome}/test.xml" target="runtests" dir="${eclipseAutomatedTestHome}"> 
+		<property name="os" value="${baseos}" />
+		<property name="ws" value="${basews}" />
+		<property name="arch" value="${basearch}" />
+		<property name="testPlugin" value="org.rubypeople.rdt.tests.all_0.5.0" /> 
+		<property name="report" value="org.rubypeople.rdt.tests.all" /> 
+		</ant>	-->
+	</target>
 
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->

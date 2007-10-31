@@ -42,7 +42,9 @@
         <unjar src="${eclipse-home}/plugins/${testPlugin}_.jar" dest="${eclipse-home}/plugins/${testPlugin}"/>
         <delete file="${eclipse-home}/plugins/${testPlugin}_.jar"/> 
         
-        <ant antfile="${eclipse-home}/plugins/${testPlugin}/test.xml" dir="${eclipse-home}"/>
+        <ant antfile="${eclipse-home}/plugins/${testPlugin}/test.xml" dir="${eclipse-home}">
+            <property name="plugin-name" value="${testPlugin}" />
+        </ant>
         <copy file="${eclipse-home}/${report}.xml" tofile="${results}/xml/${report}_${platform}.xml"
             failonerror="false"/>
         <antcall target="genHtml"/>

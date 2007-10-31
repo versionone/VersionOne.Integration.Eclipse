@@ -157,7 +157,7 @@
 			src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
 		<copy file="${buildDirectory}/test.xml" tofile="${eclipseAutomatedTestHome}/test.xml"/>
 		
-		<property file="test.properties"/>
+		<property file="${buildDirectory}/test.properties"/>
 		
 		<ant antfile="${eclipseAutomatedTestHome}/test.xml" target="runtests"
 			dir="${eclipseAutomatedTestHome}">

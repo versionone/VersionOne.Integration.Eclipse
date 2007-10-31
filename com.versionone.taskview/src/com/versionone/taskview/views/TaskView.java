@@ -144,10 +144,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					float temp = ((Task)element).getEstimate();
-					if(0 == temp)
+					float estimate = ((Task)element).getEstimate();
+					if(-1 == estimate)
 						return "";
-					return String.valueOf(temp);
+					return String.valueOf(estimate);
 				} catch (Exception e) {
 					Activator.logError(e);
 				}
@@ -161,10 +161,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					float temp = ((Task)element).getToDo();
-					if(0 == temp)
+					float todo = ((Task)element).getToDo();
+					if(-1 == todo)
 						return "";
-					return String.valueOf(temp);
+					return String.valueOf(todo);
 				} catch (Exception e) {
 					Activator.logError(e);
 				}
@@ -222,10 +222,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			@Override
 			public String getText(Object element) {
 				try {
-					float temp = ((Task)element).getEffort();
-					if(0 == temp)
+					float effort = ((Task)element).getEffort();
+					if(-1 == effort)
 						return "";
-					return String.valueOf(temp);
+					return String.valueOf(effort);
 				} catch (Exception e) {
 					Activator.logError(e);
 				}

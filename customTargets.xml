@@ -133,6 +133,7 @@
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
+		<antcall target="test"/>
 		<antcall target="gatherLogs"/>
 	</target>
 

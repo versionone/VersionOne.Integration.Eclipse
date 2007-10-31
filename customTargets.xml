@@ -146,18 +146,19 @@
 		<echo message="Setting up tests in ${eclipseAutomatedTestHome}"/>
 		<delete dir="${eclipseAutomatedTestHome}"/>
 		<mkdir dir="${eclipseAutomatedTestHome}"/>
+		<mkdir dir="${eclipseAutomatedTestWorkspace}"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${buildDirectory}/../eclipse/testImage/eclipse-java-europa-fall-win32.zip"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/${dist.filename}"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
+		<copy file="modelTest.xml" tofile="${eclipseAutomatedTestHome}/modelTest.xml"/>
 
-	<!--
-		<ant antfile="${eclipseAutomatedTestHome}/test.xml" target="runtests" dir="${eclipseAutomatedTestHome}"> 
-		<property name="os" value="${baseos}" />
-		<property name="ws" value="${basews}" />
-		<property name="arch" value="${basearch}" />
-		<property name="testPlugin" value="org.rubypeople.rdt.tests.all_0.5.0" /> 
-		<property name="report" value="org.rubypeople.rdt.tests.all" /> 
-		</ant>	-->
+		<ant antfile="${eclipseAutomatedTestHome}/modelTest.xml" target="runtests" dir="${eclipseAutomatedTestHome}"> 
+			<property name="os" value="${baseos}" />
+			<property name="ws" value="${basews}" />
+			<property name="arch" value="${basearch}" />
+			<property name="testPlugin" value="com.versionone.common.test" /> 
+			<property name="report" value="com.versionone.common.test" /> 
+		</ant>
 	</target>
 
 	<!-- ===================================================================== -->

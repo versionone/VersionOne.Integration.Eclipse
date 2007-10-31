@@ -1,5 +1,8 @@
 <project name="Build specific targets and properties" default="noDefault">
 
+	<!-- Name of the distribution file -->
+	<property name="dist.filename" value="EclipsePlugin.zip"/>
+		
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
 	<!-- Add on <ant> task for each top level element being built. -->
@@ -124,7 +127,6 @@
 	<!-- Steps to do after  running package. -->
 	<!-- ===================================================================== -->
 	<target name="postPackage">
-		<property name="dist.filename" value="EclipsePlugin.zip"/>
 		<move file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip" tofile="${builder}/${buildLabel}/${dist.filename}"/>
 		<copy file="${builder}/${buildLabel}/${dist.filename}" tofile="${publish.dir}/${dist.filename}"/>
 	</target>

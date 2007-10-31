@@ -1,4 +1,6 @@
 <project basedir="." default="run" name="TestV1IntegrationModel">
+	<property name="library-file" value="${eclipse-home}/plugins/org.eclipse.test/library.xml"/>
+	
     <target name="init">
         <tstamp/>
     </target>

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Common Test Plug-in
+Bundle-SymbolicName: com.versionone.common.test
+Bundle-Version: 1.0.0
+Bundle-Activator: com.versionone.common.test.Activator
+Bundle-Vendor: VersionOne
+Require-Bundle: org.eclipse.core.runtime,
+ com.versionone.apiclient,
+ com.versionone.common
+Eclipse-LazyStart: true

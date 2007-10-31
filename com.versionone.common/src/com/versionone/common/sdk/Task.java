@@ -47,6 +47,10 @@ public class Task {
 	public String getStoryName() throws Exception {
 		return getValue(PARENT_NAME_PROPERTY);
 	}
+
+	public String getToken() throws Exception {
+		return _asset.getOid().getToken();
+	}
 	
 	public String getName() throws Exception {
 		return getValue(NAME_PROPERTY);

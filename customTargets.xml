@@ -145,7 +145,7 @@
 		<delete dir="${eclipseAutomatedTestHome}"/>
 		<mkdir dir="${eclipseAutomatedTestHome}"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${buildDirectory}/../eclipse/testImage/eclipse-java-europa-fall-win32.zip"/>
-        <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"/>
+        <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/${dist.filename}"/>
         <unzip dest="${eclipseAutomatedTestHome}" src="${builder}/${buildLabel}/com.versionone.v1.feature.test-${buildId}.zip"/>
 
 	<!--

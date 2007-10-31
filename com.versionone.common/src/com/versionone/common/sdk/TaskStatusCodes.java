@@ -10,8 +10,16 @@ import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
 import com.versionone.apiclient.V1Exception;
 
+/**
+ * Implementation of IStatusCodes
+ * @author jerry
+ */
 public class TaskStatusCodes implements IStatusCodes {
 
+	/**
+	 * Represents a VersionOne Status Code
+	 * @author jerry
+	 */
 	class StatusCode {
 		private String _id;
 		private String _name;

@@ -13,7 +13,7 @@ public interface IStatusCodes {
 	String[] getDisplayValues();
 	
 	/**
-	 * Given a name return it's index
+	 * Given an OID return it's index
 	 * Returns 0 if the value is invalid
 	 */
 	int getOidIndex(String value);

@@ -2,6 +2,10 @@ package com.versionone.common.sdk;
 
 import java.util.ArrayList;
 
+/**
+ * Implementation of IProjectTreeNode
+ * @author jerry
+ */
 public class ProjectTreeNode implements IProjectTreeNode {
 
 	private String _name;

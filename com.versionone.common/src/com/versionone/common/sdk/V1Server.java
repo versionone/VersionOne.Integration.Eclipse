@@ -29,30 +29,32 @@ import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 
 /**
- * Singleton class that encapulates all VersionOne Functionality
+ * Singleton class that wraps APIClient and encapsulates the VersionOne 
+ * functionality required by the integration
  * 
- * @author Jerry D. Odenwelder 
- *
+ * @author Jerry D. Odenwelder Jr. 
  */
 public class V1Server {
 
 	/**
-	 * URL Suffix for VersionOne MetaData
+	 * URL Suffix for VersionOne Meta API
 	 */
 	public static final String META_URL_SUFFIX = "meta.v1/";
 	
 	/**
-	 * URL Suffix for VersionOne Data
+	 * URL Suffix for VersionOne Data API
 	 */
 	public static final String DATA_URL_SUFFIX = "rest-1.v1/";
 	
 	/**
-	 * Localizer URL
+	 * URL Suffix for VersionOne Localizer API
 	 */
 	public static final String LOCALIZER_URL_SUFFIX = "loc.v1/";
-	
+
+	// Singleton instance
 	private static V1Server _instance = null;
 
+	// APIClient objects
 	private IServices   _services  = null;
 	private IMetaModel  _metaModel = null;
 	private ILocalizer  _localizer = null;
@@ -101,6 +103,13 @@ public class V1Server {
 		
 	}
 
+	/**
+	 * Construct with APIClient objects. 
+	 * Used for testing
+	 * @param services
+	 * @param metaModel
+	 * @param localize
+	 */
 	public V1Server(IServices services, IMetaModel metaModel, ILocalizer localize) {
 		_services  = services;
 		_metaModel = metaModel;
@@ -130,9 +139,11 @@ public class V1Server {
 	}
 
 	/**
-	 * Initialize the V1Server with specific connectors 
+	 * Initialize the V1Server with specific connectors.
+	 * Used for Testing 
 	 * @param services
 	 * @param metaModel
+	 * @param localizer
 	 */
 	public static void initialize(IServices services, IMetaModel metaModel, ILocalizer localizer) {
 		if(null == _instance) {

@@ -61,6 +61,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 				"Enabled", 
 				this.getFieldEditorParent());
 		addField(enabledEditor);
+
+		integratedAuthEditor = new BooleanFieldEditor(PreferenceConstants.P_INTEGRATED_AUTH,
+				"Windows Integrated Authentication",
+				this.getFieldEditorParent());
+		addField(integratedAuthEditor);
 		
 		urlEditor = new StringFieldEditor(PreferenceConstants.P_URL,
 						"Application URL:",
@@ -81,11 +86,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 		pwdField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_FOCUS_LOST);
 		addField(pwdField);
 		
-		integratedAuthEditor = new BooleanFieldEditor(PreferenceConstants.P_INTEGRATED_AUTH,
-				"Windows Integrated Authentication",
-				this.getFieldEditorParent());
-		addField(integratedAuthEditor);
-
 		effortEditor = new BooleanFieldEditor(PreferenceConstants.P_TRACK_EFFORT,
 						"Effort Tracking",
 						this.getFieldEditorParent());
@@ -107,8 +107,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 	 */
 	private void setControlAccess(boolean value) {
 		urlEditor.setEnabled(value, this.getFieldEditorParent());
-		userEditor.setEnabled(value, this.getFieldEditorParent());
-		pwdField.setEnabled(value, this.getFieldEditorParent());
+		if(getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH)) {
+			userEditor.setEnabled(false, this.getFieldEditorParent());
+			pwdField.setEnabled(false, this.getFieldEditorParent());
+		} else {
+			userEditor.setEnabled(value, this.getFieldEditorParent());
+			pwdField.setEnabled(value, this.getFieldEditorParent());			
+		}
 		effortEditor.setEnabled(value, this.getFieldEditorParent());
 		requiresValidation.setEnabled(value, this.getFieldEditorParent());
 		integratedAuthEditor.setEnabled(value, this.getFieldEditorParent());
@@ -134,6 +139,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			setControlAccess(enabledEditor.getBooleanValue());
 			this.checkState();
 		}
+		if(event.getSource().equals(integratedAuthEditor)){
+			userEditor.loadDefault();
+			pwdField.loadDefault();
+			userEditor.setEnabled(!integratedAuthEditor.getBooleanValue(), this.getFieldEditorParent());
+			pwdField.setEnabled(!integratedAuthEditor.getBooleanValue(), this.getFieldEditorParent());
+			this.checkState();
+		}
 		else if(event.getProperty().equals(FieldEditor.VALUE)) {
 			if ( (event.getSource().equals(userEditor)) ||
 					(event.getSource().equals(pwdField)) ||
@@ -156,7 +168,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 				setErrorMessage("Application URL Is a required field");
 				setValid(false);
 			}
-			else if(0 == userEditor.getStringValue().length()) {
+			else if((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
 				setErrorMessage("Username is a required field");
 				setValid(false);
 			}

@@ -70,20 +70,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 		urlEditor = new StringFieldEditor(PreferenceConstants.P_URL,
 						"Application URL:",
 						this.getFieldEditorParent());
-		urlEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_FOCUS_LOST);
 		addField(urlEditor);
 		
 		userEditor = new StringFieldEditor(PreferenceConstants.P_USER,
 						"Username:",
 						this.getFieldEditorParent());
-		userEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_FOCUS_LOST);
 		addField(userEditor);
 		
 		pwdField = new StringFieldEditor(PreferenceConstants.P_PASSWORD,
 						"Password:",
 						this.getFieldEditorParent());
 		pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
-		pwdField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_FOCUS_LOST);
 		addField(pwdField);
 		
 		effortEditor = new BooleanFieldEditor(PreferenceConstants.P_TRACK_EFFORT,
@@ -144,6 +141,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			pwdField.loadDefault();
 			userEditor.setEnabled(!integratedAuthEditor.getBooleanValue(), this.getFieldEditorParent());
 			pwdField.setEnabled(!integratedAuthEditor.getBooleanValue(), this.getFieldEditorParent());
+			requiresValidation.setEnabled(true, this.getFieldEditorParent());
 			this.checkState();
 		}
 		else if(event.getProperty().equals(FieldEditor.VALUE)) {
@@ -167,10 +165,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			if(0 == urlEditor.getStringValue().length()) {
 				setErrorMessage("Application URL Is a required field");
 				setValid(false);
+				requiresValidation.setEnabled(false, this.getFieldEditorParent());
 			}
+			if(!urlEditor.getStringValue().endsWith("/")) {
+				setErrorMessage("URL Must end with a /");
+				setValid(false);
+				requiresValidation.setEnabled(false, this.getFieldEditorParent());
+			}			
 			else if((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
 				setErrorMessage("Username is a required field");
 				setValid(false);
+				requiresValidation.setEnabled(false, this.getFieldEditorParent());
 			}
 			else if(requiresValidation.getValue()) {
 				setErrorMessage("Connection Parameters Require Validation");
@@ -198,10 +203,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			boolean rc = true;
 			
 			String url = urlEditor.getStringValue();
-			if( ! ((url.endsWith("/") || url.endsWith("\\")))) {
-				urlEditor.setStringValue(url + "/");
-				url = urlEditor.getStringValue();
-			}
 
 			V1APIConnector metaConnector = new V1APIConnector(url.toString() + V1Server.META_URL_SUFFIX);
 			MetaModel model = new MetaModel(metaConnector);
@@ -221,7 +222,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			} catch (V1Exception e) {
 				rc = false;
 				Activator.logError(e);
-				setErrorMessage(e.getLocalizedMessage());
+				setErrorMessage("Validation Failed.");
 			}
 			return rc;
 		}

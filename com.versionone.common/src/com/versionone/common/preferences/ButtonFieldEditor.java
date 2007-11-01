@@ -129,18 +129,16 @@ public class ButtonFieldEditor extends FieldEditor {
 
 	@Override
 	public String getLabelText() {
-		return null;
+		return button.getText();
 	}
 
 	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
-		super.setEnabled(enabled, parent);
-		button.setEnabled(enabled);
+		getChangeControl(parent).setEnabled(enabled);		
 		value = enabled;
 	}
 
 	public boolean getValue() {
 		return value;
 	}	
-	
 }

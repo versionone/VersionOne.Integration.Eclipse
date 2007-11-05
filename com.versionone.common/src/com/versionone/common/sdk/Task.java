@@ -19,7 +19,7 @@ public class Task {
 	private static final String STATUS_ID_PROPERTY     	 = "Status";
 	private static final String DONE_PROPERTY            = "Actuals.Value.@Sum";
 
-	private static final float INITIAL_EFFORT = -1;
+	private static final float INITIAL_EFFORT = 0;
 	
 	private static final String TASK_PREFIX = "Task.";
 	
@@ -139,7 +139,7 @@ public class Task {
 
 	/**
 	 * Effort on this task
-	 * @return value of estimate or -1 if the attribute is blank
+	 * @return value of estimate or 0 if the attribute is blank
 	 */
 	public float getEffort() {
 		return _effortValue;

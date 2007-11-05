@@ -1,14 +1,20 @@
 <project basedir="." default="run" name="TestV1IntegrationModel">
+	<property name="eclipse-home" value="${basedir}\..\.."/>
 	<property name="library-file" value="${eclipse-home}/plugins/org.eclipse.test/library.xml"/>
-	
+	<property name="plugin-name" value="com.versionone.common.test"/>
+			
     <target name="init">
         <tstamp/>
-    </target>
+	    <delete>
+	      <fileset dir="${eclipse-home}" includes="com.versionone*.xml"/>
+	    </delete>
+	</target>
 
     <!-- This target defines the tests that need to be run. -->
     <target name="suite">
+    	<property name="data.dir" value="${eclipse-home}/workspace"/>
         <ant target="ui-test" antfile="${library-file}" dir="${eclipse-home}">
-            <property name="data-dir" value="${eclipseAutomatedTestWorkspace}"/>
+            <property name="data-dir" value="${data.dir}"/>
             <property name="plugin-name" value="${plugin-name}"/>
             <property name="classname" value="com.versionone.common.test.TestModel"/>
         </ant>
@@ -24,6 +30,7 @@
     <!-- after all the tests have been run should go here. -->
     <target name="run" depends="init,suite,cleanup">
         <ant target="collect" antfile="${library-file}" dir="${eclipse-home}">
+            <property name="includes" value="com.versionone*.xml"/>
             <property name="output-file" value="${plugin-name}.xml"/>
         </ant>
     </target>

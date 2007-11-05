@@ -1,5 +1,7 @@
 package com.versionone.common.test;
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +21,10 @@ import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.V1Server;
 
 public class TestModel {
+
+	public static junit.framework.Test suite() {
+		return new JUnit4TestAdapter(TestModel.class);
+		}
 
 	/**
 	 * Configuration Parameters

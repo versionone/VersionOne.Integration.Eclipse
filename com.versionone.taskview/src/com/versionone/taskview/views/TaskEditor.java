@@ -167,7 +167,10 @@ abstract public class TaskEditor extends EditingSupport {
 		}
 
 		protected float getValue(Task element) throws Exception {
-			return element.getEffort();
+			float effort = element.getEffort(); 
+			if(0 == effort)
+				return -1;
+			return effort;
 		}
 
 		@Override

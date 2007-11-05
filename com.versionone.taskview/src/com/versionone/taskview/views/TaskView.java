@@ -224,7 +224,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			public String getText(Object element) {
 				try {
 					float effort = ((Task)element).getEffort();
-					if(-1 == effort)
+					if(0 == effort)
 						return "";
 					return String.valueOf(effort);
 				} catch (Exception e) {
@@ -299,7 +299,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 					}		
 					loadTable();
 					statusEditor.setStatusCodes(getStatusValues());
-					showMessage(saveUs.size() + " Task Updated");
 				}
 			}			
 		};

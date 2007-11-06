@@ -89,8 +89,8 @@ public class TestModel {
 	public void testGetTask() throws Exception {
 		Task[] allTask = V1Server.getInstance().getTasks();
 		Assert.assertEquals(2, allTask.length);
-		validateTask(allTask[0], "TK-01061", "Add Shipping Notes", "Service Changes", 24, "30.0", -1, 10, "TaskStatus:123");
-		validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", 24, "", -1, 24, "TaskStatus:123");
+		validateTask(allTask[0], "TK-01061", "Add Shipping Notes", "Service Changes", 24, "30.0", 0, 10, "TaskStatus:123");
+		validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", 24, "", 0, 24, "TaskStatus:123");
 	}
 	
 	@Test

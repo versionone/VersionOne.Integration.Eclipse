@@ -109,7 +109,7 @@ public class TestTaskView {
 		Assert.assertNotNull(table);
 		Assert.assertEquals(8, table.getColumnCount());
 		TableColumn[] columns = table.getColumns();
-		Assert.assertEquals("Task Name", columns[NAME_COLUMN_INDEX].getText());
+		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Story", columns[STORY_COLUMN_INDEX].getText());
 		Assert.assertEquals("Detail Estimate", columns[ESTIMATE_COLUMN_INDEX].getText());
@@ -136,7 +136,7 @@ public class TestTaskView {
 		Assert.assertNotNull(table);
 		Assert.assertEquals(6, table.getColumnCount());
 		TableColumn[] columns = table.getColumns();
-		Assert.assertEquals("Task Name", columns[NAME_COLUMN_INDEX].getText());
+		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Story", columns[STORY_COLUMN_INDEX].getText());
 		Assert.assertEquals("Detail Estimate", columns[ESTIMATE_COLUMN_INDEX].getText());

@@ -51,8 +51,8 @@ abstract public class TaskEditor extends EditingSupport {
 			Activator.logError(e);
 			MessageDialog.openError(this.getViewer().getControl().getShell(), "Task View", "Error updating field. Check Error log for more information.");
 		}
-	}		
-
+	}	
+	
 	/**
 	 * Derived class must update this method and set the appropriate property on the Task
 	 * @param element

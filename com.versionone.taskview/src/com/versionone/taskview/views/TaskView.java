@@ -42,6 +42,20 @@ import com.versionone.taskview.Activator;
  *
  */
 public class TaskView extends ViewPart implements IPropertyChangeListener {
+
+	/**
+	 * These constants are the VersionOne names for the column titles.  
+	 * We localize these values and use that name as column titles
+	 */
+	private static final String V1_COLUMN_TITLE_ID              = "ColumnTitle'ID";
+	private static final String V1_COLUMN_TITLE_PARENT          = "Story";
+	private static final String V1_COLUMN_TITLE_TITLE           = "Task";
+	private static final String V1_COLUMN_TITLE_DETAIL_ESTIMATE = "ColumnTitle'DetailEstimate";
+	private static final String V1_COLUMN_TITLE_TO_DO           = "ColumnTitle'ToDo";
+	private static final String V1_COLUMN_TITLE_STATUS          = "ColumnTitle'Status";
+	private static final String V1_COLUMN_TITLE_DONE            = "ColumnTitle'Done";
+	private static final String V1_COLUMN_TITLE_EFFORT          = "ColumnTitle'Effort";
+	
 	
 	private TableViewer viewer;
 	private StatusEditor statusEditor;
@@ -95,7 +109,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void configureTable() {
 
-		TableViewerColumn column = createTableViewerColumn("ColumnTitle'ID", 70, SWT.LEFT);
+		TableViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -114,7 +128,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskIdEditor(viewer));
 
-		createTableViewerColumn("ColumnTitle'Parent", 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn(V1_COLUMN_TITLE_PARENT, 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				try {
@@ -126,7 +140,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
 		});
 		
-		column = createTableViewerColumn("ColumnTitle'Title", 150, SWT.LEFT);
+		column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -140,7 +154,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.NameEditor(viewer));
 
-		column = createTableViewerColumn("ColumnTitle'DetailEstimate", 100, SWT.CENTER);
+		column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -157,7 +171,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
 		
-		column = createTableViewerColumn("ColumnTitle'ToDo", 50, SWT.CENTER);
+		column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -174,7 +188,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		});
 		column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
 		
-		column = createTableViewerColumn("ColumnTitle'Status", 100, SWT.LEFT);
+		column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -205,7 +219,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void addEffortColumns() {
 
-		createTableViewerColumn("ColumnTitle'Done", 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
 			public String getText(Object element)  {
@@ -218,7 +232,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}			
 		});
 		
-		TableViewerColumn column = createTableViewerColumn("ColumnTitle'Effort", 50, SWT.CENTER, 5);
+		TableViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -282,6 +296,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		saveAction = new Action() {
 			public void run() {
+				if(viewer.isCellEditorActive()) {
+					viewer.getTable().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
+				}
 				TableItem[] rows = viewer.getTable().getItems();
 				ArrayList<Task> saveUs = new ArrayList<Task>();
 				for(int i = 0; i < rows.length; ++i) {

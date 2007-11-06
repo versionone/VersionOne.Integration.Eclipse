@@ -75,12 +75,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
+
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		configureTable();
+		
+		if(isEnabled()) {
+			configureTable();
+		}
+		
 		makeActions();
 		contributeToActionBars();		
 		hookDoubleClickAction();
-		selectProvider();
+		selectProvider();			
+
 	}
 
 	/**
@@ -89,13 +95,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private void selectProvider() {
 
 		boolean isEnabled = isEnabled();
+		
 		selectProjectAction.setEnabled(isEnabled);
 		refreshAction.setEnabled(isEnabled);
 		viewer.getTable().setEnabled(isEnabled);
+		viewer.getTable().setLinesVisible(isEnabled);
+		viewer.getTable().setHeaderVisible(isEnabled);
+		viewer.getTable().setEnabled(isEnabled);
+
 		viewer.setContentProvider(new ViewContentProvider());
 		
 		if(isEnabled) {		
-			loadTable();
+			loadTable();			
 		}
 		else {
 			viewer.getTable().clearAll();
@@ -207,11 +218,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
 		statusEditor = new StatusEditor(viewer, getStatusValues()); 
 		column.setEditingSupport(statusEditor);
-		
-		viewer.getTable().setLinesVisible(true);
-		viewer.getTable().setHeaderVisible(true);
-		viewer.getTable().setEnabled(isEnabled());
-
 	}
 
 	/**
@@ -394,6 +400,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 		String property = event.getProperty();
 		if(property.equals(PreferenceConstants.P_ENABLED)) {
+			if(0 == viewer.getTable().getColumnCount())
+				configureTable();
 			selectProvider();
 		}
 		else if(property.equals(PreferenceConstants.P_TRACK_EFFORT)) {

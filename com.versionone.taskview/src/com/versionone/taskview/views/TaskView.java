@@ -62,7 +62,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * The constructor.
 	 */
 	public TaskView() {
-		PreferencePage.getPreferences().addPropertyChangeListener(this);
 	}
 	
 	/**
@@ -70,6 +69,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
+		
+		PreferencePage.getPreferences().addPropertyChangeListener(this);
 
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
@@ -406,6 +407,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			else {
 				this.removeEffortColumns();
 			}
+		}
+		else if(property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+			refreshAction.run();
 		}
 	}
 

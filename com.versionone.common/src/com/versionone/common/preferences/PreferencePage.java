@@ -1,5 +1,6 @@
 package com.versionone.common.preferences;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -27,6 +28,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 	private BooleanFieldEditor enabledEditor;
 	private ButtonFieldEditor requiresValidation;
 	private BooleanFieldEditor integratedAuthEditor;
+	private boolean resetConnection = false;
 
 	public static IPreferenceStore getPreferences() {
 		return Activator.getDefault().getPreferenceStore();
@@ -218,7 +220,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			Services v1Service = new Services(model, dataConnector);
 			
 			try {
-				V1Server.setMemberToken(getPreferenceStore(), v1Service);
+				v1Service.getLoggedIn();
+				resetConnection = true;
 			} catch (V1Exception e) {
 				rc = false;
 				Activator.logError(e);
@@ -226,5 +229,29 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 			}
 			return rc;
 		}
-	}	
+	}
+
+	@Override
+	public boolean performOk() {
+		boolean rc = super.performOk();
+		if(rc && resetConnection ) {
+			try {
+				V1Server.reset();
+				resetConnection = false;
+			} catch (V1Exception e) {
+				Activator.logError(e);
+				MessageDialog.openInformation(this.getShell(), "VersionOne Preferences", "Cannot obtain user identity from server.  Check Error Log for more details");
+				rc = false;
+			}
+		}
+		return rc;
+	}
+
+	@Override
+	public boolean performCancel() {
+		resetConnection = false;
+		return super.performCancel();
+	}
+	
+	
 }

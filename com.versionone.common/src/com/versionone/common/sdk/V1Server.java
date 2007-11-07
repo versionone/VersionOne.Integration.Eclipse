@@ -71,8 +71,6 @@ public class V1Server {
 		if(!config.getBoolean(PreferenceConstants.P_ENABLED)) {
 			return;
 		}
-		else if(null != _services)
-			_services = null;
 		
 		String url = config.getString(PreferenceConstants.P_URL);
 		V1APIConnector metaConnector = new V1APIConnector(url + META_URL_SUFFIX);
@@ -89,17 +87,15 @@ public class V1Server {
 		}
 		
 		_services = new Services(_metaModel, dataConnector);		
-
-		try {
-			setMemberToken(config, _services);
-			_actualType = _metaModel.getAssetType("Actual");
-		} catch (V1Exception e) {
-			Activator.logError(e);
-		}
 		
 		V1APIConnector localizerConnector = new V1APIConnector(url + LOCALIZER_URL_SUFFIX);
 		_localizer = new Localizer(localizerConnector);
 		
+		try {
+			_actualType = _metaModel.getAssetType("Actual");
+		} catch (V1Exception e) {
+			Activator.logError(e);
+		}
 		
 	}
 
@@ -122,9 +118,12 @@ public class V1Server {
 	 * @param services - VersionOne Service
 	 * @throws V1Exception 
 	 */
-	public static void setMemberToken(IPreferenceStore config, IServices services) throws V1Exception {
-		Oid userOid = services.getLoggedIn();
-		config.setValue(PreferenceConstants.P_MEMBER_TOKEN, userOid.getToken());
+	void setMemberToken() throws V1Exception {
+		String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
+		Oid userOid = _services.getLoggedIn();
+		if(!currentOid.equals(userOid.getToken())) {
+			PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, userOid.getToken());
+		}
 	}
 		
 	/**
@@ -272,5 +271,14 @@ public class V1Server {
 	 */
 	public String getLocalString(String value) {
 		return _localizer.resolve(value);
+	}
+
+	/**
+	 * This causes a reset to the V1Server 
+	 * @throws V1Exception 
+	 */
+	public static void reset() throws V1Exception {
+		_instance = new V1Server(Activator.getDefault().getPreferenceStore());
+		_instance.setMemberToken();
 	}
 }

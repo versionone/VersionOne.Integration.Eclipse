@@ -1,7 +1,6 @@
 package com.versionone.taskview.views;
 
 
-import java.net.URL;
 import java.util.ArrayList;
 
 import org.eclipse.jface.action.Action;
@@ -11,10 +10,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -23,7 +19,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.versionone.common.preferences.PreferenceConstants;
@@ -516,22 +511,30 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	}
 
 	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				String oid = null;
-				try {
-					oid = ((Task)selection.getFirstElement()).getToken();
-					StringBuffer v1Url = new StringBuffer(PreferencePage.getPreferences().getString(PreferenceConstants.P_URL));
-					v1Url.append("assetdetail.v1?Oid=");
-					v1Url.append(oid);
-					URL url = new URL(v1Url.toString());
-					PlatformUI.getWorkbench().getBrowserSupport().createBrowser(oid).openURL(url);
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-			}
-		});
+
+//
+// Code to launch a browser when the user double clicks on a task.  The browser is instructed to navigate
+// to the asset detail page for that task.
+// This code is currently commented out because 
+//		a) with integrated authentication the server responds with a "forbidden" message.
+//      b) with v1 authentication, the user is always prompted for credentials.
+// 
+//		viewer.addDoubleClickListener(new IDoubleClickListener() {
+//			public void doubleClick(DoubleClickEvent event) {
+//				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+//				String oid = null;
+//				try {
+//					oid = ((Task)selection.getFirstElement()).getToken();
+//					StringBuffer v1Url = new StringBuffer(PreferencePage.getPreferences().getString(PreferenceConstants.P_URL));
+//					v1Url.append("assetdetail.v1?Oid=");
+//					v1Url.append(oid);
+//					URL url = new URL(v1Url.toString());
+//					PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(url);
+//				} catch (Exception e) {
+//					Activator.logError(e);
+//				}
+//			}
+//		});
 	}
 	
 	private void showMessage(String message) {

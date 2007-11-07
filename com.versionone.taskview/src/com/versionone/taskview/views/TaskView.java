@@ -544,5 +544,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private void showMessage(String message) {
 		MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
 	}
+
+	@Override
+	public void dispose() {
+		PreferencePage.getPreferences().removePropertyChangeListener(this);
+		super.dispose();
+	}
 	
 }

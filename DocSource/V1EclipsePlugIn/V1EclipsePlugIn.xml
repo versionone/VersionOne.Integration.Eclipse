@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--<!DOCTYPE article PUBLIC "-//OASIS//DTD Simplied DocBook XML V1.1//EN" "http://www.oasis-open.org/docbook/xml/simple/1.1/sdocbook.dtd"-->
+<!--<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "../../Common/docbook/xml/4.3/docbookx.dtd"
+[
+<!ENTITY addkey1 SYSTEM "addkey1.cdata">
+<!ENTITY addkey2 SYSTEM "addkey2.cdata">
+<!ENTITY downloads SYSTEM "../Common/download.xml">
+<!ENTITY name "VSAddin">
+]>
+<article id="V1EclipsePlugIn.user">
+    <title>VersionOne Eclipse Pl;ugin User Guide</title>
+    <section id="description">
+        <title>Description</title>
+        <para>
+            The VersionOne Eclipse Plugin (V1EclipsePlugIn) provides direct interaction with VersionOne developer tasks from within Eclipse.  
+            This enables Java developers to update VersionOne task status, estimates, remaining effort, etc., without 
+            needing to leave the comfortable confines of the Eclipse Environment.
+        </para>
+    </section>
+    <section id="systemreqs">
+        <title>System Requirements</title>
+        <para>
+            VersionOne: 7.3 or above
+        </para>
+        <para>
+            Client Workstation:
+            <itemizedlist>
+                <listitem><para>IDE&mdash;Eclipse 3.3.1.1 (Europa) </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+    &downloads;
+    <section id="installation">
+        <title>1. Installation</title>        
+        <section id="install.setup">
+            <para>Use the following steps to install the VersionOne Eclipse Plugin
+                <orderedlist>
+                    <listitem>Remove any existing VersionOne integration</listitem>
+                    <listitem>Unzip ***** into a temporary location</listitem>
+                    <listitem>Copy the features and plugins directory into ECLIPSE_HOME</listitem>
+                </orderedlist>            
+            </para>
+        </section>
+        <section id="install.configure">
+            <title>2.  Configure</title>
+            <para>
+                Select <emphasis>Preferences...</emphasis> from the <emphasis>Window</emphasis> 
+                menu, and navigate to the VersionOne settings as show in <xref
+                    linkend="install.configure.options"/>.
+                <figure
+                    id="install.configure.options">
+                    <title>Configuration Options Screen</title>
+                    <graphic fileref="Options.JPG"/>
+                </figure>
+                
+                Enter the configuration parameters as specified in the table below and click <emphasis>Validate Connection</emphasis> to ensure that
+                the add-in can both access VersionOne’s API and authenticate using the supplied username and password.				
+                If the add-in is not configured correctly, or if VersionOne is unavailable (e.g. you are off-network), both the Projects and Tasks windows will inform you 
+                of the appropriate error, and provide an option to modify the add-in configuration.
+                
+                <table
+                    frame="none" id="install.configure.table">
+                    <title>VSAddin Configuration Parameters</title>
+                    <tgroup cols="2">
+                        <thead>
+                            <row>
+                                <entry>Parameter</entry>
+                                <entry>Description</entry>
+                            </row>
+                        </thead>
+                        <tbody>
+                            <row>
+                                <entry>Enable</entry>
+                                <entry>Allows you to enable/disable the Plugin</entry>
+                            </row>
+                            <row>
+                                <entry>Windows Integrated Authentication</entry>
+                                <entry>Enables Windows Integraten Authentication</entry>
+                            </row>
+                            <row>
+                                <entry>Application URL</entry>
+                                <entry>VersionOne installation URL</entry>
+                            </row>
+                            <row>
+                                <entry>Username</entry>
+                                <entry>User that will access VersionOne.</entry>
+                            </row>
+                            <row>
+                                <entry>Password</entry>
+                                <entry>Password for the username above.  If the authenticationType is WindowsIntegrated this should be left blank if the username is blank (to use the currently logged on user account).</entry>
+                            </row>
+                            <row>
+                                <entry>Effort Tracking</entry>
+                                <entry>Flag for Effort Tracking.  If VersionOne has effort tracking enabled, check this box to add the
+                                    <emphasis>Effort</emphasis> and <emphasis>Done</emphasis> columns</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table>
+            </para>
+        </section>
+    </section>
+    <section id="usage">
+        <title>Usage</title>
+        <para>
+            ***** Work here and below
+            The add-in consists of two dockable windows, <emphasis>VersionOne Projects</emphasis> and <emphasis>VersionOne Tasks</emphasis>, 
+            accessible via the View menu’s Other Windows sub-menu.  
+            Additionally, the built-in Visual Studio properties grid is populated with relevant properties dependent on the user’s context and focus within either window.
+        </para>
+        <section id="usage.project">
+            <title>Selecting Projects</title>
+            
+            <para>As shown in <xref linkend="usage.project.figure"
+            />, the VersionOne Projects dockable window displays a project tree populated with your current projects. 
+                To access this window, go to the View menu, select the Other Windows sub-menu, and select VersionOne Projects. 
+                To choose a specific project to work on, simply navigate the tree and select it.
+            </para>
+            <para>
+                Note that your project selection is maintained between uses of Visual Studio (per user, via Documents And Settings), 
+                so after you select the project you may close this window to preserve real estate within the IDE.  The Task Window
+                (discussed next) displays the current project name in its’ window title for project context.	
+            </para>
+            <figure id="usage.project.figure">
+                <title>Projects Window</title>
+                <graphic fileref="Projects.JPG"/>
+            </figure>
+        </section>
+        <section id="usage.tasks">
+            <title>Updating Tasks</title>
+            <para>
+                Like the VersionOne Projects window, the Tasks window is accessible by selecting VersionOne Tasks via the View menu’s Other Windows sub-menu.
+                Once you’ve selected a project you’re working on, the Tasks window will display a grid listing all tasks that belong to you.
+                To update a task, either modify the attribute directly in the tasks grid (for the most common properties) or, after selecting the row,
+                use the Visual Studio properties grid to edit the extended set of task properties.  Once you’re finished updating a Task, click the Save button to update the task in VersionOne.				
+            </para>
+            <figure id="usage.tasks.figure">
+                <title>Tasks Window</title>
+                <graphic fileref="Tasks.JPG"/>
+            </figure>
+        </section>
+    </section>
+    <section id="section.footer">
+        <title/>
+        <para>Copyright &copy; <?dbtimestamp format="Y"?>, VersionOne, Inc. All rights reserved. This document was generated <?dbtimestamp format="Y-m-d H:M:S"?>.</para>
+    </section>
+</article>

@@ -181,12 +181,10 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish">
-	
+	<target name="publish">	
 		<!-- create the new zip -->
 		<zip destfile="${builder}/${buildLabel}/${dist.filename}"
 		     basedir="${dist.dir}"/>				
-
 		<copy file="${builder}/${buildLabel}/${dist.filename}"
 			tofile="${publish.dir}/${dist.filename}"/>
 	</target>
@@ -194,8 +192,7 @@
 	<!-- ===================================================================== -->
 	<!-- Create the UpdateSite -->
 	<!-- ===================================================================== -->
-	<target name="generateUpdateSite">
-		
+	<target name="generateUpdateSite">		
 		<!-- Create the directory structure -->
 		<mkdir dir="${UpdateSiteStagingLocation}"/>
 		
@@ -217,7 +214,6 @@
 		<delete dir="${UpdateSiteStagingLocation}/eclipse"/>		
 	</target>
 
-
 	<!-- ===================================================================== -->
 	<!-- Create Documentation-->
 	<!-- ===================================================================== -->		
@@ -237,9 +233,9 @@
 	</macrodef>
 
 	<target name="gendoc">
-		<property name="doc.source.dir" value="DocSource"/>
+		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>		
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
-
+		
 		<svn javahl="false">
 			<export srcurl="${doc.URL}" revision="${doc.revision}"
 				destpath="${doc.source.dir}" force="true"/>
@@ -248,13 +244,13 @@
 		<delete dir="${doc.dir}/Common"/>
 		<mkdir dir="${doc.dir}/Common"/>
 		<copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>
-
+		
 		<!-- this is the index file -->
 		<exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
 			failonerror="true">
 			<arg line="-o ../${doc.dir}/index.html Common/index.xsl index.xml"/>
 		</exec>
-
+		
 		<gendoc.content.base filename="V1EclipsePlugIn" collect.xref.targets="only"/>
 		<gendoc.content.base filename="V1EclipsePlugIn" collect.xref.targets="no"/>
 		
@@ -263,7 +259,6 @@
 				<include name="*.JPG" />
 			</fileset>
 		</copy>
-
 	</target>	
 	
 	<!-- ===================================================================== -->

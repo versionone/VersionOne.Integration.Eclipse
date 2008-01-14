@@ -200,11 +200,11 @@
 		
 		<!-- Put build results into directory-->
 		<unzip src="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip" dest="${UpdateSiteStagingLocation}"/>
-		<move todir="${UpdateSiteStagingLocation}/eclipse/features">
-			<fileset dir="${UpdateSiteStagingLocation}/features"/>
+		<move todir="${UpdateSiteStagingLocation}/features">
+			<fileset dir="${UpdateSiteStagingLocation}/eclipse/features"/>
 		</move>
-		<move todir="${UpdateSiteStagingLocation}/eclipse/plugins">
-			<fileset dir="${UpdateSiteStagingLocation}/plugins"/>
+		<move todir="${UpdateSiteStagingLocation}/plugins">
+			<fileset dir="${UpdateSiteStagingLocation}/eclipse/plugins"/>
 		</move>
 		<delete dir="${UpdateSiteStagingLocation}/eclipse"/>
 		

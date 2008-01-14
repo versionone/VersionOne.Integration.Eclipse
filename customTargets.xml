@@ -2,7 +2,13 @@
 
 	<!-- Name of the distribution file -->
 	<property name="dist.filename" value="V1EclipsePlugin.zip"/>
-
+	<!-- Subdirecotry used to create distribution -->
+	<property name="dist.dir" value="${buildDirectory}/dist"/>
+	<!-- Directory where documentation is created -->
+	<property name="doc.dir" value="${dist.dir}/doc"/>
+	<!-- subdirectory used to create update site -->
+	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
+	
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
 	<!-- Add on <ant> task for each top level element being built. -->
@@ -121,12 +127,15 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do before running package. -->
 	<!-- ===================================================================== -->
-	<target name="prePackage"> </target>
+	<target name="prePackage"> 
+	</target>
 
 	<!-- ===================================================================== -->
 	<!-- Steps to do after  running package. -->
 	<!-- ===================================================================== -->
 	<target name="postPackage">
+		<antcall target="gendoc"/>
+		<antcall target="generateUpdateSite"/>
 	</target>
 
 	<!-- ===================================================================== -->
@@ -134,9 +143,8 @@
 	<!-- ===================================================================== -->
 	<target name="postBuild">
 <!--		<antcall target="test"/> -->
-		<antcall target="generateUpdateSite"/>
+		<antcall target="publish" />
 		<antcall target="gatherLogs"/>
-		
 	</target>	
 	
 	<!-- ===================================================================== -->
@@ -173,9 +181,12 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish"> 
-<!-- 		<move file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"
-			tofile="${builder}/${buildLabel}/${dist.filename}"/> -->
+	<target name="publish">
+	
+		<!-- create the new zip -->
+		<zip destfile="${builder}/${buildLabel}/${dist.filename}"
+		     basedir="${dist.dir}"/>				
+
 		<copy file="${builder}/${buildLabel}/${dist.filename}"
 			tofile="${publish.dir}/${dist.filename}"/>
 	</target>
@@ -184,10 +195,7 @@
 	<!-- Create the UpdateSite -->
 	<!-- ===================================================================== -->
 	<target name="generateUpdateSite">
-	
-		<property name="UpdateSiteStagingLocation" value="${buildDirectory}/updateSite"/>
-		<property name="sitePackagePrefix" value="com.versionone.updatesite"/>
-	
+		
 		<!-- Create the directory structure -->
 		<mkdir dir="${UpdateSiteStagingLocation}"/>
 		
@@ -206,12 +214,57 @@
 		<move todir="${UpdateSiteStagingLocation}/plugins">
 			<fileset dir="${UpdateSiteStagingLocation}/eclipse/plugins"/>
 		</move>
-		<delete dir="${UpdateSiteStagingLocation}/eclipse"/>
-		
-		<!-- create the new zip -->
-		<zip destfile="${builder}/${buildLabel}/${dist.filename}"
-		     basedir="${UpdateSiteStagingLocation}"/>				
+		<delete dir="${UpdateSiteStagingLocation}/eclipse"/>		
 	</target>
+
+
+	<!-- ===================================================================== -->
+	<!-- Create Documentation-->
+	<!-- ===================================================================== -->		
+	<macrodef name="gendoc.content.base">
+		<attribute name="filename"/>
+		<attribute name="collect.xref.targets"/>
+		<attribute name="content.doc.output.dir" default="${doc.dir}/@{filename}"/>
+		<sequential>
+			<mkdir dir="@{content.doc.output.dir}"/>
+			<exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
+				failonerror="true">
+				<arg
+					line="-o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid ${filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename ${filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml"
+				/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<target name="gendoc">
+		<property name="doc.source.dir" value="DocSource"/>
+		<property name="common.dir" value="${doc.source.dir}/Common"/>
+
+		<svn javahl="false">
+			<export srcurl="${doc.URL}" revision="${doc.revision}"
+				destpath="${doc.source.dir}" force="true"/>
+		</svn>
+		
+		<delete dir="${doc.dir}/Common"/>
+		<mkdir dir="${doc.dir}/Common"/>
+		<copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>
+
+		<!-- this is the index file -->
+		<exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
+			failonerror="true">
+			<arg line="-o ../${doc.dir}/index.html Common/index.xsl index.xml"/>
+		</exec>
+
+		<gendoc.content.base filename="V1EclipsePlugIn" collect.xref.targets="only"/>
+		<gendoc.content.base filename="V1EclipsePlugIn" collect.xref.targets="no"/>
+		
+		<copy todir="${doc.dir}/V1EclipsePlugIn" flatten="false">
+			<fileset dir="${doc.source.dir}/V1EclipsePlugIn">
+				<include name="*.JPG" />
+			</fileset>
+		</copy>
+
+	</target>	
 	
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->

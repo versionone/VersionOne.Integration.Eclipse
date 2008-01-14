@@ -7,7 +7,7 @@
 <!ENTITY addkey1 SYSTEM "addkey1.cdata">
 <!ENTITY addkey2 SYSTEM "addkey2.cdata">
 <!ENTITY downloads SYSTEM "../Common/download.xml">
-<!ENTITY name "VSAddin">
+<!ENTITY name "V1EclipsePlugin">
 ]>
 <article id="V1EclipsePlugIn.user">
     <title>VersionOne Eclipse Pl;ugin User Guide</title>
@@ -38,19 +38,15 @@
         <section id="install.setup">
             <title>1. Install the Plugin</title>
             <para>
-                <note><para>In the following instructions ECLIPSE_HOME refers to the Eclipse subdirectory where you want to install the VersionOne plugin</para></note>
                 <orderedlist>
-                    <listitem>
-                        <para>Remove previous versions of the VersionOne plugin.
-                            <orderedlist>
-                                <listitem><para>Under ECLIPSE_HOME/features remove any subdirectory named com.versionone*</para></listitem>
-                                <listitem><para>Under ECLIPSE_HOME/plugins remove any subdirectory named com.versionone*</para></listitem>
-                                <listitem><para>Under ECLIPSE_HOME/plugins remove any jar files named com.versionone*</para></listitem>
-                            </orderedlist>                            
-                        </para>
-                    </listitem>
-                    <listitem><para>Unzip the EclipsePlugin.zip file into a temporary subdirectory. </para></listitem>
-                    <listitem><para>From the temporary subdirectory, copy the eclipse/features and eclipse/plugins subdirectory into ECLIPSE_HOME</para></listitem>
+                    <listitem><para>Unzip the file V1EclipsePlugin.zip into a temporary location.</para></listitem>
+                    <listitem><para>Launch Eclipse</para></listitem>
+                    <listitem><para>Click Help</para></listitem>
+                    <listitem><para>Click Software Updates</para></listitem>
+                    <listitem><para>Find and Install</para></listitem>
+                    <listitem><para>Select  "Search for new features to install" and click next</para></listitem>
+                    <listitem><para>Click "New Local Site"</para></listitem>
+                    <listitem><para>Find the subdirectoy used in step 1</para></listitem>
                 </orderedlist>
             </para>
         </section>
@@ -98,7 +94,7 @@
                             </row>
                             <row>
                                 <entry>Password</entry>
-                                <entry>Password for the username above.  If the authenticationType is WindowsIntegrated this should be left blank if the username is blank (to use the currently logged on user account).</entry>
+                                <entry>Password for the username above.</entry>
                             </row>
                             <row>
                                 <entry>Effort Tracking</entry>
@@ -114,8 +110,7 @@
     <section id="usage">
         <title>Usage</title>
         <para>
-            ***** Work here and below
-            The add-in consists of two dockable windows, <emphasis>VersionOne Projects</emphasis> and <emphasis>VersionOne Tasks</emphasis>, 
+            The plugin adds consists of two dockable windows, <emphasis>VersionOne Projects</emphasis> and <emphasis>VersionOne Tasks</emphasis>, 
             accessible via the View menu’s Other Windows sub-menu.  
             Additionally, the built-in Visual Studio properties grid is populated with relevant properties dependent on the user’s context and focus within either window.
         </para>

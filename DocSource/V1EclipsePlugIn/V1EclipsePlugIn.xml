@@ -14,9 +14,8 @@
     <section id="description">
         <title>Description</title>
         <para>
-            The VersionOne Eclipse Plugin (V1EclipsePlugIn) provides direct interaction with VersionOne developer tasks from within Eclipse.  
-            This enables Java developers to update VersionOne task status, estimates, remaining effort, etc., without 
-            needing to leave the comfortable confines of the Eclipse Environment.
+            The VersionOne Eclipse Plugin (V1EclipsePlugIn) provides direct interaction with development task in VersionOne within the Eclipse IDE.  
+            This enables Java developers to update VersionOne task status, estimates, remaining effort, etc., without leaving the confines of the Eclipse environment.
         </para>
     </section>
     <section id="systemreqs">
@@ -27,24 +26,36 @@
         <para>
             Client Workstation:
             <itemizedlist>
-                <listitem><para>IDE&mdash;Eclipse 3.3.1.1 (Europa) </para></listitem>
+                <listitem>
+                    <para>IDE&mdash;Tested with Eclipse 3.3.1.1 (Europa) </para>
+                </listitem>
             </itemizedlist>
         </para>
     </section>
     &downloads;
     <section id="installation">
-        <title>1. Installation</title>        
+        <title>Installation</title>
         <section id="install.setup">
-            <para>Use the following steps to install the VersionOne Eclipse Plugin
+            <title>1. Install the Plugin</title>
+            <para>
+                <note><para>In the following instructions ECLIPSE_HOME refers to the Eclipse subdirectory where you want to install the VersionOne plugin</para></note>
                 <orderedlist>
-                    <listitem>Remove any existing VersionOne integration</listitem>
-                    <listitem>Unzip ***** into a temporary location</listitem>
-                    <listitem>Copy the features and plugins directory into ECLIPSE_HOME</listitem>
-                </orderedlist>            
+                    <listitem>
+                        <para>Remove previous versions of the VersionOne plugin.
+                            <orderedlist>
+                                <listitem><para>Under ECLIPSE_HOME/features remove any subdirectory named com.versionone*</para></listitem>
+                                <listitem><para>Under ECLIPSE_HOME/plugins remove any subdirectory named com.versionone*</para></listitem>
+                                <listitem><para>Under ECLIPSE_HOME/plugins remove any jar files named com.versionone*</para></listitem>
+                            </orderedlist>                            
+                        </para>
+                    </listitem>
+                    <listitem><para>Unzip the EclipsePlugin.zip file into a temporary subdirectory. </para></listitem>
+                    <listitem><para>From the temporary subdirectory, copy the eclipse/features and eclipse/plugins subdirectory into ECLIPSE_HOME</para></listitem>
+                </orderedlist>
             </para>
         </section>
         <section id="install.configure">
-            <title>2.  Configure</title>
+            <title>2.  Configure the Plugin</title>
             <para>
                 Select <emphasis>Preferences...</emphasis> from the <emphasis>Window</emphasis> 
                 menu, and navigate to the VersionOne settings as show in <xref
@@ -57,8 +68,6 @@
                 
                 Enter the configuration parameters as specified in the table below and click <emphasis>Validate Connection</emphasis> to ensure that
                 the add-in can both access VersionOne’s API and authenticate using the supplied username and password.				
-                If the add-in is not configured correctly, or if VersionOne is unavailable (e.g. you are off-network), both the Projects and Tasks windows will inform you 
-                of the appropriate error, and provide an option to modify the add-in configuration.
                 
                 <table
                     frame="none" id="install.configure.table">
@@ -77,7 +86,7 @@
                             </row>
                             <row>
                                 <entry>Windows Integrated Authentication</entry>
-                                <entry>Enables Windows Integraten Authentication</entry>
+                                <entry>Check this box if your VersionOne instance uses Windows Integraten Authentication.</entry>
                             </row>
                             <row>
                                 <entry>Application URL</entry>
@@ -112,9 +121,9 @@
         </para>
         <section id="usage.project">
             <title>Selecting Projects</title>
-            
+
             <para>As shown in <xref linkend="usage.project.figure"
-            />, the VersionOne Projects dockable window displays a project tree populated with your current projects. 
+                />, the VersionOne Projects dockable window displays a project tree populated with your current projects. 
                 To access this window, go to the View menu, select the Other Windows sub-menu, and select VersionOne Projects. 
                 To choose a specific project to work on, simply navigate the tree and select it.
             </para>

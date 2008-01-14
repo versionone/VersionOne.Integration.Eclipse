@@ -139,9 +139,12 @@
 	<!-- ===================================================================== -->
 	<target name="postBuild">
 <!--		<antcall target="test"/> -->
+		<property name="UpdateSiteStagingLocation" value="${buildDirectory}/updateSite"/>
+		<property name="sitePackagePrefix" value="com.versionone.updatesite"/>
+		<antcall target="generateUpdateSite"/>
 		<antcall target="gatherLogs"/>
-	</target>
-
+	</target>	
+	
 	<!-- ===================================================================== -->
 	<!-- Steps to do to test the build results -->
 	<!-- ===================================================================== -->
@@ -178,6 +181,40 @@
 	<!-- ===================================================================== -->
 	<target name="publish"> </target>
 
+	<!-- ===================================================================== -->
+	<!-- Create the UpdateSite -->
+	<!-- ===================================================================== -->
+	<target name="generateUpdateSite">
+		<!-- Create the directory structure -->
+		<mkdir dir="${UpdateSiteStagingLocation}"/>
+		<mkdir dir="${UpdateSiteStagingLocation}/features"/>
+		<mkdir dir="${UpdateSiteStagingLocation}/plugins"/>
+		<!-- Build the jar files -->
+		<antcall target="allElements">
+			<param name="genericTargets" value="${builder}/customTargets.xml"/>
+			<param name="target" value="updateSiteExport"/>
+		</antcall>
+		<antcall target="copySiteXmlFromCvs"/>
+		<antcall target="createNightlyBuildSiteXml"/>
+	</target>
+	
+	<target name="updateSiteExport">
+		<ant antfile="build.xml" dir="${buildDirectory}/features/${id}/" target="build.update.jar">
+			<property name="feature.destination" value="${UpdateSiteStagingLocation}/features"/>
+			<property name="plugin.destination" value="${UpdateSiteStagingLocation}/plugins"/>
+		</ant>
+	</target>
+	
+	<target name="copySiteXmlFromCvs" unless="isNightlyBuild">
+		<!-- connect to CVS and fetch site.xml, copy to ${UpdateSiteStagingLocation}/site.xml afterwards -->
+	</target>
+	
+	<target name="createNightlyBuildSiteXml" if="isNightlyBuild">
+		<!-- create ${UpdateSiteStagingLocation}/site.xml which contains only the nighlty build version -->
+	</target>
+	
+	
+	
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->
 	<!-- ===================================================================== -->

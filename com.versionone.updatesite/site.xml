@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+   <feature url="features/com.versionone.v1.feature_1.0.0.jar" id="com.versionone.v1.feature" version="1.0.0">
+      <category name="VersionOne Task View"/>
+   </feature>
    <category-def name="VersionOne Task View" label="VersionOne Task View">
       <description>
          Provides direct interaction with development task in VersionOne from within Eclipse.
       </description>
    </category-def>
-   <feature url="features/com.versionone.v1.feature_1.0.0.jar" id="com.versionone.v1.feature" version="1.0.0">
-   	<category name="VersionOne Task View"/>
-   </feature>
 </site>

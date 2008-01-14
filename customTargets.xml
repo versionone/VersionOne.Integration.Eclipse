@@ -208,6 +208,9 @@
 			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}" destpath="${UpdateSiteStagingLocation}" force="true"/>
 		</svn>
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
+		<delete>
+			<fileset dir="${UpdateSiteStagingLocation}" includes="**/*test*"/>
+		</delete>
 		
 		<!-- Put build results into directory
 		<unzip src="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip" dest="${UpdateSiteStagingLocation}"/>

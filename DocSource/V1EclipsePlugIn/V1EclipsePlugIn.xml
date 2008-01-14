@@ -10,7 +10,7 @@
 <!ENTITY name "V1EclipsePlugin">
 ]>
 <article id="V1EclipsePlugIn.user">
-    <title>VersionOne Eclipse Pl;ugin User Guide</title>
+    <title>VersionOne Eclipse Plugin User Guide</title>
     <section id="description">
         <title>Description</title>
         <para>
@@ -39,12 +39,16 @@
             <title>1. Install the Plugin</title>
             <para>
                 <orderedlist>
-                    <listitem><para>Unzip the file V1EclipsePlugin.zip into a temporary location.</para></listitem>
+                    <listitem><para>Unzip the file V1EclipsePlugin.zip into a temporary location.  We will refer to this location as INSTALL_TEMP</para></listitem>
                     <listitem><para>Launch Eclipse</para></listitem>
                     <listitem><para>Open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
                     <listitem><para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para></listitem>
-                    <listitem><para>Click "New Local Site"</para></listitem>
-                    <listitem><para>Find the subdirectoy used in step 1</para></listitem>
+                    <listitem><para>Click <emphasis>"New Local Site"</emphasis></para></listitem>
+                    <listitem><para>Select INSTALL_TEMP/updatesite</para></listitem>
+                    <listitem><para>Change the name to "VersionOne Eclipse Plugin Updates" (without the quotes)</para></listitem>
+                    <listitem><para>Click <emphasis>OK</emphasis></para></listitem>
+                    <listitem><para>Ensure that only the "VersionOne Eclipse Plugin Updates" is selected</para></listitem>
+                    <listitem><para>Click <emphasis>Finish</emphasis></para></listitem>                    
                 </orderedlist>
             </para>
         </section>

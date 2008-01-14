@@ -41,10 +41,8 @@
                 <orderedlist>
                     <listitem><para>Unzip the file V1EclipsePlugin.zip into a temporary location.</para></listitem>
                     <listitem><para>Launch Eclipse</para></listitem>
-                    <listitem><para>Click Help</para></listitem>
-                    <listitem><para>Click Software Updates</para></listitem>
-                    <listitem><para>Find and Install</para></listitem>
-                    <listitem><para>Select  "Search for new features to install" and click next</para></listitem>
+                    <listitem><para>Open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
+                    <listitem><para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para></listitem>
                     <listitem><para>Click "New Local Site"</para></listitem>
                     <listitem><para>Find the subdirectoy used in step 1</para></listitem>
                 </orderedlist>

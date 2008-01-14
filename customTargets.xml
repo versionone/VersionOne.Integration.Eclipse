@@ -223,6 +223,7 @@
 		<attribute name="content.doc.output.dir" default="${doc.dir}/@{filename}"/>
 		<sequential>
 			<mkdir dir="@{content.doc.output.dir}"/>
+			<echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid ${filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename ${filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml</echo>
 			<exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
 				failonerror="true">
 				<arg
@@ -246,6 +247,7 @@
 		<copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>
 		
 		<!-- this is the index file -->
+		<echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../${doc.dir}/index.html Common/index.xsl index.xml</echo>
 		<exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
 			failonerror="true">
 			<arg line="-o ../${doc.dir}/index.html Common/index.xsl index.xml"/>

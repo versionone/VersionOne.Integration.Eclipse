@@ -38,17 +38,19 @@
         <section id="install.setup">
             <title>1. Install the Plugin</title>
             <para>
-                <orderedlist>
-                    <listitem><para>Unzip the file V1EclipsePlugin.zip into a temporary location.  We will refer to this location as INSTALL_TEMP</para></listitem>
-                    <listitem><para>Launch Eclipse</para></listitem>
-                    <listitem><para>Open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
+                <orderedlist spacing="compact">
+                    <listitem><para>Unzip the file &name;.zip into a temporary location.  We will refer to this location as INSTALL_TEMP</para></listitem>
+                    <listitem><para>From inside the Eclipse IDE, open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
                     <listitem><para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para></listitem>
                     <listitem><para>Click <emphasis>"New Local Site"</emphasis></para></listitem>
                     <listitem><para>Select INSTALL_TEMP/updatesite</para></listitem>
-                    <listitem><para>Change the name to "VersionOne Eclipse Plugin Updates" (without the quotes)</para></listitem>
-                    <listitem><para>Click <emphasis>OK</emphasis></para></listitem>
-                    <listitem><para>Ensure that only the "VersionOne Eclipse Plugin Updates" is selected</para></listitem>
-                    <listitem><para>Click <emphasis>Finish</emphasis></para></listitem>                    
+                    <listitem><para>Change the name to "VersionOne Eclipse Plugin Updates" (without the quotes) and click <emphasis>Ok</emphasis></para></listitem>
+                    <listitem><para>Ensure that only the "VersionOne Eclipse Plugin Updates" is selected and click <emphasis>Finish</emphasis></para></listitem>
+                    <listitem><para>Select "VersionOne Eclipse Plugin Updates" and click <emphasis>Next</emphasis></para></listitem>
+                    <listitem><para>Accept the license agreement and click <emphasis>Next</emphasis></para></listitem>
+                    <listitem><para>Review the information and click <emphasis>Finish</emphasis></para></listitem>
+                    <listitem><para>When prompted select <emphasis>Install</emphasis></para></listitem>
+                    <listitem><para>When prompted restart Eclipse</para></listitem>
                 </orderedlist>
             </para>
         </section>
@@ -112,41 +114,35 @@
     <section id="usage">
         <title>Usage</title>
         <para>
-            The plugin adds consists of two dockable windows, <emphasis>VersionOne Projects</emphasis> and <emphasis>VersionOne Tasks</emphasis>, 
-            accessible via the View menu’s Other Windows sub-menu.  
-            Additionally, the built-in Visual Studio properties grid is populated with relevant properties dependent on the user’s context and focus within either window.
+            &name; contributes a new View to the Eclipse environment.  This view can be added to any perspective by selecting <emphasis>Window | Show View | Other ...</emphasis> .
+            From the Show View dialog , expand the <emphasis>VersionOne</emphasis> node and select <emphasis>Task View</emphasis>.
+            <figure id="usage.newtask.figure">
+                <title>Tasks Window</title>
+                <graphic fileref="NewTaskWindow.JPG"/>
+            </figure>
         </para>
         <section id="usage.project">
             <title>Selecting Projects</title>
-
-            <para>As shown in <xref linkend="usage.project.figure"
-                />, the VersionOne Projects dockable window displays a project tree populated with your current projects. 
-                To access this window, go to the View menu, select the Other Windows sub-menu, and select VersionOne Projects. 
-                To choose a specific project to work on, simply navigate the tree and select it.
+            <para>In order to view VersionOne Task you must first select a Project.  To select a Project clicking the <emphasis>Filter</emphasis> icon located on the right side of the Task View tool bar. 
+                <figure id="usage.project.figure">
+                    <title>Projects Window</title>
+                    <graphic fileref="Projects.JPG"/>
+                </figure>
+                To choose a specific project to work on, simply navigate the tree and select it.  Once selected, click <emphasis>OK</emphasis> to exit.
             </para>
-            <para>
-                Note that your project selection is maintained between uses of Visual Studio (per user, via Documents And Settings), 
-                so after you select the project you may close this window to preserve real estate within the IDE.  The Task Window
-                (discussed next) displays the current project name in its’ window title for project context.	
-            </para>
-            <figure id="usage.project.figure">
-                <title>Projects Window</title>
-                <graphic fileref="Projects.JPG"/>
-            </figure>
         </section>
         <section id="usage.tasks">
             <title>Updating Tasks</title>
             <para>
-                Like the VersionOne Projects window, the Tasks window is accessible by selecting VersionOne Tasks via the View menu’s Other Windows sub-menu.
-                Once you’ve selected a project you’re working on, the Tasks window will display a grid listing all tasks that belong to you.
-                To update a task, either modify the attribute directly in the tasks grid (for the most common properties) or, after selecting the row,
-                use the Visual Studio properties grid to edit the extended set of task properties.  Once you’re finished updating a Task, click the Save button to update the task in VersionOne.				
+                Once you’ve selected a project your Task view will refresh and list all VersionOne task to which you are assigned.  
+                To update a task, modify the attribute directly in the grid. Once you’re finished updating a Task, click the Save icon to update the task in VersionOne.				
+                <figure id="usage.tasks.figure">
+                    <title>Tasks Window</title>
+                    <graphic fileref="Tasks.JPG"/>
+                </figure>
             </para>
-            <figure id="usage.tasks.figure">
-                <title>Tasks Window</title>
-                <graphic fileref="Tasks.JPG"/>
-            </figure>
         </section>
+        
     </section>
     <section id="section.footer">
         <title/>

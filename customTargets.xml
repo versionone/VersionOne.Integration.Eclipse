@@ -1,7 +1,7 @@
 <project name="Build specific targets and properties" default="noDefault">
 
 	<!-- Name of the distribution file -->
-	<property name="dist.filename" value="EclipsePlugin.zip"/>
+	<property name="dist.filename" value="V1EclipsePlugin.zip"/>
 
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
@@ -34,7 +34,6 @@
 			<export srcurl="${maps.URL}" revision="${maps.revision}"
 				destpath="${buildDirectory}/maps" force="true"/>
 		</svn>
-
 	</target>
 
 	<target name="checkLocalMaps">
@@ -194,8 +193,10 @@
 			<param name="genericTargets" value="${builder}/customTargets.xml"/>
 			<param name="target" value="updateSiteExport"/>
 		</antcall>
-		<antcall target="copySiteXmlFromCvs"/>
-		<antcall target="createNightlyBuildSiteXml"/>
+		<svn javahl="false">
+			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}"
+				destpath="${UpdateSiteStagingLocation}" force="true"/>
+		</svn>		
 	</target>
 	
 	<target name="updateSiteExport">
@@ -203,17 +204,7 @@
 			<property name="feature.destination" value="${UpdateSiteStagingLocation}/features"/>
 			<property name="plugin.destination" value="${UpdateSiteStagingLocation}/plugins"/>
 		</ant>
-	</target>
-	
-	<target name="copySiteXmlFromCvs" unless="isNightlyBuild">
-		<!-- connect to CVS and fetch site.xml, copy to ${UpdateSiteStagingLocation}/site.xml afterwards -->
-	</target>
-	
-	<target name="createNightlyBuildSiteXml" if="isNightlyBuild">
-		<!-- create ${UpdateSiteStagingLocation}/site.xml which contains only the nighlty build version -->
-	</target>
-	
-	
+	</target>	
 	
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->

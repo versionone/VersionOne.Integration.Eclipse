@@ -127,10 +127,6 @@
 	<!-- Steps to do after  running package. -->
 	<!-- ===================================================================== -->
 	<target name="postPackage">
-		<move file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"
-			tofile="${builder}/${buildLabel}/${dist.filename}"/>
-		<copy file="${builder}/${buildLabel}/${dist.filename}"
-			tofile="${publish.dir}/${dist.filename}"/>
 	</target>
 
 	<!-- ===================================================================== -->
@@ -138,10 +134,9 @@
 	<!-- ===================================================================== -->
 	<target name="postBuild">
 <!--		<antcall target="test"/> -->
-		<property name="UpdateSiteStagingLocation" value="${buildDirectory}/updateSite"/>
-		<property name="sitePackagePrefix" value="com.versionone.updatesite"/>
 		<antcall target="generateUpdateSite"/>
 		<antcall target="gatherLogs"/>
+		
 	</target>	
 	
 	<!-- ===================================================================== -->
@@ -178,33 +173,39 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish"> </target>
+	<target name="publish"> 
+<!-- 		<move file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"
+			tofile="${builder}/${buildLabel}/${dist.filename}"/> -->
+		<copy file="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip"
+			tofile="${publish.dir}/${dist.filename}"/>
+	</target>
 
 	<!-- ===================================================================== -->
 	<!-- Create the UpdateSite -->
 	<!-- ===================================================================== -->
 	<target name="generateUpdateSite">
+	
+		<property name="UpdateSiteStagingLocation" value="${buildDirectory}/updateSite"/>
+		<property name="sitePackagePrefix" value="com.versionone.updatesite"/>
+	
 		<!-- Create the directory structure -->
 		<mkdir dir="${UpdateSiteStagingLocation}"/>
-		<mkdir dir="${UpdateSiteStagingLocation}/features"/>
-		<mkdir dir="${UpdateSiteStagingLocation}/plugins"/>
-		<!-- Build the jar files -->
-		<antcall target="allElements">
-			<param name="genericTargets" value="${builder}/customTargets.xml"/>
-			<param name="target" value="updateSiteExport"/>
-		</antcall>
+		
 		<svn javahl="false">
 			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}"
 				destpath="${UpdateSiteStagingLocation}" force="true"/>
 		</svn>		
+
+		<delete file="${UpdateSiteStagingLocation}/.project"/>
+		
+		<unzip src="${builder}/${buildLabel}/com.versionone.v1.feature-${buildId}.zip" dest="${UpdateSiteStagingLocation}">
+			<patternset>
+				<include name="**/features/*"/>
+				<include name="**/plugins/*"/>
+			</patternset>
+		</unzip>
+
 	</target>
-	
-	<target name="updateSiteExport">
-		<ant antfile="build.xml" dir="${buildDirectory}/features/${id}/" target="build.update.jar">
-			<property name="feature.destination" value="${UpdateSiteStagingLocation}/features"/>
-			<property name="plugin.destination" value="${UpdateSiteStagingLocation}/plugins"/>
-		</ant>
-	</target>	
 	
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->

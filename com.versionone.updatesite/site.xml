@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <description url="http://eval.versionone.net/updatesite/V1EclipsePlugin">
-     VersionOne Eclipse Integrations Update
+      VersionOne Eclipse Integrations Update
    </description>
-   <feature url="features/com.versionone.v1.feature_1.0.0.jar" id="com.versionone.v1.feature" version="1.0.0">
+   <feature url="features/com.versionone.v1.feature_1.0.1.jar" id="com.versionone.v1.feature" version="1.0.1">
       <category name="VersionOne Task View"/>
    </feature>
    <category-def name="VersionOne Task View" label="VersionOne Task View">

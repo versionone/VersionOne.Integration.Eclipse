@@ -2,7 +2,7 @@
 <feature
       id="com.versionone.v1.feature"
       label="VersionOne V1: Agile Enterprise"
-      version="1.0.1"
+      version="1.0.0"
       provider-name="VersionOne">
 
    <description url="http://www.versionone.com">
@@ -44,7 +44,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </license>
 
    <url>
-      <update label="VersionOne Eclipse Integrations Update" url="http://eval.versionone.net/updatesite/V1EclipsePlugin"/>
+      <update label="VersionOne Eclipse Integrations Update" url="http://updates.versionone.com/eclipse/v1plugin"/>
    </url>
 
    <plugin

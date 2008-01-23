@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!--<!DOCTYPE article PUBLIC "-//OASIS//DTD Simplied DocBook XML V1.1//EN" "http://www.oasis-open.org/docbook/xml/simple/1.1/sdocbook.dtd"-->
 <!--<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"-->
@@ -40,7 +40,7 @@
             <title>1a. Install from the Update Site</title>
             <para>Use these instructions if you can install from our internet update site.
             <orderedlist spacing="compact">
-                <listitem><para>From inside the Eclipse IDE, open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
+                <listitem><para>From inside the Eclipse IDE, open the Install Wizard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
                 <listitem><para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para></listitem>
                 <listitem><para>Click <emphasis>"New Remote Site"</emphasis></para></listitem>
                 <listitem><para>Enter the following parameters</para>
@@ -83,7 +83,7 @@
                         <para>Unzip the file &name;.zip into a temporary location.  We will refer to this location as INSTALL_TEMP</para>
                     </listitem>
                     <listitem>
-                        <para>From inside the Eclipse IDE, open the Install Wizzard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para>
+                        <para>From inside the Eclipse IDE, open the Install Wizard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para>
                     </listitem>
                     <listitem>
                         <para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para>

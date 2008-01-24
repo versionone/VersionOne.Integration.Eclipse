@@ -292,8 +292,8 @@
 	<!-- ===================================================================== -->
 	<target name="gatherSource">
 		<zip destfile="${builder}/${buildLabel}/${dist.source.filename}">
-			<fileset dir="${buildDirectory}/features" excludes="**/@dot"/>
-			<fileset dir="${buildDirectory}/plugins" excludes="**/@dot"/>
+			<fileset dir="${buildDirectory}/features" excludes="**/@dot/**"/>
+			<fileset dir="${buildDirectory}/plugins" excludes="**/@dot/**"/>
 			<fileset dir="${buildDirectory}">
 				<include name="allElements.xml"/>
 				<include name="build.properties"/>

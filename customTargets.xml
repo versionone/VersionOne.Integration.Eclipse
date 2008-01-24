@@ -189,9 +189,11 @@
 	<target name="publish">	
 		<!-- create the new zip -->
 		<zip destfile="${builder}/${buildLabel}/${dist.filename}"
-		     basedir="${dist.dir}"/>				
+		     basedir="${dist.dir}"/>
 		<copy file="${builder}/${buildLabel}/${dist.filename}"
 			tofile="${publish.dir}/${dist.filename}"/>
+		<copy file="${builder}/${buildLabel}/${dist.source.filename}"
+			tofile="${publish.dir}/${dist.source.filename}"/>
 	</target>
 
 	<!-- ===================================================================== -->
@@ -290,10 +292,12 @@
 	<!-- ===================================================================== -->
 	<target name="gatherSource">
 		<zip destfile="${builder}/${buildLabel}/${dist.source.filename}">
-			<fileset dir="${buildDirectory}/features"/>
-			<fileset dir="${buildDirectory}/plugins"/>
-			<fileset dir="${buildDirectory}/maps"/>
-			<fileset dir="${buildDirectory}/DocSource"/>
+			<fileset dir="${buildDirectory}">
+				<include name="features/**/*"/>
+				<include name="plugins/**/*"/>
+				<include name="maps/**/*"/>
+				<include name="DocSource/**/*"/>
+			</fileset>
 		</zip>
 	</target>
 

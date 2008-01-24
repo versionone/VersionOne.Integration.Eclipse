@@ -256,7 +256,7 @@
 	</macrodef>
 
 	<target name="gendoc">
-		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>		
+		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
 		
 		<svn javahl="false">
@@ -290,10 +290,10 @@
 	<!-- ===================================================================== -->
 	<target name="gatherSource">
 		<zip destfile="${builder}/${buildLabel}/${dist.source.filename}">
-			<fileset dir="features"/>
-			<fileset dir="plugins"/>
-			<fileset dir="maps"/>
-			<fileset dir="DocSource"/>
+			<fileset dir="${buildDirectory}/features"/>
+			<fileset dir="${buildDirectory}/plugins"/>
+			<fileset dir="${buildDirectory}/maps"/>
+			<fileset dir="${buildDirectory}/DocSource"/>
 		</zip>
 	</target>
 

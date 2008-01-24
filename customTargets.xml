@@ -292,11 +292,17 @@
 	<!-- ===================================================================== -->
 	<target name="gatherSource">
 		<zip destfile="${builder}/${buildLabel}/${dist.source.filename}">
+			<fileset dir="${buildDirectory}/features"/>
+			<fileset dir="${buildDirectory}/plugins"/>
+			<fileset dir="${buildDirectory}/maps"/>
+			<fileset dir="${buildDirectory}/DocSource"/>
 			<fileset dir="${buildDirectory}">
-				<include name="features/**/*"/>
-				<include name="plugins/**/*"/>
-				<include name="maps/**/*"/>
-				<include name="DocSource/**/*"/>
+				<include name="allElements.xml"/>
+				<include name="build.properties"/>
+				<include name="build.xml"/>
+				<include name="customTargets.xml"/>
+				<include name="test.properties"/>
+				<include name="test.xml"/>
 			</fileset>
 		</zip>
 	</target>

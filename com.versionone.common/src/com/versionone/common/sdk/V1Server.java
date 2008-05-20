@@ -19,11 +19,13 @@ import com.versionone.apiclient.IServices;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
+import com.versionone.apiclient.OrderBy;
 import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
 import com.versionone.apiclient.Services;
 import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Exception;
+import com.versionone.apiclient.OrderBy.Order;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -204,6 +206,10 @@ public class V1Server {
 		Query query = new Query(taskType);
 		addTaskSelection(query, taskType);
 		addFilter(query, taskType);
+		
+		OrderBy order = new OrderBy();
+		order.majorSort(taskType.getAttributeDefinition("Parent.Order"), Order.Ascending);
+		query.setOrderBy(order);
 		
 		QueryResult result = _services.retrieve(query);
 		Asset[] taskAssets = result.getAssets();

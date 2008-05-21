@@ -209,6 +209,7 @@ public class V1Server {
 		
 		OrderBy order = new OrderBy();
 		order.majorSort(taskType.getAttributeDefinition("Parent.Order"), Order.Ascending);
+		order.minorSort(taskType.getAttributeDefinition("Order"), Order.Ascending);
 		query.setOrderBy(order);
 		
 		QueryResult result = _services.retrieve(query);

@@ -2,6 +2,8 @@ package com.versionone.common.sdk;
 
 import com.versionone.Oid;
 import com.versionone.apiclient.Asset;
+import com.versionone.apiclient.AssetState;
+import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.IMetaModel;
@@ -49,10 +51,14 @@ public class TaskStatusCodes implements IStatusCodes {
 	TaskStatusCodes(IMetaModel metaModel, IServices services) throws V1Exception {
 		
 		IAssetType statusType = metaModel.getAssetType("TaskStatus");
-		IAttributeDefinition name = statusType.getAttributeDefinition("Name");
+		IAttributeDefinition name  = statusType.getAttributeDefinition("Name");
 
 		Query query = new Query(statusType);
 		query.getSelection().add(name);
+		
+		FilterTerm term = new FilterTerm(statusType.getAttributeDefinition("AssetState"),          FilterTerm.Operator.NotEqual, AssetState.Closed);
+		query.setFilter(term);
+
 		QueryResult queryResults = services.retrieve(query);
 		Asset[] result = queryResults.getAssets();
 		

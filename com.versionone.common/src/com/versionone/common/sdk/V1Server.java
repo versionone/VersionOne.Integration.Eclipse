@@ -95,10 +95,9 @@ public class V1Server {
 		
 		try {
 			_actualType = _metaModel.getAssetType("Actual");
-		} catch (V1Exception e) {
+		} catch (MetaException e) {
 			Activator.logError(e);
-		}
-		
+		}		
 	}
 
 	/**

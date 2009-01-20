@@ -99,7 +99,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 */
 	public static abstract class FloatEditor extends TaskEditor {
 
-		float oldValue;
+		double oldValue;
 
 		public FloatEditor(TableViewer viewer) {
 			super(viewer);
@@ -133,9 +133,9 @@ abstract public class TaskEditor extends EditingSupport {
 		 * @param task - instance to use
 		 * @return float value or -1 if an error occurs
 		 */
-		abstract float getValue(Task task) throws Exception;
+		abstract double getValue(Task task) throws Exception;
 		
-		abstract void setFloatValue(Task task, float value) throws Exception;
+		abstract void setFloatValue(Task task, double value) throws Exception;
 	}
 		
 	/**
@@ -147,12 +147,12 @@ abstract public class TaskEditor extends EditingSupport {
 			super(viewer);
 		}
 
-		protected float getValue(Task task) throws Exception {
+		protected double getValue(Task task) throws Exception {
 			return task.getEstimate();
 		}
 
 		@Override
-		protected void setFloatValue(Task element, float value) throws Exception {
+		protected void setFloatValue(Task element, double value) throws Exception {
 			element.setEstimate(value);
 		}
 	}
@@ -166,15 +166,15 @@ abstract public class TaskEditor extends EditingSupport {
 			super(viewer);
 		}
 
-		protected float getValue(Task element) throws Exception {
-			float effort = element.getEffort(); 
+		protected double getValue(Task element) throws Exception {
+			double effort = element.getEffort(); 
 			if(0 == effort)
 				return -1;
 			return effort;
 		}
 
 		@Override
-		protected void setFloatValue(Task element, float value) throws Exception {
+		protected void setFloatValue(Task element, double value) throws Exception {
 			element.setEffort(value);
 		}
 	}
@@ -188,12 +188,12 @@ abstract public class TaskEditor extends EditingSupport {
 			super(viewer);
 		}
 
-		protected float getValue(Task element) throws Exception {
+		protected double getValue(Task element) throws Exception {
 			return element.getToDo();
 		}
 
 		@Override
-		protected void setFloatValue(Task element, float value) throws Exception {
+		protected void setFloatValue(Task element, double value) throws Exception {
 			element.setToDo(value);
 		}
 	}

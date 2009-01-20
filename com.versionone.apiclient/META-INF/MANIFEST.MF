@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: APIClient Plugin
 Bundle-SymbolicName: com.versionone.apiclient
-Bundle-Version: 1.0.0
-Bundle-ClassPath: APIClient.jar
+Bundle-Version: 2.0.0
+Bundle-ClassPath: VersionOne.APIClient.jar
 Bundle-Vendor: VersionOne
 Export-Package: com.versionone,
  com.versionone.apiclient,

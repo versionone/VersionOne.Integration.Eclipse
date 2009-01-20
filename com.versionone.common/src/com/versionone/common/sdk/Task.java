@@ -19,7 +19,7 @@ public class Task {
 	private static final String STATUS_ID_PROPERTY     	 = "Status";
 	private static final String DONE_PROPERTY            = "Actuals.Value.@Sum";
 
-	private static final float INITIAL_EFFORT = 0;
+	private static final double INITIAL_EFFORT = 0;
 	
 	private static final String TASK_PREFIX = "Task.";
 	
@@ -29,7 +29,7 @@ public class Task {
 	IAttributeDefinition _statusDefinition;
 
 	Asset _asset;
-	Float _effortValue = new Float(INITIAL_EFFORT);
+	Double _effortValue = new Double(INITIAL_EFFORT);
 	
 	/**
 	 * Create  
@@ -69,7 +69,7 @@ public class Task {
 	 * @return value of estimate or -1 if the attribute is blank
 	 * @throws Exception
 	 */
-	public float getEstimate() throws Exception {		
+	public double getEstimate() throws Exception {		
 		return getFloatValue(_estimateDefinition);
 	}
 
@@ -81,7 +81,7 @@ public class Task {
 	 * @throws Exception when an API error occurs
 	 * @throws IllegalArgumentException if the value is less than 0
 	 */
-	public void setEstimate(float value) throws Exception {
+	public void setEstimate(double value) throws Exception {
 		if(0 > value)
 			throw new IllegalArgumentException("Estimate cannot be negative");
 		_asset.setAttributeValue(_estimateDefinition, value);
@@ -92,7 +92,7 @@ public class Task {
 	 * @return value of estimate or -1 if the attribute is blank
 	 * @throws Exception
 	 */
-	public float getToDo() throws Exception {
+	public double getToDo() throws Exception {
 		return getFloatValue(_todoDefinition);
 	}
 	
@@ -103,7 +103,7 @@ public class Task {
 	 * @throws Exception when an API error occurs
 	 * @throws IllegalArgumentException if the value is less than 0
 	 */
-	public void setToDo(float value) throws Exception {
+	public void setToDo(double value) throws Exception {
 		if(0 > value)
 			throw new IllegalArgumentException("ToDo cannot be negative");
 		_asset.setAttributeValue(_todoDefinition, value);
@@ -141,11 +141,11 @@ public class Task {
 	 * Effort on this task
 	 * @return value of estimate or 0 if the attribute is blank
 	 */
-	public float getEffort() {
+	public double getEffort() {
 		return _effortValue;
 	}
 	
-	public void setEffort(float value) throws Exception {
+	public void setEffort(double value) throws Exception {
 		_effortValue = value;		
 	}
 
@@ -181,11 +181,11 @@ public class Task {
 	 * @return value of attribute or -1 if the attribute does not exist
 	 * @throws Exception
 	 */
-	float getFloatValue(IAttributeDefinition attribute) throws Exception {
+	double getFloatValue(IAttributeDefinition attribute) throws Exception {
 		float rc = -1;
 		Attribute attrib = _asset.getAttribute(attribute);
 		if(null != attrib) {
-			Float value = ((Float)attrib.getValue());
+			Double value = ((Double)attrib.getValue());
 			if(null != value)
 				rc = value.floatValue(); 
 		}

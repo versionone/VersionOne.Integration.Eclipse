@@ -27,7 +27,7 @@
             Client Workstation:
             <itemizedlist>
                 <listitem>
-                    <para>IDE&mdash;Tested with Eclipse 3.3.1.1 (Europa) </para>
+                    <para>IDE&mdash;Eclipse 3.3.1.1 (Europa) &mdash; Eclipse 3.4.2 (Ganymede)</para>
                 </listitem>
             </itemizedlist>
         </para>
@@ -39,46 +39,67 @@
         <section id="install.updatesite">
             <title>1a. Install from the Update Site</title>
             <para>Use these instructions if you can install from our internet update site.
-            <orderedlist spacing="compact">
-                <listitem><para>From inside the Eclipse IDE, open the Install Wizard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para></listitem>
-                <listitem><para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para></listitem>
-                <listitem><para>Click <emphasis>"New Remote Site"</emphasis></para></listitem>
-                <listitem><para>Enter the following parameters</para>
-                    <table>
-                        <title></title>
-                        <tgroup cols="2">
-                            <thead>
-                                <row>
-                                    <entry>Parameter</entry>
-                                    <entry>Value</entry>
-                                </row>
-                            </thead>
-                            <tbody>
-                                <row>
-                                    <entry>Name</entry>
-                                    <entry>VersionOne Plugin Updates</entry>
-                                </row>
-                                <row>
-                                    <entry>URL</entry>
-                                    <entry>http://updates.versionone.com/eclipse/v1plugin</entry>
-                                </row>
-                            </tbody>
-                        </tgroup>
-                    </table>
-                </listitem>
-                <listitem><para>Ensure that <emphasis>"VersionOne Plugin Updates"</emphasis> is selected and press <emphasis>Finsih</emphasis></para></listitem>
-                <listitem><para>Under <emphasis>Select the Features to Install</emphasis> check the <emphasis>"VersionOne Plugin Updates"</emphasis> check box  and press <emphasis>Next</emphasis></para></listitem>
-                <listitem><para>Accept the license agreement and press <emphasis>Next</emphasis></para></listitem>
-                <listitem><para>Review the information and if correct click <emphasis>Finish</emphasis></para></listitem>
-                <listitem><para>If you get a warning that the plugin is unsigned click <emphasis>Install</emphasis> or <emphasis>Install All</emphasis></para></listitem>
-                <listitem><para>After the install is complete, restart Eclipse for the changes to take affect</para></listitem>
-            </orderedlist>
+            <orderedlist
+                    spacing="compact">
+                    <listitem>
+                        <para>From inside the Eclipse IDE, open the Install Wizard by clicking <emphasis>Help | Software Updates... | Find and Install</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Select  <emphasis>"Search for new features to install"</emphasis> and click <emphasis>Next</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Click <emphasis>"New Remote Site"</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Enter the following parameters</para>
+                        <table>
+                            <title/>
+                            <tgroup cols="2">
+                                <thead>
+                                    <row>
+                                        <entry>Parameter</entry>
+                                        <entry>Value</entry>
+                                    </row>
+                                </thead>
+                                <tbody>
+                                    <row>
+                                        <entry>Name</entry>
+                                        <entry>VersionOne Plugin Updates</entry>
+                                    </row>
+                                    <row>
+                                        <entry>URL</entry>
+                                        <entry>http://updates.versionone.com/eclipse/v1plugin</entry>
+                                    </row>
+                                </tbody>
+                            </tgroup>
+                        </table>
+                    </listitem>
+                    <listitem>
+                        <para>Ensure that <emphasis>"VersionOne Plugin Updates"</emphasis> is selected and press <emphasis>Finsih</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Under <emphasis>Select the Features to Install</emphasis> check the <emphasis>"VersionOne Plugin Updates"</emphasis> check box  and press <emphasis>Next</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Accept the license agreement and press <emphasis>Next</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>Review the information and if correct click <emphasis>Finish</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>If you get a warning that the plugin is unsigned click <emphasis>Install</emphasis> or <emphasis>Install All</emphasis></para>
+                    </listitem>
+                    <listitem>
+                        <para>After the install is complete, restart Eclipse for the changes to take affect</para>
+                    </listitem>
+                </orderedlist>
             </para>
-        </section>        
+        </section>
         <section id="install.local.setup">
             <title>1b. Install the Plugin Locally</title>
             <para>Use these instructions if you cannot install from our internet update site or prefer to install locally
-                <orderedlist spacing="compact">
+                <orderedlist
+                    spacing="compact">
                     <listitem>
                         <para>Unzip the file &name;.zip into a temporary location.  We will refer to this location as INSTALL_TEMP</para>
                     </listitem>

@@ -2,7 +2,7 @@
 <feature
       id="com.versionone.v1.feature"
       label="VersionOne V1: Agile Enterprise"
-      version="1.6.0"
+      version="2.0"
       provider-name="VersionOne">
 
    <description url="http://www.versionone.com">
@@ -10,12 +10,12 @@
    </description>
 
    <copyright url="http://www.example.com/copyright">
-      Copyright (c) 2007, VersionOne, Inc.
+      Copyright (c) 2009, VersionOne, Inc.
 All rights reserved.
    </copyright>
 
    <license>
-      Copyright (c) 2007, VersionOne, Inc.
+      Copyright (c) 2009, VersionOne, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions

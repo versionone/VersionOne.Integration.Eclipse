@@ -19,12 +19,12 @@
 
    <requires>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.junit4"/>
-      <import feature="com.versionone.v1.feature" version="1.0.0"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="com.versionone.apiclient"/>
       <import plugin="com.versionone.common"/>
+      <import plugin="org.junit4"/>
       <import plugin="com.versionone.taskview"/>
+      <import feature="com.versionone.v1.feature"/>
    </requires>
 
    <plugin

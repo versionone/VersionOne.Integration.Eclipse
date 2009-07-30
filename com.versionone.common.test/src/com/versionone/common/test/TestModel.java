@@ -36,6 +36,7 @@ public class TestModel {
 	static final String SCOPE_ID = "Scope:1012";
 	static final boolean VALIDATION_REQUIRED = false;
 	static final boolean TRACKING = false;
+	private static final double EPSILON = 0.005;
 	
 	
 	@BeforeClass
@@ -123,17 +124,17 @@ public class TestModel {
 	private void validateSetToDo(Task testMe) throws Exception {
 		
 		testMe.setToDo(0);
-		Assert.assertEquals(0, testMe.getToDo());
+		Assert.assertEquals(0, testMe.getToDo(), EPSILON);
 		
 		testMe.setToDo(10);
-		Assert.assertEquals(10, testMe.getToDo());
+		Assert.assertEquals(10, testMe.getToDo(), EPSILON);
 		
 		try {
 			testMe.setToDo(-1);
 			Assert.fail("ToDo cannot be negative");
 		}
 		catch(IllegalArgumentException e) {}
-		Assert.assertEquals(10, testMe.getToDo());
+		Assert.assertEquals(10, testMe.getToDo(), EPSILON);
 	}
 
 	/**
@@ -179,10 +180,10 @@ public class TestModel {
 	private void validateSetEstimate(Task testMe) throws Exception {
 	
 		testMe.setEstimate(0);
-		Assert.assertEquals(0, testMe.getEstimate());
+		Assert.assertEquals(0, testMe.getEstimate(), EPSILON);
 		
 		testMe.setEstimate(10);
-		Assert.assertEquals(10, testMe.getEstimate());
+		Assert.assertEquals(10, testMe.getEstimate(), EPSILON);
 		
 		try {
 			testMe.setEstimate(-1);
@@ -190,7 +191,7 @@ public class TestModel {
 		}
 		catch(IllegalArgumentException e) {}
 		
-		Assert.assertEquals(10, testMe.getEstimate());
+		Assert.assertEquals(10, testMe.getEstimate(), EPSILON);
 	}
 
 	/**
@@ -200,13 +201,13 @@ public class TestModel {
 	 */
 	private void validateSetEffort(Task testMe) throws Exception {
 		testMe.setEffort(0);
-		Assert.assertEquals(0, testMe.getEffort());
+		Assert.assertEquals(0, testMe.getEffort(), EPSILON);
 		
 		testMe.setEffort(10);
-		Assert.assertEquals(10, testMe.getEffort());
+		Assert.assertEquals(10, testMe.getEffort(), EPSILON);
 
 		testMe.setEffort(-1);
-		Assert.assertEquals(-1, testMe.getEffort());
+		Assert.assertEquals(-1, testMe.getEffort(), EPSILON);
 	}
 	
 	
@@ -267,10 +268,10 @@ public class TestModel {
 		Assert.assertEquals(expectedName, task.getName());
 		Assert.assertEquals(expectedId, task.getID());
 		Assert.assertEquals(expectedStory, task.getStoryName());
-		Assert.assertEquals(expectedEstimate, task.getEstimate());
+		Assert.assertEquals(expectedEstimate, task.getEstimate(), EPSILON);
 		Assert.assertEquals(expectedDone, task.getDone());
-		Assert.assertEquals(expectedEffort, task.getEffort());
-		Assert.assertEquals(expectedTodo, task.getToDo());
+		Assert.assertEquals(expectedEffort, task.getEffort(), EPSILON);
+		Assert.assertEquals(expectedTodo, task.getToDo(), EPSILON);
 		Assert.assertEquals(expectedStatus, task.getStatus());
 	}
 }

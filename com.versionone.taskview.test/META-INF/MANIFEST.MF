@@ -4,11 +4,13 @@ Bundle-Name: Test Plug-in
 Bundle-SymbolicName: com.versionone.taskview.test
 Bundle-Version: 1.0.0
 Bundle-Activator: com.versionone.taskview.test.Activator
-Bundle-Vendor: VERSIONONE
-Require-Bundle: org.eclipse.ui,
+Bundle-Vendor: VersionOne
+Bundle-ActivationPolicy: lazy
+Require-Bundle: 
+ org.eclipse.ui,
  org.eclipse.core.runtime,
  com.versionone.common,
- com.versionone.taskview,
+ com.versionone.taskview;bundle-version="2.0.0",
  com.versionone.apiclient,
  org.junit4
-Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

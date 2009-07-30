@@ -10,7 +10,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -333,38 +332,32 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		Object justForTest;
 		
-		//@Override
 		public Object[] getChildren(Object parentElement) {
 			// TODO Auto-generated method stub
 			return (Object[]) justForTest;
 		}
 
-		//@Override
 		public Object getParent(Object element) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		//@Override
 		public boolean hasChildren(Object element) {
 			// TODO Auto-generated method stub
 			return true;
 		}
 
-		//@Override
 		public Object[] getElements(Object inputElement) {
 			justForTest = inputElement;
 			return new Object[]{"test1" ,"test2" ,"test3" ,"test4" ,"test5", "test6" };
 
 		}
 
-		//@Override
 		public void dispose() {
 			// TODO Auto-generated method stub
 			
 		}
 
-		//@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			// TODO Auto-generated method stub
 			

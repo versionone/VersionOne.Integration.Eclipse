@@ -269,62 +269,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * Create the action menus
 	 */
 	private void makeActions() {
-		selectProjectAction  = new Action() {
-			public void run() {
-				IProjectTreeNode root = getProjectTreeNode();
-				IProjectTreeNode selectNode = null;
-				String projectToken = PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN); 
-				if(!projectToken.equals("")) {
-					selectNode = new ProjectTreeNode("", projectToken);
-				}
-				ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(viewer.getControl().getShell(), root, selectNode);
-				projectSelectDialog.create();
-				projectSelectDialog.open();
-				loadTable();
-			}
-		};
-		selectProjectAction.setText("Select Project");
-		selectProjectAction.setToolTipText("Select Project");
-		selectProjectAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.FILTER_IMAGE_ID));
+		selectProjectAction  = new ProjectAction(this, viewer);
 		
-		refreshAction = new Action() {
-			public void run() {
-				loadTable();
-				statusEditor.setStatusCodes(getStatusValues());
-			}
-		};
-		refreshAction.setText("Refresh");
-		refreshAction.setToolTipText("Refresh");
-		refreshAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.REFRESH_IMAGE_ID));
+		refreshAction = new RefreshAction(this);
 		
-		saveAction = new Action() {
-			public void run() {
-				if(viewer.isCellEditorActive()) {
-					viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
-				}
-				TreeItem[] rows = viewer.getTree().getItems();
-				ArrayList<Task> saveUs = new ArrayList<Task>();
-				for(int i = 0; i < rows.length; ++i) {
-					if(((Task)rows[i].getData()).isDirty()) {
-						saveUs.add((Task) rows[i].getData());
-					}
-				}
-				if(0 != saveUs.size()) {
-					try {
-						V1Server.getInstance().save(saveUs);
-					}
-					catch(Exception e) {
-						Activator.logError(e);
-						showMessage("Error saving task. Check Error log for more information.");
-					}		
-					loadTable();
-					statusEditor.setStatusCodes(getStatusValues());
-				}
-			}			
-		};
-		saveAction.setText("Save");
-		saveAction.setToolTipText("Save");
-		saveAction.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));	
+		saveAction = new SaveAction(this, viewer);	
 	}
 
 	// add actions to Action bars and pull down menu
@@ -461,7 +410,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * Get the projects from VersionOne 
 	 * @return
 	 */
-	private IProjectTreeNode getProjectTreeNode() {
+	protected IProjectTreeNode getProjectTreeNode() {
 		try {
 			return V1Server.getInstance().getProjects();
 		} catch (Exception e) {
@@ -474,7 +423,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	/**
 	 * Load the Viewer with Task data
 	 */
-	private void loadTable() {
+	protected void loadTable() {
 		try {
 			viewer.setInput(V1Server.getInstance().getTasks());
 		} catch (Exception e) {
@@ -585,7 +534,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 //		});
 	}
 	
-	private void showMessage(String message) {
+	protected void showMessage(String message) {
 		MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
 	}
 
@@ -593,6 +542,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	public void dispose() {
 		PreferencePage.getPreferences().removePropertyChangeListener(this);
 		super.dispose();
+	}
+
+	protected void updateStatusCodes() {
+		statusEditor.setStatusCodes(getStatusValues());		
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TreeItem;
 

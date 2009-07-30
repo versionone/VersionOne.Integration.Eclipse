@@ -6,6 +6,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Assert;
@@ -29,9 +32,9 @@ public class TestTaskView {
 	/**
 	 * Configuration Parameters
 	 */
-	static final String SERVER_URL = "http://localhost/V1_71";
-	static final String USER_ID = "andre";
-	static final String USER_PASSWORD = "andre";
+	static final String SERVER_URL = "http://jsdksrv01:8080/VersioOne/";
+	static final String USER_ID = "admin";
+	static final String USER_PASSWORD = "admin";
 	static final String USER_MEMBER_ID = "Member:1000";
 	static final String SCOPE_ID = "Scope:1012";
 	static final boolean VALIDATION_REQUIRED = false;
@@ -105,10 +108,10 @@ public class TestTaskView {
 	@Test
 	public void testEffortEnabled() {
 		enableEffortTracking();
-		Table table = testView.getViewer().getTable();
+		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		Assert.assertEquals(8, table.getColumnCount());
-		TableColumn[] columns = table.getColumns();
+		TreeColumn[] columns = table.getColumns();
 		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Story", columns[STORY_COLUMN_INDEX].getText());
@@ -132,10 +135,10 @@ public class TestTaskView {
 	@Test
 	public void testEffortDisabled() {
 		disableEffortTracking();
-		Table table = testView.getViewer().getTable();
+		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		Assert.assertEquals(6, table.getColumnCount());
-		TableColumn[] columns = table.getColumns();
+		TreeColumn[] columns = table.getColumns();
 		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Story", columns[STORY_COLUMN_INDEX].getText());
@@ -157,9 +160,9 @@ public class TestTaskView {
 	@Test
 	public void testViewDataNoEffort() {
 		disableEffortTracking();
-		Table table = testView.getViewer().getTable();
+		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
-		TableItem[] rows = table.getItems();
+		TreeItem[] rows = table.getItems();
 		Assert.assertEquals(2, rows.length);
 
 		validateRow(rows[0], "Add Shipping Notes", "Service Changes", "TK-01061", "24.0", "10.0", "In Progress");
@@ -170,9 +173,9 @@ public class TestTaskView {
 	 * Check each column and verify if edits are allowed
 	 */
 	@Test
-	public void testEditability() {
+	public void testEditability() {		
 		enableEffortTracking();
-		Object selectedElement = testView.getViewer().getElementAt(0);		
+		Object selectedElement = testView.getViewer().getTree().getItem(0);		
 		checkEditor(selectedElement, ID_COLUMN_INDEX, true);
 		checkEditor(selectedElement, STORY_COLUMN_INDEX, false);
 		checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
@@ -203,7 +206,7 @@ public class TestTaskView {
 	/**
 	 * Validate one row in the table
 	 */	
-	private void validateRow(TableItem row, String story, String name, String number, String estimate, String todo, String status) {
+	private void validateRow(TreeItem row, String story, String name, String number, String estimate, String todo, String status) {
 		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));
@@ -218,9 +221,9 @@ public class TestTaskView {
 	@Test
 	public void testViewDataEffort() {
 		enableEffortTracking();
-		Table table = testView.getViewer().getTable();
+		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
-		TableItem[] rows = table.getItems();
+		TreeItem[] rows = table.getItems();
 		Assert.assertEquals(2, rows.length);
 
 		validateRow(rows[0], "Add Shipping Notes", "Service Changes", "TK-01061", "24.0", "30.0", "", "10.0", "In Progress");
@@ -230,7 +233,7 @@ public class TestTaskView {
 	/**
 	 * Validate one row in the table
 	 */	
-	private void validateRow(TableItem row, String story, String name, String number, String estimate, String done, String effort, String todo, String status) {
+	private void validateRow(TreeItem row, String story, String name, String number, String estimate, String done, String effort, String todo, String status) {
 		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));

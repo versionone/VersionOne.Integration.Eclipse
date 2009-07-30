@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.Task;
 import com.versionone.taskview.Activator;
@@ -22,9 +23,9 @@ abstract public class TaskEditor extends EditingSupport {
 	// the editor
 	protected TextCellEditor _editor;
 	
-	public TaskEditor(TableViewer viewer) {
+	public TaskEditor(TreeViewer viewer) {
 		super(viewer);
-		_editor = new TextCellEditor(viewer.getTable());
+		_editor = new TextCellEditor(viewer.getTree());
 	}
 
 	@Override
@@ -70,7 +71,7 @@ abstract public class TaskEditor extends EditingSupport {
 	public static class NameEditor extends TaskEditor {
 		
 		String oldValue;
-		public NameEditor(TableViewer viewer) {
+		public NameEditor(TreeViewer viewer) {
 			super(viewer);
 		}
 
@@ -101,7 +102,7 @@ abstract public class TaskEditor extends EditingSupport {
 
 		double oldValue;
 
-		public FloatEditor(TableViewer viewer) {
+		public FloatEditor(TreeViewer viewer) {
 			super(viewer);
 		}
 
@@ -143,7 +144,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 */
 	public static class EstimateEditor extends FloatEditor {
 		
-		public EstimateEditor(TableViewer viewer) {
+		public EstimateEditor(TreeViewer viewer) {
 			super(viewer);
 		}
 
@@ -162,7 +163,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 */
 	public static class EffortEditor extends FloatEditor {
 
-		public EffortEditor(TableViewer viewer) {
+		public EffortEditor(TreeViewer viewer) {
 			super(viewer);
 		}
 
@@ -184,7 +185,7 @@ abstract public class TaskEditor extends EditingSupport {
 	 */
 	public static class ToDoEditor extends FloatEditor {
 
-		public ToDoEditor(TableViewer viewer) {
+		public ToDoEditor(TreeViewer viewer) {
 			super(viewer);
 		}
 

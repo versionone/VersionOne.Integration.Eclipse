@@ -11,13 +11,14 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -52,7 +53,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private static final String V1_COLUMN_TITLE_EFFORT          = "ColumnTitle'Effort";
 	
 	
-	private TableViewer viewer;
+	private TreeViewer viewer;
 	private StatusEditor statusEditor;
 	private Action selectProjectAction = null;
 	private Action refreshAction = null;
@@ -72,7 +73,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		PreferencePage.getPreferences().addPropertyChangeListener(this);
 
-		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
 		if(isEnabled()) {
 			configureTable();
@@ -94,10 +95,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		selectProjectAction.setEnabled(isEnabled);
 		refreshAction.setEnabled(isEnabled);
-		viewer.getTable().setEnabled(isEnabled);
-		viewer.getTable().setLinesVisible(isEnabled);
-		viewer.getTable().setHeaderVisible(isEnabled);
-		viewer.getTable().setEnabled(isEnabled);
+		viewer.getTree().setEnabled(isEnabled);
+		viewer.getTree().setLinesVisible(isEnabled);
+		viewer.getTree().setHeaderVisible(isEnabled);
+		viewer.getTree().setEnabled(isEnabled);
 
 		viewer.setContentProvider(new ViewContentProvider());
 		
@@ -105,7 +106,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			loadTable();			
 		}
 		else {
-			viewer.getTable().clearAll();
+			viewer.getTree().clearAll(true);
 			viewer.setSorter(null);
 			viewer.setInput(getViewSite());
 		}
@@ -116,7 +117,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void configureTable() {
 
-		TableViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
+		TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -234,7 +235,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}			
 		});
 		
-		TableViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
+		TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -259,8 +260,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void removeEffortColumns() {
 
-		viewer.getTable().getColumn(5).dispose();
-		viewer.getTable().getColumn(4).dispose();		
+		viewer.getTree().getColumn(5).dispose();
+		viewer.getTree().getColumn(4).dispose();		
 		viewer.refresh();
 	}
 
@@ -299,9 +300,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		saveAction = new Action() {
 			public void run() {
 				if(viewer.isCellEditorActive()) {
-					viewer.getTable().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
+					viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
 				}
-				TableItem[] rows = viewer.getTable().getItems();
+				TreeItem[] rows = viewer.getTree().getItems();
 				ArrayList<Task> saveUs = new ArrayList<Task>();
 				for(int i = 0; i < rows.length; ++i) {
 					if(((Task)rows[i].getData()).isDirty()) {
@@ -356,7 +357,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * This method added for testing.  It provides access to the underlying TableViewer
 	 * @return TableViewer used in this control
 	 */	
-	public TableViewer getViewer() {return this.viewer;}
+	public TreeViewer getViewer() {return this.viewer;}
 
 	/**
 	 * Determine if VersionOne Task List is tracking effort
@@ -378,7 +379,49 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * ContentProvider for VersionOne Task
 	 * @author jerry
 	 */
-	class ViewContentProvider implements IStructuredContentProvider {
+	class ViewContentProvider implements ITreeContentProvider {
+		
+		
+		Object justForTest;
+		
+		@Override
+		public Object[] getChildren(Object parentElement) {
+			// TODO Auto-generated method stub
+			return (Object[]) justForTest;
+		}
+
+		@Override
+		public Object getParent(Object element) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean hasChildren(Object element) {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			justForTest = inputElement;
+			return new Object[]{"test1" ,"test2" ,"test3" ,"test4" ,"test5", "test6" };
+
+		}
+
+		@Override
+		public void dispose() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			// TODO Auto-generated method stub
+			
+		} 
+		
+		/*
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 		public void dispose() {}
 		public Object[] getElements(Object parent) {
@@ -388,6 +431,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				return new Object[]{};
 			}
 		}
+		*/
 	}
 	
 	/**
@@ -396,7 +440,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 		String property = event.getProperty();
 		if(property.equals(PreferenceConstants.P_ENABLED)) {
-			if(0 == viewer.getTable().getColumnCount())
+			if(0 == viewer.getTree().getColumnCount())
 				configureTable();
 			selectProvider();
 		}
@@ -487,7 +531,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * @param alignment - Column alignment
 	 * @return new TableViewerColumn 
 	 */
-	TableViewerColumn createTableViewerColumn(String label, int width, int alignment) {
+	TreeViewerColumn createTableViewerColumn(String label, int width, int alignment) {
 		return createTableViewerColumn(label, width, alignment, -1);
 	}
 
@@ -500,13 +544,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 * @param index - location for column.  -1 indicates the column goes at the end
 	 * @return new TableViewerColumn
 	 */
-	TableViewerColumn createTableViewerColumn(String label, int width, int alignment, int index) {
-		TableViewerColumn rc = null;
+	TreeViewerColumn createTableViewerColumn(String label, int width, int alignment, int index) {
+		TreeViewerColumn rc = null;
 		if(-1 == index) {
-			rc = new TableViewerColumn(viewer,SWT.NONE);	
+			rc = new TreeViewerColumn(viewer,SWT.NONE);	
 		}
 		else {
-			rc = new TableViewerColumn(viewer,SWT.NONE, index);
+			rc = new TreeViewerColumn(viewer,SWT.NONE, index);
 		}		
 		rc.getColumn().setWidth(width);
 		rc.getColumn().setAlignment(alignment);

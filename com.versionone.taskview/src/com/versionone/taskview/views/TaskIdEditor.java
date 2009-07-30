@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -96,9 +97,9 @@ public class TaskIdEditor extends EditingSupport {
 	 * Create  
 	 * @param viewer - table viewer
 	 */
-	public TaskIdEditor(TableViewer viewer) {
+	public TaskIdEditor(TreeViewer viewer) {
 		super(viewer);
-		_editor = new TaskIdCellEditor(viewer.getTable());
+		_editor = new TaskIdCellEditor(viewer.getTree());
 	}
 
 	@Override

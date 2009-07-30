@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.Task;
@@ -19,10 +20,10 @@ public class StatusEditor extends EditingSupport {
 	private ComboBoxCellEditor _editor;
 	private IStatusCodes _statusCodes; 
 	
-	public StatusEditor(TableViewer viewer, IStatusCodes codes) {
+	public StatusEditor(TreeViewer viewer, IStatusCodes codes) {
 		super(viewer);
 		_statusCodes = codes;
-		_editor = new ComboBoxCellEditor(viewer.getTable(), _statusCodes.getDisplayValues());
+		_editor = new ComboBoxCellEditor(viewer.getTree(), _statusCodes.getDisplayValues());
 	}
 
 	@Override

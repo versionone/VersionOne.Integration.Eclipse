@@ -6,13 +6,15 @@ import java.util.List;
 
 import com.versionone.apiclient.Asset;
 
-public class Workitem {
+public class Workitem {	
     public static final String TaskPrefix = "Task";
     public static final String StoryPrefix = "Story";
     public static final String DefectPrefix = "Defect";
     public static final String TestPrefix = "Test";
     public static final String ProjectPrefix = "Scope";
 
+	public static final String IdProperty = "ID";
+	public static final String DetailEstimateProperty = "DetailEstimate"; 
     public static final String NameProperty = "Name";
     public static final String StatusProperty = "Status";
     public static final String EffortProperty = "Actuals";
@@ -34,7 +36,10 @@ public class Workitem {
     	Parent = parent;
     	Asset = asset;
     	if (asset == null) {//temporary
-        	Children = null;
+    		Children = new ArrayList<Workitem>() ;
+    		if (parent == null) {    			
+        		Children.add(new Workitem(null, this));
+    		}
     		return;
     		}
     	Children = new ArrayList<Workitem>(asset.getChildren().size());
@@ -52,10 +57,16 @@ public class Workitem {
     
     
     public String getTypePrefix() {
+    	if (Asset == null) {//temporary
+    		return "nULL";
+    		}
     	return Asset.getAssetType().getToken();
     }
 
     public String getId() {
+    	if (Asset == null) {//temporary
+    		return "nULL";
+    		}
         return Asset.getOid().getMomentless().getToken();
     }
 

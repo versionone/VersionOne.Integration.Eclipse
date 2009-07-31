@@ -23,4 +23,14 @@ public class ApiDataLayer {
 	public Workitem[] getWorkitemTree(){
 		return new Workitem[] {new Workitem(null, null)};
 	}
+
+	public Double GetEffort(Asset asset) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public PropertyValues GetListPropertyValues(String type, String propertyName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

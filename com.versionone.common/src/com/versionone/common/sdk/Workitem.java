@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.versionone.Oid;
+import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
+import com.versionone.apiclient.Attribute;
 
 public class Workitem {	
     public static final String TaskPrefix = "Task";
@@ -135,31 +138,45 @@ public class Workitem {
     }
 */
 
-    /// <summary>
-    /// Gets property value.
-    /// </summary>
-    /// <param name="propertyName">Short name of the property to get. Eg. "Name"</param>
-    /// <returns>String, Double, ValueId or IList&lt;ValueId&gt;.</returns>
-    /// <exception cref="KeyNotFoundException">If no property found.</exception>
+    private PropertyValues getPropertyValues(String propertyName) {
+        return dataLayer.GetListPropertyValues(getTypePrefix(), propertyName);
+    }
+
+    //TODO <exception cref="KeyNotFoundException">If no property found.</exception>
+    /**
+     * Gets property value.
+     * @param propertyName Name of the property to get. Eg. "Status"
+     * @return String, Double, ValueId or IList&lt;ValueId&gt;.
+     * @see #NameProperty
+     * @see #StatusProperty
+     * @see #EffortProperty
+     * @see #DoneProperty
+     * @see #ScheduleNameProperty
+     * @see #OwnersProperty
+     * @see #TodoProperty
+     */
     public Object GetProperty(String propertyName) {
-    	return "Prop";
-/*        if (propertyName == EffortProperty) {
+        if (propertyName.equals(EffortProperty)) {
             return dataLayer.GetEffort(Asset);
         }
 
-        Attribute attribute = Asset.Attributes[TypePrefix + '.' + propertyName];
+        Attribute attribute = Asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
 
-        if (attribute.Definition.IsMultiValue) {
-            return GetPropertyValues(propertyName).Subset(attribute.Values);
+        if (attribute.getDefinition().isMultiValue()) {
+            return getPropertyValues(propertyName).Subset(attribute.getValues());
         }
 
-        object val = attribute.Value;
-        if (val is Oid) {
-            PropertyValues res = GetPropertyValues(propertyName);
-            return res.Find((Oid)val);
-        }
-        return val;
-*/    }
+        try {
+			Object val = attribute.getValue();
+			if (val instanceof Oid) {
+				PropertyValues res = getPropertyValues(propertyName);
+				return res.Find((Oid) val);
+			}
+			return val;
+		} catch (APIException e) {
+			throw new IllegalArgumentException("Cannot get property: " + propertyName, e);
+		}
+    }
 
     /// <summary>
     /// Sets property value.

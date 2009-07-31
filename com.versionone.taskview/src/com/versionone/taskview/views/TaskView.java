@@ -19,12 +19,15 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
+import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.IProjectTreeNode;
 import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.ProjectTreeNode;
 import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.V1Server;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.providers.SimplePlovider;
 
 /**
  * VersionOne Task View
@@ -113,84 +116,22 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	private void configureTable() {
 
 		TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
-		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					return ((Task)element).getID();
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}
-			
-			@Override
-			public Image getImage(Object element) {
-				return Activator.getDefault().getImageRegistry().get(Activator.TASK_IMAGE_ID);
-			}
-		});
+		column.setLabelProvider(new SimplePlovider(Workitem.IdProperty, true));
 		column.setEditingSupport(new TaskIdEditor(viewer));
-
-		createTableViewerColumn(V1_COLUMN_TITLE_PARENT, 200, SWT.LEFT).setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					return ((Task)element).getStoryName();
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}
-		});
 		
 		column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
-		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					return ((Task)element).getName();
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}
-		});
+		column.setLabelProvider(new SimplePlovider(Workitem.NameProperty, false));
 		column.setEditingSupport(new TaskEditor.NameEditor(viewer));
 
 		column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
-		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					double estimate = ((Task)element).getEstimate();
-					if(-1 == estimate)
-						return "";
-					return String.valueOf(estimate);
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}			
-		});
+		column.setLabelProvider(new SimplePlovider(Workitem.DetailEstimateProperty, false));
 		column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
 		
 		column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
-		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					double todo = ((Task)element).getToDo();
-					if(-1 == todo)
-						return "";
-					return String.valueOf(todo);
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}			
-		});
+		column.setLabelProvider(new SimplePlovider(Workitem.TodoProperty, false));
 		column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
 		
+		/*TODO
 		column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
 		column.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -203,6 +144,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				return "*** Error ***";
 			}			
 		});
+		*/
 
 		if(this.isTrackEffort()) {
 			addEffortColumns();
@@ -217,34 +159,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	private void addEffortColumns() {
 
-		createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4).setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element)  {
-				try {
-					return ((Task)element).getDone();
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}			
-		});
+		createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4).setLabelProvider(new SimplePlovider(Workitem.DoneProperty, false));
 		
 		TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
-		column.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				try {
-					double effort = ((Task)element).getEffort();
-					if(0 == effort)
-						return "";
-					return String.valueOf(effort);
-				} catch (Exception e) {
-					Activator.logError(e);
-				}
-				return "*** Error ***";
-			}			
-		});
+		column.setLabelProvider(new SimplePlovider(Workitem.EffortProperty, false));
+
 		column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
 		
 		viewer.refresh();
@@ -330,22 +249,28 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		public Object[] getChildren(Object parentElement) {
 			// TODO Auto-generated method stub
-			return (Object[]) justForTest;
+			return ((Workitem)parentElement).Children.toArray();
 		}
 
 		public Object getParent(Object element) {
 			// TODO Auto-generated method stub
-			return null;
+			return ((Workitem)element).Parent;
 		}
 
 		public boolean hasChildren(Object element) {
 			// TODO Auto-generated method stub
-			return true;
+			Workitem workitem = ((Workitem)element);
+			return workitem.Children != null && workitem.Children.size() > 0;
 		}
 
 		public Object[] getElements(Object inputElement) {
-			justForTest = inputElement;
-			return new Object[]{"test1" ,"test2" ,"test3" ,"test4" ,"test5", "test6" };
+			//justForTest = inputElement;
+			//return inputElement;
+			if(inputElement instanceof Workitem[]) {
+				return (Object[]) inputElement;
+			} else {
+				return new Object[]{};
+			}
 
 		}
 
@@ -414,7 +339,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 	 */
 	protected void loadTable() {
 		try {
-			viewer.setInput(V1Server.getInstance().getTasks());
+			//viewer.setInput(V1Server.getInstance().getTasks());
+			viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
 		} catch (Exception e) {
 			Activator.logError(e);
 			MessageDialog.openError(viewer.getControl().getShell(), "Task View Error", "Error Occurred Retrieving Task. Check ErrorLog for more Details");

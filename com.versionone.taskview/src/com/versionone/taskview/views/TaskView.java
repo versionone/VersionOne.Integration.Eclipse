@@ -6,13 +6,11 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
@@ -23,7 +21,6 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.IProjectTreeNode;
 import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.ProjectTreeNode;
-import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.V1Server;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
@@ -249,18 +246,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 		
 		public Object[] getChildren(Object parentElement) {
 			// TODO Auto-generated method stub
-			return ((Workitem)parentElement).Children.toArray();
+			return ((Workitem)parentElement).children.toArray();
 		}
 
 		public Object getParent(Object element) {
 			// TODO Auto-generated method stub
-			return ((Workitem)element).Parent;
+			return ((Workitem)element).parent;
 		}
 
 		public boolean hasChildren(Object element) {
 			// TODO Auto-generated method stub
 			Workitem workitem = ((Workitem)element);
-			return workitem.Children != null && workitem.Children.size() > 0;
+			return workitem.children != null && workitem.children.size() > 0;
 		}
 
 		public Object[] getElements(Object inputElement) {

@@ -33,4 +33,14 @@ public class ApiDataLayer {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	static void warning(String string, Exception ex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addEffort(Asset asset, double value) {
+	    // TODO Auto-generated method stub
+	    
+	}
 }

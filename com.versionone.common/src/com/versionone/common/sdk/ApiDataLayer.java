@@ -13,6 +13,7 @@ import com.versionone.apiclient.APIException;
 
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
+import com.versionone.apiclient.ConnectionException;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
@@ -21,6 +22,7 @@ import com.versionone.apiclient.ILocalizer;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
+import com.versionone.apiclient.OidException;
 import com.versionone.apiclient.OrderBy;
 import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
@@ -61,7 +63,8 @@ public class ApiDataLayer {
     private QueryResult assetList;
     private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
     private static LinkedList<AttributeInfo> attributesToQuery = new LinkedList<AttributeInfo>();
-    private Asset[] allAssets;
+    private List<Asset> allAssets;
+    private Map<String, PropertyValues> listPropertyValues;
 
     private boolean trackEffort;
     public EffortTrackingLevel defectTrackingLevel;
@@ -72,7 +75,7 @@ public class ApiDataLayer {
     private ILocalizer localizer;
 
     private String currentProjectId;
-    public boolean showAllTasks;
+    public boolean showAllTasks = true;
 
     public static ApiDataLayer getInstance() {
         if (instance == null) {
@@ -119,7 +122,7 @@ public class ApiDataLayer {
             defectTrackingLevel = translateEffortTrackingLevel(v1Config.getDefectTrackingLevel());
 
             memberOid = services.getLoggedIn();
-            // listPropertyValues = GetListPropertyValues(); TODO implement
+            listPropertyValues = getListPropertyValues();
             isConnected = true;
             return true;
         } catch (MetaException ex) {
@@ -164,7 +167,8 @@ public class ApiDataLayer {
         if (currentProjectId == null) {
             // throw new DataLayerException("Current project is not selected");
             // // TODO implement
-            throw new Exception("Current project is not selected");
+            //throw new Exception("Current project is not selected");
+            currentProjectId = "Scope:0";
 
         }
 
@@ -187,7 +191,7 @@ public class ApiDataLayer {
                 query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
                 assetList = services.retrieve(query);
-                allAssets = assetList.getAssets(); // TODO implement getting all
+                addRecursive(assetList.getAssets(), allAssets); // TODO implement getting all
                 // assets as list (for
                 // example create AssetList
                 // class from C# SDK)
@@ -214,6 +218,16 @@ public class ApiDataLayer {
         }
         return res.toArray(new Workitem[res.size()]);
         // return new Workitem[] {new Workitem(null, null)};
+    }
+
+    private void addRecursive(Asset[] assets, List<Asset> target) {
+        for (Asset asset : assets) {
+            target.add(asset);
+            if (asset.getChildren().size() > 0) {
+                addRecursive(asset.getChildren().toArray(new Asset[asset.getChildren().size()]), target);
+            }
+        }
+        
     }
 
     private IFilterTerm getScopeFilter(IAssetType assetType) {
@@ -258,6 +272,74 @@ public class ApiDataLayer {
     public Double getEffort(Asset asset) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    private Map<String, PropertyValues> getListPropertyValues() throws ConnectionException, APIException, OidException, MetaException {
+        Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
+        for (AttributeInfo attrInfo : attributesToQuery) {
+            if (!attrInfo.isList) {
+                continue;
+            }
+
+            String propertyAlias = attrInfo.prefix + attrInfo.attr;
+            if (!res.containsKey(propertyAlias)) {
+                String propertyName = resolvePropertyKey(propertyAlias);
+                
+                PropertyValues values;
+                if (res.containsKey(propertyName)) {
+                    values = res.get(propertyName);
+                } else {
+                    values = queryPropertyValues(propertyName);
+                    res.put(propertyName, values);
+                }
+                
+                if (!res.containsKey(propertyAlias)) {
+                    res.put(propertyAlias, values);
+                }
+            }
+        }
+        return res;
+    }
+
+    private static String resolvePropertyKey(String propertyAlias) {
+        if (propertyAlias == "DefectStatus") {
+            return "StoryStatus";
+        } else if (propertyAlias == "DefectSource") {
+            return "StorySource";
+        } else if (propertyAlias == "ScopeBuildProjects") {
+            return "BuildProject";
+        } else if (propertyAlias == "TaskOwners" || propertyAlias == "StoryOwners" || propertyAlias == "DefectOwners"
+                || propertyAlias == "TestOwners") {
+            return "Member";
+        }
+
+        return propertyAlias;
+    }
+
+    private PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException, OidException, MetaException {
+        PropertyValues res = new PropertyValues();
+        IAssetType assetType = metaModel.getAssetType(propertyName);
+        IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NameProperty);
+        IAttributeDefinition inactiveDef;
+
+        Query query = new Query(assetType);
+        query.getSelection().add(nameDef);        
+        //if (assetType.TryGetAttributeDefinition("Inactive", out inactiveDef)) {
+        inactiveDef = assetType.getAttributeDefinition("Inactive");
+        if (inactiveDef != null) {
+            FilterTerm filter = new FilterTerm(inactiveDef);
+            filter.Equal("False");
+            query.setFilter(filter);
+        }
+
+        query.getOrderBy().majorSort(assetType.getDefaultOrderBy(), OrderBy.Order.Ascending);
+
+        res.add(new ValueId());
+        for (Asset asset : services.retrieve(query).getAssets()) {
+            String name = (String) asset.getAttribute(nameDef).getValue();
+            res.add(new ValueId(asset.getOid(), name));
+        }
+        return res;
     }
 
     public PropertyValues getListPropertyValues(String type, String propertyName) {

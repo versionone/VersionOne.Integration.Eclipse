@@ -14,100 +14,107 @@ import com.versionone.apiclient.V1Exception;
 
 /**
  * Implementation of IStatusCodes
+ * 
  * @author jerry
  */
 public class TaskStatusCodes implements IStatusCodes {
 
-	/**
-	 * Represents a VersionOne Status Code
-	 * @author jerry
-	 */
-	class StatusCode {
-		private String _id;
-		private String _name;
-		
-		StatusCode(Oid oid, String name) {
-			_id = oid.getToken();
-			_name = name;
-		}
-		
-		String getId() {
-			return _id;
-		}
-		
-		String getName() {
-			return _name;
-		}
-	}
+    /**
+     * Represents a VersionOne Status Code
+     * 
+     * @author jerry
+     */
+    class StatusCode {
+        private String _id;
+        private String _name;
 
-	private StatusCode[] _status = null;
+        StatusCode(Oid oid, String name) {
+            _id = oid.getToken();
+            _name = name;
+        }
 
-	/**
-	 * Create
-	 * @param metaModel - metamodel to use for obtaining data
-	 * @param services  - services to use for obtaining data
-	 * @throws V1Exception - if we cannot read data
-	 */
-	TaskStatusCodes(IMetaModel metaModel, IServices services) throws V1Exception {
-		
-		IAssetType statusType = metaModel.getAssetType("TaskStatus");
-		IAttributeDefinition name  = statusType.getAttributeDefinition("Name");
+        String getId() {
+            return _id;
+        }
 
-		Query query = new Query(statusType);
-		query.getSelection().add(name);
-		
-		FilterTerm term = new FilterTerm(statusType.getAttributeDefinition("AssetState"),          FilterTerm.Operator.NotEqual, AssetState.Closed);
-		query.setFilter(term);
+        String getName() {
+            return _name;
+        }
+    }
 
-		QueryResult queryResults = services.retrieve(query);
-		Asset[] result = queryResults.getAssets();
-		
-		_status = new StatusCode[result.length+1];
-		_status[0] = new StatusCode(Oid.Null, "");
-		for(int i = 0; i < result.length; ++i) {
-			_status[i+1] = new StatusCode(result[i].getOid(), result[i].getAttribute(name).getValue().toString());
-		}
-	}
+    private StatusCode[] _status = null;
 
-	public String getDisplayValue(int index) {
-		if( (index >= 0) && (index < _status.length) ){
-			return _status[index]._name;
-		}
-		throw new IndexOutOfBoundsException();
-	}
+    /**
+     * Create
+     * 
+     * @param metaModel
+     *            - metamodel to use for obtaining data
+     * @param services
+     *            - services to use for obtaining data
+     * @throws V1Exception
+     *             - if we cannot read data
+     */
+    TaskStatusCodes(IMetaModel metaModel, IServices services) throws V1Exception {
 
-	public String[] getDisplayValues() {
-		String[] rc = new String[_status.length];
-		for(int i=0; i < rc.length; ++i) {
-			rc[i] = _status[i]._name;
-		}
-		return rc;
-	}
+        IAssetType statusType = metaModel.getAssetType("TaskStatus");
+        IAttributeDefinition name = statusType.getAttributeDefinition("Name");
 
-	public int getOidIndex(String oid) {
-		for(int i = 0; i < _status.length; ++i) {
-			if(oid.equals(_status[i]._id))
-				return i;
-		}
-		return 0;
-	}
+        Query query = new Query(statusType);
+        query.getSelection().add(name);
 
-	public String getID(int index) {
-		if( (index >= 0) && (index < _status.length) ){
-			return _status[index]._id;
-		}
-		throw new IndexOutOfBoundsException();
-	}
+        FilterTerm term = new FilterTerm(statusType.getAttributeDefinition("AssetState"), FilterTerm.Operator.NotEqual,
+                AssetState.Closed);
+        query.setFilter(term);
 
-	public String getDisplayFromOid(String oid) {
-		String rc = null;
-		for(int i=0; i < _status.length; ++i) {
-			if(oid.equals(_status[i]._id)) {
-				rc = _status[i]._name; 
-			}
-		}
-		if(null == rc)
-			rc = "*** Invalid OID " + oid + "***";
-		return rc;
-	}
+        QueryResult queryResults = services.retrieve(query);
+        Asset[] result = queryResults.getAssets();
+
+        _status = new StatusCode[result.length + 1];
+        _status[0] = new StatusCode(Oid.Null, "");
+        for (int i = 0; i < result.length; ++i) {
+            _status[i + 1] = new StatusCode(result[i].getOid(), result[i].getAttribute(name).getValue().toString());
+        }
+    }
+
+    public String getDisplayValue(int index) {
+        if ((index >= 0) && (index < _status.length)) {
+            return _status[index]._name;
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    public String[] getDisplayValues() {
+        String[] rc = new String[_status.length];
+        for (int i = 0; i < rc.length; ++i) {
+            rc[i] = _status[i]._name;
+        }
+        return rc;
+    }
+
+    public int getOidIndex(String oid) {
+        for (int i = 0; i < _status.length; ++i) {
+            if (oid.equals(_status[i]._id))
+                return i;
+        }
+        return 0;
+    }
+
+    public String getID(int index) {
+        if ((index >= 0) && (index < _status.length)) {
+            return _status[index]._id;
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    public String getDisplayFromOid(String oid) {
+        String rc = null;
+        for (int i = 0; i < _status.length; ++i) {
+            if (oid.equals(_status[i]._id)) {
+                rc = _status[i]._name;
+            }
+        }
+        if (null == rc)
+            rc = "*** Invalid OID " + oid + "***";
+        return rc;
+    }
 }

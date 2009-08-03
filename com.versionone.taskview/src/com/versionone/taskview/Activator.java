@@ -12,95 +12,102 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "com.versionone.taskview";
+    // The plug-in ID
+    public static final String PLUGIN_ID = "com.versionone.taskview";
 
-	// Filter Image Id
-	public static final String FILTER_IMAGE_ID = "image.filter";
-	public static final String TASK_IMAGE_ID = "image.task";
-	public static final String STORY_IMAGE_ID = "image.story";
-	public static final String DEFECT_IMAGE_ID = "image.defect";
-	public static final String TEST_IMAGE_ID = "image.test";
-	public static final String REFRESH_IMAGE_ID = "image.refresh";
-	public static final String SAVE_IMAGE_ID = "image.save";
-	
-	// The shared instance
-	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
+    // Filter Image Id
+    public static final String FILTER_IMAGE_ID = "image.filter";
+    public static final String TASK_IMAGE_ID = "image.task";
+    public static final String STORY_IMAGE_ID = "image.story";
+    public static final String DEFECT_IMAGE_ID = "image.defect";
+    public static final String TEST_IMAGE_ID = "image.test";
+    public static final String REFRESH_IMAGE_ID = "image.refresh";
+    public static final String SAVE_IMAGE_ID = "image.save";
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    // The shared instance
+    private static Activator plugin;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    /**
+     * The constructor
+     */
+    public Activator() {
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+     * )
+     */
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+    }
 
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-	
-	public static void logError(Throwable t) {
-		logError("Unexpected Error", t);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+     * )
+     */
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
 
-	public static void logError(String message, Throwable t) {
-		log(IStatus.ERROR, IStatus.OK, message, t);
-	}
-	
-	public static void logInfo(String message) {
-		log(IStatus.INFO, IStatus.OK, message, null);
-	}
+    /**
+     * Returns the shared instance
+     * 
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
 
-	private static void log(int severity, int code, String message, Throwable t) {
-		Activator.getDefault().getLog().log(createStatus(severity, code, message, t));
-		
-	}
+    /**
+     * Returns an image descriptor for the image file at the given plug-in
+     * relative path
+     * 
+     * @param path
+     *            the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
 
-	private static IStatus createStatus(int severity, int code, String message, Throwable t) {
-		return new Status(severity, PLUGIN_ID, code, message, t);
-	}
-	
-	@Override
-	protected void initializeImageRegistry(ImageRegistry registry) {
+    public static void logError(Throwable t) {
+        logError("Unexpected Error", t);
+    }
+
+    public static void logError(String message, Throwable t) {
+        log(IStatus.ERROR, IStatus.OK, message, t);
+    }
+
+    public static void logInfo(String message) {
+        log(IStatus.INFO, IStatus.OK, message, null);
+    }
+
+    private static void log(int severity, int code, String message, Throwable t) {
+        Activator.getDefault().getLog().log(createStatus(severity, code, message, t));
+
+    }
+
+    private static IStatus createStatus(int severity, int code, String message, Throwable t) {
+        return new Status(severity, PLUGIN_ID, code, message, t);
+    }
+
+    @Override
+    protected void initializeImageRegistry(ImageRegistry registry) {
         registry.put(FILTER_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/filter.gif"));
         registry.put(TASK_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/task.gif"));
         registry.put(DEFECT_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/defect.gif"));
-        registry.put(TEST_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/test.gif"));        
+        registry.put(TEST_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/test.gif"));
         registry.put(STORY_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/story.gif"));
         registry.put(REFRESH_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/refresh.gif"));
         registry.put(SAVE_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/save.gif"));
-	}
-	
+    }
+
 }

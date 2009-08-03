@@ -1,5 +1,5 @@
 package com.versionone.common.sdk;
 
 public enum EffortTrackingLevel {
-    PrimaryWorkitem, SecondaryWorkitem, Both
+    PRIMARY_WORKITEM, SECONDARY_WORKITEM, BOTH
 }

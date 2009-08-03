@@ -37,7 +37,7 @@ public class Workitem {
         properties.put(DoneProperty, false);
         properties.put(ScheduleNameProperty, false);
         properties.put(OwnersProperty, true);
-        properties.put(TodoProperty, true);
+        properties.put(TodoProperty, false);
     }
 
     protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();

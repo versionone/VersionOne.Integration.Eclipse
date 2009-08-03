@@ -76,6 +76,19 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
+    
+    private ApiDataLayer() {
+        String[] prefixes = new String[] {
+            Workitem.TaskPrefix, 
+            Workitem.DefectPrefix, 
+            Workitem.StoryPrefix, 
+            Workitem.TestPrefix
+        };
+        for (String prefix : prefixes) {
+            attributesToQuery.addLast(new AttributeInfo("CheckQuickClose", prefix, false));
+            attributesToQuery.addLast(new AttributeInfo("CheckQuickSignup", prefix, false));
+        }
+    }
 
     public static ApiDataLayer getInstance() {
         if (instance == null) {
@@ -302,14 +315,14 @@ public class ApiDataLayer {
     }
 
     private static String resolvePropertyKey(String propertyAlias) {
-        if (propertyAlias == "DefectStatus") {
+        if (propertyAlias.equals("DefectStatus")) {
             return "StoryStatus";
-        } else if (propertyAlias == "DefectSource") {
+        } else if (propertyAlias.equals("DefectSource")) {
             return "StorySource";
-        } else if (propertyAlias == "ScopeBuildProjects") {
+        } else if (propertyAlias.equals("ScopeBuildProjects")) {
             return "BuildProject";
-        } else if (propertyAlias == "TaskOwners" || propertyAlias == "StoryOwners" || propertyAlias == "DefectOwners"
-                || propertyAlias == "TestOwners") {
+        } else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners") || propertyAlias.equals("DefectOwners")
+                || propertyAlias.equals("TestOwners")) {
             return "Member";
         }
 
@@ -334,17 +347,17 @@ public class ApiDataLayer {
 
         query.getOrderBy().majorSort(assetType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
-        res.add(new ValueId());
+        res.addInternal(new ValueId());
         for (Asset asset : services.retrieve(query).getAssets()) {
             String name = (String) asset.getAttribute(nameDef).getValue();
-            res.add(new ValueId(asset.getOid(), name));
+            res.addInternal(new ValueId(asset.getOid(), name));
         }
         return res;
     }
 
     public PropertyValues getListPropertyValues(String type, String propertyName) {
-        // TODO Auto-generated method stub
-        return null;
+        String propertyKey = resolvePropertyKey(type + propertyName);
+        return listPropertyValues.get(propertyKey);
     }
 
     static DataLayerException warning(String string, Exception ex) {

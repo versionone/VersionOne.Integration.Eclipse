@@ -40,7 +40,6 @@ public class Activator extends AbstractUIPlugin {
 
     private void setAttributes() throws Exception {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-        dataLayer.connect("http://jsdksrv01:8080/VersionOne/", "admin", "admin", false);
 
         for (String key : Workitem.properties.keySet()) {
             dataLayer.addProperty(key, Workitem.DefectPrefix, Workitem.properties.get(key));
@@ -49,6 +48,7 @@ public class Activator extends AbstractUIPlugin {
             dataLayer.addProperty(key, Workitem.TaskPrefix, Workitem.properties.get(key));
         }
 
+        dataLayer.connect("http://jsdksrv01:8080/VersionOne/", "admin", "admin", false);
     }
 
     /*

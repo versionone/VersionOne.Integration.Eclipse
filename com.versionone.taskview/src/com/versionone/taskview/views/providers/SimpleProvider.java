@@ -7,12 +7,12 @@ import org.eclipse.swt.graphics.Image;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
-public class SimplePlovider extends ColumnLabelProvider {
+public class SimpleProvider extends ColumnLabelProvider {
 
     private String propertyName;
     private boolean isShowTypeIcon;
 
-    public SimplePlovider(String propertyName, boolean isShowTypeIcon) {
+    public SimpleProvider(String propertyName, boolean isShowTypeIcon) {
         this.propertyName = propertyName;
         this.isShowTypeIcon = isShowTypeIcon;
 

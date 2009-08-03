@@ -46,8 +46,8 @@ public class Workitem {
 	}
 	children = new ArrayList<Workitem>(asset.getChildren().size());
 	for (Asset childAsset : asset.getChildren()) {
-	    if (getTypePrefix().equals(ProjectPrefix) || dataLayer.ShowAllTasks
-		    || dataLayer.IsCurrentUserOwnerAsset(childAsset)) {
+	    if (getTypePrefix().equals(ProjectPrefix) || dataLayer.showAllTasks
+		    || dataLayer.isCurrentUserOwnerAsset(childAsset)) {
 		children.add(new Workitem(childAsset, this));
 	    }
 	}
@@ -75,7 +75,7 @@ public class Workitem {
     public boolean isPropertyReadOnly(String propertyName) {
 	String fullName = getTypePrefix() + '.' + propertyName;
 	try {
-	    if (dataLayer.IsEffortTrackingRelated(propertyName)) {
+	    if (dataLayer.isEffortTrackingRelated(propertyName)) {
 		return isEffortTrackingPropertyReadOnly(propertyName);
 	    }
 
@@ -100,7 +100,7 @@ public class Workitem {
      
     
     private boolean isEffortTrackingPropertyReadOnly(String propertyName) {
-	if (!dataLayer.IsEffortTrackingRelated(propertyName)) {
+	if (!dataLayer.isEffortTrackingRelated(propertyName)) {
 	    throw new IllegalArgumentException(
 		    "This property is not related to effort tracking.");
 	}
@@ -128,7 +128,7 @@ public class Workitem {
     }
 
     private PropertyValues getPropertyValues(String propertyName) {
-	return dataLayer.GetListPropertyValues(getTypePrefix(), propertyName);
+	return dataLayer.getListPropertyValues(getTypePrefix(), propertyName);
     }
 
     /**
@@ -147,10 +147,10 @@ public class Workitem {
      * @see #OwnersProperty
      * @see #TodoProperty
      */
-    public Object GetProperty(String propertyName)
+    public Object getProperty(String propertyName)
 	    throws IllegalArgumentException {
 	if (propertyName.equals(EffortProperty)) {
-	    return dataLayer.GetEffort(asset);
+	    return dataLayer.getEffort(asset);
 	}
 
 	Attribute attribute = asset.getAttributes().get(
@@ -169,8 +169,7 @@ public class Workitem {
 	    }
 	    return val;
 	} catch (APIException e) {
-	    throw new IllegalArgumentException("Cannot get property: "
-		    + propertyName, e);
+	    throw new IllegalArgumentException("Cannot get property: " + propertyName, e);
 	}
     }
 
@@ -182,7 +181,7 @@ public class Workitem {
      * @param newValue
      *            String, Double, null, ValueId, PropertyValues accepted.
      */
-    public void SetProperty(String propertyName, Object newValue) {
+    public void setProperty(String propertyName, Object newValue) {
 	try {
 	    if (propertyName.equals(EffortProperty)) {
 		dataLayer.addEffort(asset, Double.valueOf((String) newValue));
@@ -235,33 +234,46 @@ public class Workitem {
 	return false;
     }
 
+    public boolean propertyChanged(String propertyName) {
+	IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+	return asset.getAttribute(attrDef).hasChanged();
+    }
+
+    public void commitChanges() throws DataLayerException {
+	try {
+	    dataLayer.commitAsset(asset);
+	} catch (APIException e) {
+	    throw ApiDataLayer.warning("Failed to commit changes.", e);
+	}
+    }
+
+    public boolean isMine() {
+	PropertyValues owners = (PropertyValues) getProperty(OwnersProperty);
+	return owners.ContainsOid(dataLayer.memberOid);
+    }
+
+    public boolean canQuickClose() {
+	try {
+	    return (Boolean) getProperty("CheckQuickClose");
+	} catch (IllegalArgumentException e) {
+	    ApiDataLayer.warning("QuickClose not supported.", e);
+	    return false;
+	}
+    }
+     
     /*
-     * public bool PropertyChanged(string propertyName) { IAttributeDefinition
-     * attrDef = Asset.AssetType.GetAttributeDefinition(propertyName); return
-     * Asset.GetAttribute(attrDef).HasChanged; }
-     * 
-     * public void CommitChanges() { try { dataLayer.CommitAsset(Asset); } catch
-     * (APIException e) { throw
-     * ApiDataLayer.Warning("Failed to commit changes.", e); } }
-     * 
-     * public bool IsMine() { PropertyValues owners =
-     * (PropertyValues)GetProperty(OwnersProperty); return
-     * owners.ContainsOid(dataLayer.MemberOid); }
-     * 
-     * public bool CanQuickClose { get { try { return
-     * (bool)GetProperty("CheckQuickClose"); } catch (KeyNotFoundException e) {
-     * ApiDataLayer.Warning("QuickClose not supported.", e); return false; } } }
+     * Performs QuickClose operation.
      */
-    // / <summary>
-    // / Performs QuickClose operation.
-    // / </summary>
-    /*
-     * public void QuickClose() { CommitChanges(); try {
-     * dataLayer.ExecuteOperation(Asset,
-     * Asset.AssetType.GetOperation("QuickClose"));
-     * dataLayer.RefreshAsset(this); } catch (APIException e) { throw
-     * ApiDataLayer.Warning("Failed to QuickClose.", e); } }
-     */
+    public void quickClose() throws DataLayerException {
+	commitChanges();
+	try {
+	    dataLayer.executeOperation(asset, asset.getAssetType().getOperation("QuickClose"));
+	    dataLayer.refreshAsset(this);
+	} catch (APIException e) {
+	    throw ApiDataLayer.warning("Failed to QuickClose.", e);
+	}
+    }
+     
     /*
      * public bool CanSignup { get { try { return
      * (bool)GetProperty("CheckQuickSignup"); } catch (KeyNotFoundException e) {

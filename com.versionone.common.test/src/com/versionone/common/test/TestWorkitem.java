@@ -23,7 +23,7 @@ public class TestWorkitem extends Workitem {
     }
 
     @Override
-    public Object GetProperty(String propertyName) {
+    public Object getProperty(String propertyName) {
 	return properties.get(propertyName);
     }
 
@@ -38,7 +38,7 @@ public class TestWorkitem extends Workitem {
     }
 
     @Override
-    public void SetProperty(String propertyName, Object newValue) {
+    public void setProperty(String propertyName, Object newValue) {
 	properties.put(propertyName, newValue);
     }
 

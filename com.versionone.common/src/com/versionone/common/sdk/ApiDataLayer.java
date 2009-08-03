@@ -1,6 +1,9 @@
 package com.versionone.common.sdk;
 
+import com.versionone.Oid;
+import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
+import com.versionone.apiclient.IOperation;
 
 public class ApiDataLayer {
 
@@ -13,11 +16,12 @@ public class ApiDataLayer {
 		return instance;
 	}
 
-	public boolean ShowAllTasks;
+	public boolean showAllTasks;
 	public EffortTrackingLevel storyTrackingLevel;
 	public EffortTrackingLevel defectTrackingLevel;
+	public Oid memberOid;
 
-	public boolean IsCurrentUserOwnerAsset(Asset childAsset) {
+	public boolean isCurrentUserOwnerAsset(Asset childAsset) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -26,19 +30,19 @@ public class ApiDataLayer {
 		return new Workitem[] {new Workitem(null, null)};
 	}
 
-	public Double GetEffort(Asset asset) {
+	public Double getEffort(Asset asset) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public PropertyValues GetListPropertyValues(String type, String propertyName) {
+	public PropertyValues getListPropertyValues(String type, String propertyName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	static void warning(String string, Exception ex) {
+	static DataLayerException warning(String string, Exception ex) {
 		// TODO Auto-generated method stub
-		
+		return new DataLayerException();
 	}
 
 	public void addEffort(Asset asset, double value) {
@@ -46,8 +50,23 @@ public class ApiDataLayer {
 	    
 	}
 
-	public boolean IsEffortTrackingRelated(String propertyName) {
+	public boolean isEffortTrackingRelated(String propertyName) {
 	    // TODO Auto-generated method stub
 	    return false;
+	}
+
+	public void commitAsset(Asset asset) throws APIException {
+	    // TODO Auto-generated method stub
+	    
+	}
+
+	public void executeOperation(Asset asset, IOperation operation) throws APIException{
+	    // TODO Auto-generated method stub
+	    
+	}
+
+	public void refreshAsset(Workitem workitem) {
+	    // TODO Auto-generated method stub
+	    
 	}
 }

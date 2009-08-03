@@ -24,7 +24,7 @@ public class SimplePlovider extends ColumnLabelProvider {
 			if (propertyName.equals(Workitem.IdProperty)) {
 				return ((Workitem)element).getId();
 			} else {
-				return ((Workitem)element).GetProperty(propertyName).toString();
+				return ((Workitem)element).getProperty(propertyName).toString();
 			}
 		} catch (Exception e) {
 			Activator.logError(e);

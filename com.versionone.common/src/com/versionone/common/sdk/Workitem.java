@@ -85,7 +85,6 @@ public class Workitem {
 	    return true;
 	}
     }
-
     
     public boolean isPropertyDefinitionReadOnly(String propertyName) {
 	String fullName = getTypePrefix() + '.' + propertyName;
@@ -157,15 +156,14 @@ public class Workitem {
 		getTypePrefix() + '.' + propertyName);
 
 	if (attribute.getDefinition().isMultiValue()) {
-	    return getPropertyValues(propertyName)
-		    .Subset(attribute.getValues());
+	    return getPropertyValues(propertyName).subset(attribute.getValues());
 	}
 
 	try {
 	    Object val = attribute.getValue();
 	    if (val instanceof Oid) {
 		PropertyValues res = getPropertyValues(propertyName);
-		return res.Find((Oid) val);
+		return res.find((Oid) val);
 	    }
 	    return val;
 	} catch (APIException e) {
@@ -215,11 +213,11 @@ public class Workitem {
 	IAttributeDefinition attrDef = asset.getAssetType()
 		.getAttributeDefinition(propertyName);
 	for (Object oldOid : oldValues) {
-	    if (!newValues.ContainsOid((Oid) oldOid)) {
+	    if (!newValues.containsOid((Oid) oldOid)) {
 		asset.removeAttributeValue(attrDef, oldOid);
 	    }
 	}
-	for (ValueId newValue : newValues.values()) {
+	for (ValueId newValue : newValues) {
 	    if (!checkContains(oldValues, newValue.oid)) {
 		asset.addAttributeValue(attrDef, newValue.oid);
 	    }
@@ -249,7 +247,7 @@ public class Workitem {
 
     public boolean isMine() {
 	PropertyValues owners = (PropertyValues) getProperty(OwnersProperty);
-	return owners.ContainsOid(dataLayer.memberOid);
+	return owners.containsOid(dataLayer.memberOid);
     }
 
     public boolean canQuickClose() {

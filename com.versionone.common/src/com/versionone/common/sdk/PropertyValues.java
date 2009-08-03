@@ -1,26 +1,79 @@
 package com.versionone.common.sdk;
 
+import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.versionone.Oid;
 
-public class PropertyValues extends HashMap<Oid, ValueId>{
+public class PropertyValues extends AbstractCollection<ValueId> {
 
-	private static final long serialVersionUID = -8979996731417517341L;
+    private static final long serialVersionUID = -8979996731417517341L;
 
-	public Object Subset(Object[] values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private final Map<Oid, ValueId> dictionary = new HashMap<Oid, ValueId>();
 
-	public Object Find(Oid val) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public PropertyValues(Collection<ValueId> valueIds) {
+        for (ValueId id : valueIds) {
+            add(id);
+        }
+    }
 
-	public boolean ContainsOid(Oid oldValue) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public PropertyValues() {
+    }
 
+    @Override
+    public Iterator<ValueId> iterator() {
+        return dictionary.values().iterator();
+    }
+
+    @Override
+    public int size() {
+        return dictionary.values().size();
+    }
+
+    @Override
+    public String toString() {
+        if (dictionary.isEmpty()) {
+            return "";
+        }
+        StringBuilder res = new StringBuilder();
+        Iterator<ValueId> i = iterator();
+        res.append(i.next());
+        while (i.hasNext()) {
+            res.append(i.next());
+        }
+        return res.toString();
+    }
+
+    ValueId find(Oid oid) {
+        return dictionary.get(oid.getMomentless());
+    }
+
+    boolean containsOid(Oid value) {
+        return dictionary.containsKey(value.getMomentless());
+    }
+
+    public boolean contains(ValueId valueId) {
+        return dictionary.containsValue(valueId);
+    }
+
+    public ValueId[] toArray() {
+        ValueId[] values = new ValueId[size()];
+        dictionary.values().toArray(values);
+        return values;
+    }
+
+    void addInternal(ValueId value) {
+        dictionary.put(value.oid, value);
+    }
+
+    PropertyValues subset(Object[] oids) {
+        PropertyValues result = new PropertyValues();
+        for (Object oid : oids) {
+            result.add(find((Oid) oid));
+        }
+        return result;
+    }
 }

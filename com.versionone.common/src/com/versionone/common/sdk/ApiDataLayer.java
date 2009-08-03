@@ -69,4 +69,9 @@ public class ApiDataLayer {
 	    // TODO Auto-generated method stub
 	    
 	}
+
+	public void revertAsset(Asset asset) {
+	    // TODO Auto-generated method stub
+	    
+	}
 }

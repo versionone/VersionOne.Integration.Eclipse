@@ -274,44 +274,58 @@ public class Workitem {
 	}
     }
      
+    public boolean canSignup() {
+	try {
+	    return (Boolean) getProperty("CheckQuickSignup");
+	} catch (IllegalArgumentException e) {
+	    ApiDataLayer.warning("QuickSignup not supported.", e);
+	    return false;
+	}
+    }      
+     
     /*
-     * public bool CanSignup { get { try { return
-     * (bool)GetProperty("CheckQuickSignup"); } catch (KeyNotFoundException e) {
-     * ApiDataLayer.Warning("QuickSignup not supported.", e); return false; } }
-     * }
+     * Performs QuickSignup operation.
      */
-    // / <summary>
-    // / Performs QuickSignup operation.
-    // / </summary>
-    /*
-     * public void Signup() { try { dataLayer.ExecuteOperation(Asset,
-     * Asset.AssetType.GetOperation("QuickSignup"));
-     * dataLayer.RefreshAsset(this); } catch (APIException e) { throw
-     * ApiDataLayer.Warning("Failed to QuickSignup.", e); } }
-     * 
-     * public void Close() { dataLayer.ExecuteOperation(Asset,
-     * Asset.AssetType.GetOperation("Inactivate"));
-     * dataLayer.RefreshAsset(this); }
-     * 
-     * public void RevertChanges() { dataLayer.RevertAsset(Asset); }
-     */
+    public void signup() throws DataLayerException {
+	try {
+	    dataLayer.executeOperation(asset, asset.getAssetType().getOperation("QuickSignup"));
+	    dataLayer.refreshAsset(this);
+	} catch (APIException e) {
+	    throw ApiDataLayer.warning("Failed to QuickSignup.", e);
+	}
+    }
+      
+    public void Close() throws APIException {
+	dataLayer.executeOperation(asset, asset.getAssetType().getOperation("Inactivate"));
+	dataLayer.refreshAsset(this);
+    }
 
-    /*
-     * public override bool Equals(object obj) { if (obj == null) { return
-     * false; } if (!(obj is Workitem)) { return false; } Workitem other =
-     * (Workitem)obj; if (other.Asset.Oid != Asset.Oid) { return false; } return
-     * true; }
-     * 
-     * public override int GetHashCode() { return Asset.Oid.GetHashCode(); }
-     * 
-     * public static bool operator ==(Workitem t1, Workitem t2) { if
-     * (ReferenceEquals(t1, t2)) { return true; } if (ReferenceEquals(t1, null)
-     * || ReferenceEquals(t2, null)) { return false; } return t1.Equals(t2); }
-     * 
-     * public static bool operator !=(Workitem t1, Workitem t2) { return !(t1 ==
-     * t2); }
-     * 
-     * public override String ToString() { return Id + (Asset.HasChanged ?
-     * " (Changed)" : ""); }
-     */
+    public void RevertChanges() {
+	dataLayer.revertAsset(asset);
+    }     
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null) {
+	    return false;
+	}
+	if (!(obj instanceof Workitem)) {
+	    return false;
+	}
+	Workitem other = (Workitem) obj;
+	if (other.asset.getOid() != asset.getOid()) {
+	    return false;
+	}
+	return true;
+    }
+
+    @Override
+    public int hashCode() {
+	return asset.getOid().hashCode();
+    }
+
+    @Override
+    public String toString() {
+	return getId() + (asset.hasChanged() ? " (Changed)" : "");
+    }
 }

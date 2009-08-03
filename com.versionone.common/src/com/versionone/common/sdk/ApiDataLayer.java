@@ -14,6 +14,8 @@ public class ApiDataLayer {
 	}
 
 	public boolean ShowAllTasks;
+	public EffortTrackingLevel storyTrackingLevel;
+	public EffortTrackingLevel defectTrackingLevel;
 
 	public boolean IsCurrentUserOwnerAsset(Asset childAsset) {
 		// TODO Auto-generated method stub
@@ -42,5 +44,10 @@ public class ApiDataLayer {
 	public void addEffort(Asset asset, double value) {
 	    // TODO Auto-generated method stub
 	    
+	}
+
+	public boolean IsEffortTrackingRelated(String propertyName) {
+	    // TODO Auto-generated method stub
+	    return false;
 	}
 }

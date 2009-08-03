@@ -34,7 +34,7 @@ public class Workitem {
      */
     public final ArrayList<Workitem> children;
 
-    Workitem(Asset asset, Workitem parent) {
+    protected Workitem(Asset asset, Workitem parent) {
 	this.parent = parent;
 	this.asset = asset;
 	if (asset == null) {// TODO temporary
@@ -72,51 +72,60 @@ public class Workitem {
 	return asset.hasChanged();
     }
 
-    public boolean IsPropertyReadOnly(String propertyName) {
-	return true;
-	/*
-	 * String fullName = TypePrefix + '.' + propertyName; try { if
-	 * (dataLayer.IsEffortTrackingRelated(propertyName)) { return
-	 * IsEffortTrackingPropertyReadOnly(propertyName); }
-	 * 
-	 * return false; } catch (Exception e) {
-	 * ApiDataLayer.Warning("Cannot get property: " + fullName, e); return
-	 * true; }
-	 */}
+    public boolean isPropertyReadOnly(String propertyName) {
+	String fullName = getTypePrefix() + '.' + propertyName;
+	try {
+	    if (dataLayer.IsEffortTrackingRelated(propertyName)) {
+		return isEffortTrackingPropertyReadOnly(propertyName);
+	    }
 
-    /*
-     * public boolean IsPropertyDefinitionReadOnly(string propertyName) { String
-     * fullName = TypePrefix + '.' + propertyName; try { Attribute attribute =
-     * Asset.Attributes[fullName];
-     * 
-     * if (attribute.Definition.IsReadOnly) { return true; }
-     * 
-     * return false; } catch (Exception e) {
-     * ApiDataLayer.Warning("Cannot get property: " + fullName, e); return true;
-     * } }
-     */
-    /*
-     * private bool IsEffortTrackingPropertyReadOnly(string propertyName) { if
-     * (!dataLayer.IsEffortTrackingRelated(propertyName)) { throw new
-     * InvalidOperationException
-     * ("This property is not related to effort tracking."); }
-     * 
-     * EffortTrackingLevel storyLevel = dataLayer.StoryTrackingLevel;
-     * EffortTrackingLevel defectLevel = dataLayer.DefectTrackingLevel;
-     * 
-     * switch (TypePrefix) { case StoryPrefix: return storyLevel !=
-     * EffortTrackingLevel.PrimaryWorkitem && storyLevel !=
-     * EffortTrackingLevel.Both; case DefectPrefix: return defectLevel !=
-     * EffortTrackingLevel.PrimaryWorkitem && defectLevel !=
-     * EffortTrackingLevel.Both; case TaskPrefix: case TestPrefix:
-     * EffortTrackingLevel parentLevel; if (Parent.TypePrefix == StoryPrefix) {
-     * parentLevel = storyLevel; } else if (Parent.TypePrefix == DefectPrefix) {
-     * parentLevel = defectLevel; } else { throw new
-     * InvalidOperationException("Unexpected parent asset type."); } return
-     * parentLevel != EffortTrackingLevel.SecondaryWorkitem && parentLevel !=
-     * EffortTrackingLevel.Both; default: throw new
-     * NotSupportedException("Unexpected asset type."); } }
-     */
+	    return false;
+	} catch (Exception e) {
+	    ApiDataLayer.warning("Cannot get property: " + fullName, e);
+	    return true;
+	}
+    }
+
+    
+    public boolean isPropertyDefinitionReadOnly(String propertyName) {
+	String fullName = getTypePrefix() + '.' + propertyName;
+	try {
+	    Attribute attribute = asset.getAttributes().get(fullName);
+	    return attribute.getDefinition().isReadOnly();
+	} catch (Exception e) {
+	    ApiDataLayer.warning("Cannot get property: " + fullName, e);
+	    return true;
+	}
+    }
+     
+    
+    private boolean isEffortTrackingPropertyReadOnly(String propertyName) {
+	if (!dataLayer.IsEffortTrackingRelated(propertyName)) {
+	    throw new IllegalArgumentException(
+		    "This property is not related to effort tracking.");
+	}
+
+	EffortTrackingLevel storyLevel = dataLayer.storyTrackingLevel;
+	EffortTrackingLevel defectLevel = dataLayer.defectTrackingLevel;
+
+	if (getTypePrefix().equals(StoryPrefix)) {
+	    return storyLevel != EffortTrackingLevel.PrimaryWorkitem && storyLevel != EffortTrackingLevel.Both;
+	} else if (getTypePrefix().equals(DefectPrefix)) {
+	    return defectLevel != EffortTrackingLevel.PrimaryWorkitem && defectLevel != EffortTrackingLevel.Both;
+	} else if (getTypePrefix().equals(TaskPrefix) || getTypePrefix().equals(TestPrefix)) {
+	    EffortTrackingLevel parentLevel;
+	    if (parent.getTypePrefix().equals(StoryPrefix)) {
+		parentLevel = storyLevel;
+	    } else if (parent.getTypePrefix().equals(DefectPrefix)) {
+		parentLevel = defectLevel;
+	    } else {
+		throw new IllegalStateException("Unexpected parent asset type.");
+	    }
+	    return parentLevel != EffortTrackingLevel.SecondaryWorkitem && parentLevel != EffortTrackingLevel.Both;
+	} else {
+	    throw new IllegalStateException("Unexpected asset type.");
+	}
+    }
 
     private PropertyValues getPropertyValues(String propertyName) {
 	return dataLayer.GetListPropertyValues(getTypePrefix(), propertyName);

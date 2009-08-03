@@ -27,19 +27,6 @@ public class Workitem {
     public static final String OwnersProperty = "Owners";
     public static final String TodoProperty = "ToDo";
 
-    public static final Map<String, Boolean> properties = new HashMap<String, Boolean>();
-    static {
-        properties.put(IdProperty, false);
-        properties.put(DetailEstimateProperty, false);
-        properties.put(NameProperty, false);
-        properties.put(StatusProperty, true);
-        properties.put(EffortProperty, false);
-        properties.put(DoneProperty, false);
-        properties.put(ScheduleNameProperty, false);
-        properties.put(OwnersProperty, true);
-        properties.put(TodoProperty, false);
-    }
-
     protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();
     protected Asset asset;
     public Workitem parent;

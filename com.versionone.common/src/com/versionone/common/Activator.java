@@ -1,5 +1,9 @@
 package com.versionone.common;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -39,12 +43,21 @@ public class Activator extends AbstractUIPlugin {
 
     private void setAttributes() throws Exception {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-
-        for (String key : Workitem.properties.keySet()) {
-            dataLayer.addProperty(key, Workitem.DefectPrefix, Workitem.properties.get(key));
-            dataLayer.addProperty(key, Workitem.TestPrefix, Workitem.properties.get(key));
-            dataLayer.addProperty(key, Workitem.StoryPrefix, Workitem.properties.get(key));
-            dataLayer.addProperty(key, Workitem.TaskPrefix, Workitem.properties.get(key));
+        Map<String, Boolean> properties = new HashMap<String, Boolean>();
+        properties.put(Workitem.IdProperty, false);
+        properties.put(Workitem.DetailEstimateProperty, false);
+        properties.put(Workitem.NameProperty, false);
+        properties.put(Workitem.StatusProperty, true);
+        properties.put(Workitem.EffortProperty, false);
+        properties.put(Workitem.DoneProperty, false);
+        properties.put(Workitem.ScheduleNameProperty, false);
+        properties.put(Workitem.OwnersProperty, true);
+        properties.put(Workitem.TodoProperty, false);
+        for (Entry<String, Boolean> entry : properties.entrySet()) {
+            dataLayer.addProperty(entry.getKey(), Workitem.DefectPrefix, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TestPrefix, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.StoryPrefix, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TaskPrefix, entry.getValue());
         }
 
         dataLayer.connect("http://jsdksrv01:8080/VersionOne/", "admin", "admin", false);

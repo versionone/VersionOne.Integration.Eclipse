@@ -10,6 +10,7 @@ Require-Bundle:
  org.eclipse.ui,
  org.eclipse.core.runtime,
  com.versionone.common,
+ com.versionone.common.test;bundle-version="2.0.0",
  com.versionone.taskview;bundle-version="2.0.0",
  com.versionone.apiclient,
  org.junit4

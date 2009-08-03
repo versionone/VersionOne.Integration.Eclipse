@@ -49,7 +49,7 @@ public class Workitem {
      */
     public final ArrayList<Workitem> children;
 
-    protected Workitem(Asset asset, Workitem parent) {
+    Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
         if (asset == null) {// TODO temporary
@@ -173,8 +173,7 @@ public class Workitem {
         try {
             Object val = attribute.getValue();
             if (val instanceof Oid) {
-                PropertyValues res = getPropertyValues(propertyName);
-                return res.find((Oid) val);
+                return getPropertyValues(propertyName).find((Oid) val);
             }
             return val;
         } catch (APIException e) {

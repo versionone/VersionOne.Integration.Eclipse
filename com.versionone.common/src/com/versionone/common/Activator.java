@@ -5,7 +5,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.sun.xml.internal.fastinfoset.sax.Properties;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
 

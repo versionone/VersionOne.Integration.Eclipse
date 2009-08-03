@@ -1,4 +1,4 @@
-package com.versionone.common.test;
+package com.versionone.common.sdk;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,15 +6,21 @@ import java.util.Map;
 import com.versionone.common.sdk.Workitem;
 
 
-public class TestWorkitem extends Workitem {
+public class WorkitemMock extends Workitem {
 
     public String id;
     public String prefix;
     public boolean hasChanges;
     public Map<String, Object> properties = new HashMap<String, Object>(); 
 
-    public TestWorkitem() {
-	super(null, null);
+    public WorkitemMock() {
+        super(null, null);
+    }
+    
+    public WorkitemMock(String id, String prefix) {
+	this();
+	this.id = id;
+	this.prefix = prefix;
     }
 
     @Override

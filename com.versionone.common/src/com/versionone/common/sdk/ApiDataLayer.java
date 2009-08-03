@@ -29,7 +29,6 @@ import com.versionone.apiclient.QueryResult;
 import com.versionone.apiclient.Services;
 import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
-import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 import com.versionone.apiclient.IOperation;
 
 public class ApiDataLayer {
@@ -131,8 +130,8 @@ public class ApiDataLayer {
                 efforts = new HashMap<Asset, Double>();
             }
 
-            storyTrackingLevel = translateEffortTrackingLevel(v1Config.getStoryTrackingLevel());
-            defectTrackingLevel = translateEffortTrackingLevel(v1Config.getDefectTrackingLevel());
+            storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
+            defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
 
             memberOid = services.getLoggedIn();
             listPropertyValues = getListPropertyValues();
@@ -155,19 +154,6 @@ public class ApiDataLayer {
         IAssetType type = metaModel.getAssetType(token);
         types.put(token, type);
         return type;
-    }
-
-    private static EffortTrackingLevel translateEffortTrackingLevel(TrackingLevel level) {
-        switch (level) {
-        case On:
-            return EffortTrackingLevel.PRIMARY_WORKITEM;
-        case Off:
-            return EffortTrackingLevel.SECONDARY_WORKITEM;
-        case Mix:
-            return EffortTrackingLevel.BOTH;
-        default:
-            throw new UnsupportedOperationException("Unknown tracking level");
-        }
     }
 
     public boolean isCurrentUserOwnerAsset(Asset childAsset) {

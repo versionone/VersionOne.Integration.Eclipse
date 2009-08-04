@@ -44,7 +44,7 @@ public class SaveAction extends Action {
                 workItemView.showMessage("Error saving task. Check Error log for more information.");
             }
             workItemView.loadTable();
-            workItemView.updateStatusCodes();
+            //workItemView.updateStatusCodes();
         }
     }
 }

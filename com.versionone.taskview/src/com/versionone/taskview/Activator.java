@@ -7,6 +7,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -65,7 +66,12 @@ public class Activator extends AbstractUIPlugin {
     public static Activator getDefault() {
         return plugin;
     }
-
+    
+    //public static void connect(String path, String user, String pass, boolean auth) throws Exception {
+    public static void connect() throws Exception {
+        com.versionone.common.Activator.connect();
+    }
+    
     /**
      * Returns an image descriptor for the image file at the given plug-in
      * relative path

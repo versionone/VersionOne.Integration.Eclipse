@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
 
@@ -59,8 +61,20 @@ public class Activator extends AbstractUIPlugin {
             dataLayer.addProperty(entry.getKey(), Workitem.StoryPrefix, entry.getValue());
             dataLayer.addProperty(entry.getKey(), Workitem.TaskPrefix, entry.getValue());
         }
-
-        dataLayer.connect("http://jsdksrv01:8080/VersionOneNew/", "admin", "admin", false);
+        connect();
+    }
+    
+    /**
+     * connect to the VersionOne server with current user preference
+     * @throws Exception
+     */
+    public static void connect() throws Exception {
+        String path = PreferencePage.getPreferences().getString(PreferenceConstants.P_URL);
+        String user = PreferencePage.getPreferences().getString(PreferenceConstants.P_USER);
+        String password = PreferencePage.getPreferences().getString(PreferenceConstants.P_PASSWORD);
+        boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
+        
+        ApiDataLayer.getInstance().connect(path, user, password, auth);
     }
 
     /*

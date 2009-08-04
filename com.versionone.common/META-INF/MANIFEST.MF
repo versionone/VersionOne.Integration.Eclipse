@@ -11,13 +11,12 @@ Require-Bundle:
  org.eclipse.core.runtime,
  com.versionone.apiclient;bundle-version="8.0.195"
 Export-Package: 
- com.versionone.common.preferences;uses:="
-  org.eclipse.jface.preference,
-  org.eclipse.ui,
-  org.eclipse.jface.util,
-  org.eclipse.core.runtime.preferences,
-  org.eclipse.swt.widgets",
- com.versionone.common.sdk;uses:="
-  org.eclipse.jface.preference,
-  com.versionone.apiclient"
+ com.versionone.common,
+ com.versionone.common.preferences;
+  uses:="org.eclipse.jface.preference,
+   org.eclipse.ui,
+   org.eclipse.jface.util,
+   org.eclipse.core.runtime.preferences,
+   org.eclipse.swt.widgets",
+ com.versionone.common.sdk;uses:="org.eclipse.jface.preference,com.versionone.apiclient"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

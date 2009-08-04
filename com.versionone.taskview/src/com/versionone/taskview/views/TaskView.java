@@ -223,18 +223,29 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getProperty();
         if (property.equals(PreferenceConstants.P_ENABLED)) {
-            if (0 == viewer.getTree().getColumnCount())
+            if (0 == viewer.getTree().getColumnCount()) {
                 configureTable();
+            }
             selectProvider();
-        } else if (property.equals(PreferenceConstants.P_TRACK_EFFORT)) {
+        } else if (property.equals(PreferenceConstants.P_URL) || property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+            try {
+                Activator.connect();            
+            } catch (Exception e) {
+                Activator.logError(e);
+                MessageDialog.openError(viewer.getTree().getShell(), "Task View Error",
+                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+            }
+            reCreateTable();
+        }
+        /*
+        else if (property.equals(PreferenceConstants.P_TRACK_EFFORT)) {
             if (isTrackEffort()) {
                 this.addEffortColumns();
             } else {
                 this.removeEffortColumns();
             }
-        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
-            refreshAction.run();
         }
+         */
     }
 
     /**
@@ -269,11 +280,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
     }
 
+    
     /**
      * Retrieve the StatusCodes from the server
      * 
      * @return StatusCodes from the server or an empty collection
      */
+    /*
     private IStatusCodes getStatusValues() {
         try {
             return V1Server.getInstance().getTaskStatusValues();
@@ -305,6 +318,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             };
         }
     }
+    */
 
     /**
      * Create a TableViewerColumn with specified properties and append it to the
@@ -392,15 +406,19 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         super.dispose();
     }
 
+    /*
     protected void updateStatusCodes() {
         statusEditor.setStatusCodes(getStatusValues());
     }
-    protected void reCreateTable() {
+    */
+    protected void reCreateTable() {       
+        
         if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             removeEffortColumns();
         } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
         }
+        loadTable();
     }
 
 }

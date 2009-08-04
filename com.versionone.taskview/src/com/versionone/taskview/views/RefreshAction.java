@@ -20,16 +20,16 @@ class RefreshAction extends Action {
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.REFRESH_IMAGE_ID));
     }
 
-    public void run() {        
+    public void run() {
         try {
-            ApiDataLayer.getInstance().reconnect();
+            Activator.connect();            
         } catch (Exception e) {
             Activator.logError(e);
             MessageDialog.openError(workitemViewer.getTree().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
+        
         workItemView.reCreateTable();
-        workItemView.loadTable();
-        workItemView.updateStatusCodes();
+        //workItemView.updateStatusCodes();
     }
 }

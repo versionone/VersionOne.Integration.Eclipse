@@ -34,11 +34,19 @@ import com.versionone.apiclient.IOperation;
 
 public class ApiDataLayer {
 
-    private final String MetaUrlSuffix = "meta.v1/";
-    private final String LocalizerUrlSuffix = "loc.v1/";
-    private final String DataUrlSuffix = "rest-1.v1/";
-    private final String ConfigUrlSuffix = "config.v1/";
+    private static final String MetaUrlSuffix = "meta.v1/";
+    private static final String LocalizerUrlSuffix = "loc.v1/";
+    private static final String DataUrlSuffix = "rest-1.v1/";
+    private static final String ConfigUrlSuffix = "config.v1/";
 
+    private static final List<String> effortTrackingAttributesList = Arrays.asList(
+            Workitem.DetailEstimateProperty,
+            "ToDo",
+            "Done",
+            "Effort",
+            "Actuals"
+        );
+        
     private Map<String, IAssetType> types;
     private IAssetType projectType;
     private IAssetType taskType;
@@ -76,15 +84,6 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
-    
-    private static final String[] effortTrackingRelatedAttributes = new String[] {
-        "DetailEstimate",
-        "ToDo",
-        "Done",
-        "Effort",
-        "Actuals",
-    };
-    private final List<String> effortTrackingAttributesList = new ArrayList<String>(Arrays.asList(effortTrackingRelatedAttributes));
     
     private ApiDataLayer() {
         String[] prefixes = new String[] {
@@ -376,7 +375,7 @@ public class ApiDataLayer {
         connect(path, userName, password, integrated);
     }
 
-    public void addEffort(Asset asset, double value) {
+    public void setEffort(Asset asset, double value) {
         // TODO Auto-generated method stub
 
     }

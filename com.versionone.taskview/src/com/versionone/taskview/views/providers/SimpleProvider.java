@@ -20,8 +20,7 @@ public class SimpleProvider extends ColumnLabelProvider {
     @Override
     public String getText(Object element) {
         try {
-            Object data = ((Workitem) element).getProperty(propertyName);
-            return data != null ? data.toString() : "";
+            return ((Workitem) element).getPropertyAsString(propertyName);
         } catch (IllegalArgumentException e) {
             Activator.logError("Cannot get property '" + propertyName + "' of " + element, e);
             return "*** Error ***";

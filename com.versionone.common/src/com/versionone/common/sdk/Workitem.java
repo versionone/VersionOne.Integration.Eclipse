@@ -1,16 +1,17 @@
 package com.versionone.common.sdk;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.versionone.Oid;
 import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
+import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
 public class Workitem {
+
     public static final String TaskPrefix = "Task";
     public static final String StoryPrefix = "Story";
     public static final String DefectPrefix = "Defect";
@@ -26,6 +27,12 @@ public class Workitem {
     public static final String ScheduleNameProperty = "Schedule.Name";
     public static final String OwnersProperty = "Owners";
     public static final String TodoProperty = "ToDo";
+
+    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    static {
+        numberFormat.setMinimumFractionDigits(2);
+        numberFormat.setMaximumFractionDigits(6);
+    }
 
     protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();
     protected Asset asset;
@@ -168,6 +175,16 @@ public class Workitem {
         }
     }
 
+    public String getPropertyAsString(String propertyName) throws IllegalArgumentException {
+        Object value = getProperty(propertyName);
+        if (value == null) {
+            return "";
+        } else if (value instanceof Double) {
+            return numberFormat.format(value);
+        }
+        return value.toString();
+    }
+
     /**
      * Sets property value.
      * 
@@ -179,25 +196,35 @@ public class Workitem {
     public void setProperty(String propertyName, Object newValue) {
         try {
             if (propertyName.equals(EffortProperty)) {
-                dataLayer.addEffort(asset, Double.valueOf((String) newValue));
+                final Double effort;
+                if ("".equals(newValue))
+                    effort = null;
+                else
+                    effort = numberFormat.parse((String) newValue).doubleValue();
+                dataLayer.setEffort(asset, effort);
                 return;
             }
             IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+            if (newValue == null || newValue.equals("")) {
+                asset.setAttributeValue(attrDef, null);
+                return;
+            }
             Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
             if (attrDef.isMultiValue()) {
                 updateValues(propertyName, attribute.getValues(), (PropertyValues) newValue);
-            } else {
-                if (newValue instanceof ValueId) {
-                    newValue = ((ValueId) newValue).oid;
-                } else if ("".equals(newValue)) {
-                    newValue = null;
-                }
-                if (attribute.getValue() == null || !attribute.getValue().equals(newValue)) {
-                    asset.setAttributeValue(attrDef, newValue);
-                }
+                return;
+            }
+            if (newValue instanceof ValueId) {
+                newValue = ((ValueId) newValue).oid;
+            } else if (attrDef.getAttributeType() == AttributeType.Numeric) {
+                newValue = numberFormat.parse((String) newValue);
+            }
+
+            if (!newValue.equals(attribute.getValue())) {
+                asset.setAttributeValue(attrDef, newValue);
             }
         } catch (Exception ex) {
-            ApiDataLayer.warning("Cannot set property: " + propertyName, ex);
+            ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
         }
     }
 

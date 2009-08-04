@@ -108,16 +108,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));
-        column.setEditingSupport(new TextEditingSupport(Workitem.NameProperty, viewer));
+        column.setEditingSupport(new TextEditor(Workitem.NameProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DetailEstimateProperty, false));
-        //column.setEditingSupport(new TextEditingSupport(Workitem.DetailEstimateProperty, viewer));
-        //TODO column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
+        column.setEditingSupport(new TextEditor(Workitem.DetailEstimateProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.TodoProperty, false));
-        //TODO column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
+        column.setEditingSupport(new TextEditor(Workitem.TodoProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));

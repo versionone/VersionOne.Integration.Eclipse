@@ -11,7 +11,7 @@ import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
-public class TextEditingSupport extends EditingSupport {
+public class TextEditor extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
 
@@ -19,7 +19,7 @@ public class TextEditingSupport extends EditingSupport {
     private final String property;
     private String oldValue;
 
-    public TextEditingSupport(String propertyName, TreeViewer viewer) {
+    public TextEditor(String propertyName, TreeViewer viewer) {
         super(viewer);
         editor = new TextCellEditor(viewer.getTree());
         property = propertyName;
@@ -57,7 +57,7 @@ public class TextEditingSupport extends EditingSupport {
     @Override
     protected Object getValue(Object element) {
         try {
-            return oldValue = ((Workitem) element).getProperty(property).toString();
+            return oldValue = ((Workitem) element).getPropertyAsString(property);
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;

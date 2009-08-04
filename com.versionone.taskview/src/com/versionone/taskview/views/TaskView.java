@@ -6,10 +6,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
@@ -34,7 +32,7 @@ import com.versionone.taskview.views.providers.SimpleProvider;
  */
 public class TaskView extends ViewPart implements IPropertyChangeListener {
 
-    /**
+    /*
      * These constants are the VersionOne names for the column titles. We
      * localize these values and use that name as column titles
      */
@@ -53,18 +51,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private Action refreshAction = null;
     private Action saveAction = null;
 
-    /**
-     * The constructor.
-     */
-    public TaskView() {
-    }
+    public TaskView() {}
 
     /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
      */
     public void createPartControl(Composite parent) {
-
         PreferencePage.getPreferences().addPropertyChangeListener(this);
 
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
@@ -77,14 +70,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         contributeToActionBars();
         hookDoubleClickAction();
         selectProvider();
-
     }
 
     /**
      * Select the content and label providers
      */
     private void selectProvider() {
-
         boolean isEnabled = isEnabled();
 
         selectProjectAction.setEnabled(isEnabled);
@@ -109,46 +100,42 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Configure the table
      */
     private void configureTable() {
-
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.IdProperty, true));
-        column.setEditingSupport(new TaskIdEditor(viewer));
+        //TODO column.setEditingSupport(new TaskIdEditor(viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));
-        column.setEditingSupport(new TaskEditor.NameEditor(viewer));
+        //TODO column.setEditingSupport(new TaskEditor.NameEditor(viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DetailEstimateProperty, false));
-        column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
+        //TODO column.setEditingSupport(new TaskEditor.EstimateEditor(viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.TodoProperty, false));
-        column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
+        //TODO column.setEditingSupport(new TaskEditor.ToDoEditor(viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
+        //TODO column.setEditingSupport(statusEditor = new StatusEditor(viewer, getStatusValues()));
 
         if (this.isTrackEffort()) {
             addEffortColumns();
         }
-
-        statusEditor = new StatusEditor(viewer, getStatusValues());
-        column.setEditingSupport(statusEditor);
     }
 
     /**
      * Adds the columns needed to track effort
      */
     private void addEffortColumns() {
-
         createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4).setLabelProvider(
                 new SimpleProvider(Workitem.DoneProperty, false));
 
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
         column.setLabelProvider(new SimpleProvider(Workitem.EffortProperty, false));
 
-        column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
+        //TODO column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
 
         viewer.refresh();
     }
@@ -157,7 +144,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * removes the columns needed when tracking effort
      */
     private void removeEffortColumns() {
-
         viewer.getTree().getColumn(5).dispose();
         viewer.getTree().getColumn(4).dispose();
         viewer.refresh();
@@ -168,9 +154,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void makeActions() {
         selectProjectAction = new ProjectAction(this, viewer);
-
         refreshAction = new RefreshAction(this);
-
         saveAction = new SaveAction(this, viewer);
     }
 
@@ -226,60 +210,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private boolean isEnabled() {
         return PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ENABLED);
-    }
-
-    /**
-     * ContentProvider for VersionOne Task
-     * 
-     * @author jerry
-     */
-    class ViewContentProvider implements ITreeContentProvider {
-
-        Object justForTest;
-
-        public Object[] getChildren(Object parentElement) {
-            // TODO Auto-generated method stub
-            return ((Workitem) parentElement).children.toArray();
-        }
-
-        public Object getParent(Object element) {
-            // TODO Auto-generated method stub
-            return ((Workitem) element).parent;
-        }
-
-        public boolean hasChildren(Object element) {
-            // TODO Auto-generated method stub
-            Workitem workitem = ((Workitem) element);
-            return workitem.children != null && workitem.children.size() > 0;
-        }
-
-        public Object[] getElements(Object inputElement) {
-            // justForTest = inputElement;
-            // return inputElement;
-            if (inputElement instanceof Workitem[]) {
-                return (Object[]) inputElement;
-            } else {
-                return new Object[] {};
-            }
-
-        }
-
-        public void dispose() {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            // TODO Auto-generated method stub
-
-        }
-
-        /*
-         * public void inputChanged(Viewer v, Object oldInput, Object newInput)
-         * {} public void dispose() {} public Object[] getElements(Object
-         * parent) { if(parent instanceof Task[]) { return (Object[]) parent; }
-         * else { return new Object[]{}; } }
-         */
     }
 
     /**
@@ -417,7 +347,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     private void hookDoubleClickAction() {
-
         //
         // Code to launch a browser when the user double clicks on a task. The
         // browser is instructed to navigate
@@ -461,5 +390,4 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     protected void updateStatusCodes() {
         statusEditor.setStatusCodes(getStatusValues());
     }
-
 }

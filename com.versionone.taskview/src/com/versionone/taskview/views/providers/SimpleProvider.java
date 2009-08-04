@@ -9,13 +9,12 @@ import com.versionone.taskview.Activator;
 
 public class SimpleProvider extends ColumnLabelProvider {
 
-    private String propertyName;
-    private boolean isShowTypeIcon;
+    private final String propertyName;
+    private final boolean isShowTypeIcon;
 
     public SimpleProvider(String propertyName, boolean isShowTypeIcon) {
         this.propertyName = propertyName;
         this.isShowTypeIcon = isShowTypeIcon;
-
     }
 
     @Override
@@ -23,29 +22,28 @@ public class SimpleProvider extends ColumnLabelProvider {
         try {
             Object data = ((Workitem) element).getProperty(propertyName);
             return data != null ? data.toString() : "";
-        } catch (Exception e) {
-            Activator.logError(e);
+        } catch (IllegalArgumentException e) {
+            Activator.logError("Cannot get property '" + propertyName + "' of " + element, e);
+            return "*** Error ***";
         }
-        return "*** Error ***";
     }
 
     @Override
     public Image getImage(Object element) {
         Image icon = null;
-        String workItemType = ((Workitem) element).getTypePrefix();
-        ImageRegistry imageStore = Activator.getDefault().getImageRegistry();
-        if (!isShowTypeIcon) {
-            icon = super.getImage(element);
-        } else if (workItemType.equals(Workitem.TaskPrefix)) {
-            icon = imageStore.get(Activator.TASK_IMAGE_ID);
-        } else if (workItemType.equals(Workitem.DefectPrefix)) {
-            icon = imageStore.get(Activator.DEFECT_IMAGE_ID);
-        } else if (workItemType.equals(Workitem.TestPrefix)) {
-            icon = imageStore.get(Activator.TEST_IMAGE_ID);
-        } else if (workItemType.equals(Workitem.StoryPrefix)) {
-            icon = imageStore.get(Activator.STORY_IMAGE_ID);
+        if (isShowTypeIcon) {
+            String workItemType = ((Workitem) element).getTypePrefix();
+            ImageRegistry imageStore = Activator.getDefault().getImageRegistry();
+            if (workItemType.equals(Workitem.TaskPrefix)) {
+                icon = imageStore.get(Activator.TASK_IMAGE_ID);
+            } else if (workItemType.equals(Workitem.DefectPrefix)) {
+                icon = imageStore.get(Activator.DEFECT_IMAGE_ID);
+            } else if (workItemType.equals(Workitem.TestPrefix)) {
+                icon = imageStore.get(Activator.TEST_IMAGE_ID);
+            } else if (workItemType.equals(Workitem.StoryPrefix)) {
+                icon = imageStore.get(Activator.STORY_IMAGE_ID);
+            }
         }
-
         return icon;
     }
 }

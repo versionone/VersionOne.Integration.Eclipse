@@ -12,8 +12,34 @@ public class ValueId {
     }
     
     protected ValueId(Oid oid, String name) {
-        oid = oid.getMomentless();
+        this.oid = oid.getMomentless();
         this.name = name;
     }
 
+    @Override
+    public boolean equals(Object value) {
+        if (value == this) {
+            return true;
+        }
+        if (!(value instanceof ValueId)) {
+            return false;
+        }
+        
+        ValueId newValue = (ValueId)value;
+        
+        return this.oid.equals(newValue.oid) && this.name.equals(newValue.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 31 + oid.hashCode();
+        hash = hash * 31 + name.hashCode();
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        return name;
+    }
 }

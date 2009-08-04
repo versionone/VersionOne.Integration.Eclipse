@@ -337,7 +337,7 @@ public class ApiDataLayer {
         for (Asset asset : services.retrieve(query).getAssets()) {
             String name = (String) asset.getAttribute(nameDef).getValue();
             res.addInternal(new ValueId(asset.getOid(), name));
-        }
+        }    
         return res;
     }
 

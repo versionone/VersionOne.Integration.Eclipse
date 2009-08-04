@@ -16,7 +16,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
 
     public PropertyValues(Collection<ValueId> valueIds) {
         for (ValueId id : valueIds) {
-            add(id);
+            addInternal(id);
         }
     }
 

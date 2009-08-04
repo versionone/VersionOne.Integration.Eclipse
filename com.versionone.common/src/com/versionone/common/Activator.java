@@ -60,7 +60,7 @@ public class Activator extends AbstractUIPlugin {
             dataLayer.addProperty(entry.getKey(), Workitem.TaskPrefix, entry.getValue());
         }
 
-        dataLayer.connect("http://jsdksrv01:8080/VersionOne/", "admin", "admin", false);
+        dataLayer.connect("http://jsdksrv01:8080/VersionOneNew/", "admin", "admin", false);
     }
 
     /*

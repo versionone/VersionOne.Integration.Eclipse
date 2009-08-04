@@ -1,6 +1,7 @@
 package com.versionone.common.sdk;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +76,15 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
+    
+    private static final String[] effortTrackingRelatedAttributes = new String[] {
+        "DetailEstimate",
+        "ToDo",
+        "Done",
+        "Effort",
+        "Actuals",
+    };
+    private final List<String> effortTrackingAttributesList = new ArrayList<String>(Arrays.asList(effortTrackingRelatedAttributes));
     
     private ApiDataLayer() {
         String[] prefixes = new String[] {
@@ -195,6 +205,7 @@ public class ApiDataLayer {
                 // example create AssetList
                 // class from C# SDK)
             } catch (MetaException ex) {
+                throw new Exception(ex.getMessage());
                 // throw Warning("Unable to get workitems.", ex);
             }
             /*
@@ -202,6 +213,7 @@ public class ApiDataLayer {
              * Warning("Unable to get workitems.", ex); }
              */
             catch (Exception ex) {
+                throw new Exception(ex.getMessage());
                 // throw Warning("Unable to get workitems.", ex);
             }
         }
@@ -220,9 +232,10 @@ public class ApiDataLayer {
     }
 
     private void addRecursive(Asset[] assets, List<Asset> target) {
+        target = new ArrayList<Asset>();
         for (Asset asset : assets) {
             target.add(asset);
-            if (asset.getChildren().size() > 0) {
+            if (asset.getChildren() != null && asset.getChildren().size() > 0) {
                 addRecursive(asset.getChildren().toArray(new Asset[asset.getChildren().size()]), target);
             }
         }
@@ -350,6 +363,18 @@ public class ApiDataLayer {
         // TODO Auto-generated method stub
         return new DataLayerException();
     }
+    
+    public boolean isTrackEffortEnabled() {
+        return trackEffort;
+    }
+    
+    /**
+     * Reconnect with settings, used in last Connect() call.
+     * @throws Exception 
+     */
+    public void reconnect() throws Exception {
+        connect(path, userName, password, integrated);
+    }
 
     public void addEffort(Asset asset, double value) {
         // TODO Auto-generated method stub
@@ -357,8 +382,7 @@ public class ApiDataLayer {
     }
 
     public boolean isEffortTrackingRelated(String propertyName) {
-        // TODO Auto-generated method stub
-        return false;
+        return effortTrackingAttributesList.contains(propertyName);
     }
 
     public void commitAsset(Asset asset) throws APIException {

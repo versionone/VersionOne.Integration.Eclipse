@@ -45,11 +45,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_DONE = "ColumnTitle'Done";
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
 
+    private boolean isEffortColumsShow;
     private TreeViewer viewer;
     private StatusEditor statusEditor;
     private Action selectProjectAction = null;
     private Action refreshAction = null;
     private Action saveAction = null;
+    
 
     public TaskView() {}
 
@@ -120,7 +122,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
         //TODO column.setEditingSupport(statusEditor = new StatusEditor(viewer, getStatusValues()));
 
-        if (this.isTrackEffort()) {
+        if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
         }
     }
@@ -138,6 +140,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         //TODO column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
 
         viewer.refresh();
+        isEffortColumsShow = true;
     }
 
     /**
@@ -147,6 +150,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         viewer.getTree().getColumn(5).dispose();
         viewer.getTree().getColumn(4).dispose();
         viewer.refresh();
+        isEffortColumsShow = false;
     }
 
     /**
@@ -154,7 +158,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void makeActions() {
         selectProjectAction = new ProjectAction(this, viewer);
-        refreshAction = new RefreshAction(this);
+        refreshAction = new RefreshAction(this, viewer);
         saveAction = new SaveAction(this, viewer);
     }
 
@@ -390,4 +394,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     protected void updateStatusCodes() {
         statusEditor.setStatusCodes(getStatusValues());
     }
+    protected void reCreateTable() {
+        if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+            removeEffortColumns();
+        } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+            addEffortColumns();
+        }
+    }
+
 }

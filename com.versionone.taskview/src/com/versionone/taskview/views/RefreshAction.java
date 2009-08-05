@@ -14,6 +14,7 @@ class RefreshAction extends Action {
 
     public RefreshAction(TaskView workItemView, TreeViewer workitemViewer) {
         this.workItemView = workItemView;
+        this.workitemViewer = workitemViewer;
 
         setText("Refresh");
         setToolTipText("Refresh");

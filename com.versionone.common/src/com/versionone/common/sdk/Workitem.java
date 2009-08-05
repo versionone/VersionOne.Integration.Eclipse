@@ -311,12 +311,12 @@ public class Workitem {
         }
     }
 
-    public void Close() throws APIException {
+    public void close() throws APIException {
         dataLayer.executeOperation(asset, asset.getAssetType().getOperation("Inactivate"));
         dataLayer.refreshAsset(this);
     }
 
-    public void RevertChanges() {
+    public void revertChanges() {
         dataLayer.revertAsset(asset);
     }
 

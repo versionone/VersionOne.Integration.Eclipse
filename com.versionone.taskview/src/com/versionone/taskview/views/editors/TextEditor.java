@@ -1,4 +1,4 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
@@ -21,8 +21,12 @@ public class TextEditor extends EditingSupport {
 
     public TextEditor(String propertyName, TreeViewer viewer) {
         super(viewer);
-        editor = new TextCellEditor(viewer.getTree());
         property = propertyName;
+        editor = createEditor(viewer);
+    }
+
+    protected CellEditor createEditor(TreeViewer viewer) {
+        return new TextCellEditor(viewer.getTree());
     }
 
     @Override

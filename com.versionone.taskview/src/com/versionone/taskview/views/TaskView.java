@@ -22,6 +22,8 @@ import com.versionone.common.sdk.ProjectTreeNode;
 import com.versionone.common.sdk.V1Server;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.editors.ReadOnlyEditor;
+import com.versionone.taskview.views.editors.TextEditor;
 import com.versionone.taskview.views.providers.SimpleProvider;
 
 /**
@@ -104,7 +106,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void configureTable() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.IdProperty, true));
-        //TODO column.setEditingSupport(new TaskIdEditor(viewer));
+        column.setEditingSupport(new ReadOnlyEditor(Workitem.IdProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));

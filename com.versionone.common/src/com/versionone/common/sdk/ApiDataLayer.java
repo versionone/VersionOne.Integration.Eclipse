@@ -152,7 +152,7 @@ public class ApiDataLayer {
         }// catch (WebException ex) {
         // isConnected = false;
         // throw Warning("Cannot connect to V1 server.", ex);
-        // }
+        //}
         catch (Exception ex) {
             // throw Warning("Cannot connect to V1 server.", ex); TODO implement
             throw new Exception("Cannot connect to V1 server.", ex);
@@ -260,7 +260,7 @@ public class ApiDataLayer {
 
     // need to make AlreadyUsedDefinition.Clear(); before first call of this
     // method
-    private void addSelection(Query query, String typePrefix) {
+    private void addSelection(Query query, String typePrefix) throws Exception {
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (attrInfo.prefix == typePrefix) {
                 try {
@@ -271,6 +271,7 @@ public class ApiDataLayer {
                     }
                 } catch (MetaException e) {
                     // Warning("Wrong attribute: " + attrInfo, e); /TODO warning
+                    throw new Exception ("Wrong attribute: " + attrInfo);
                 }
             }
         }
@@ -285,7 +286,7 @@ public class ApiDataLayer {
         return null;
     }
     
-    private Map<String, PropertyValues> getListPropertyValues() throws ConnectionException, APIException, OidException, MetaException {
+    private Map<String, PropertyValues> getListPropertyValues() throws Exception { //ConnectionException, APIException, OidException, MetaException {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {

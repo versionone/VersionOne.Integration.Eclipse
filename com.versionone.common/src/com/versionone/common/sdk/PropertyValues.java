@@ -76,4 +76,25 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         }
         return result;
     }
+    
+    public String[] toStringArray() {
+        String[] values = new String[size()];
+        int i = 0;
+        for (ValueId data : dictionary.values()) {
+            values[i++] = data.toString();
+        }
+        return values;
+    }
+
+    public int getPropertyListIndex(ValueId value) {
+        int i = 0;
+        for (ValueId data : dictionary.values()) {
+            if (value.equals(data)) {
+                return i;
+            }
+            i++;
+        }
+        return 0;
+        
+    }
 }

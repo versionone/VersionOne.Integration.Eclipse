@@ -27,14 +27,13 @@ public class ValueId {
         
         ValueId newValue = (ValueId)value;
         
-        return this.oid.equals(newValue.oid) && this.name.equals(newValue.name);
+        return this.oid.equals(newValue.oid);
     }
     
     @Override
     public int hashCode() {
         int hash = 1;
         hash = hash * 31 + oid.hashCode();
-        hash = hash * 31 + name.hashCode();
         return hash;
     }
     

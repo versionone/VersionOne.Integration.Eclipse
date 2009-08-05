@@ -17,11 +17,12 @@ import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.IProjectTreeNode;
-import com.versionone.common.sdk.IStatusCodes;
 import com.versionone.common.sdk.ProjectTreeNode;
 import com.versionone.common.sdk.V1Server;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+
+import com.versionone.taskview.views.editors.ListEditor;
 import com.versionone.taskview.views.editors.ReadOnlyEditor;
 import com.versionone.taskview.views.editors.TextEditor;
 import com.versionone.taskview.views.providers.SimpleProvider;
@@ -122,7 +123,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
-        //TODO column.setEditingSupport(statusEditor = new StatusEditor(viewer, getStatusValues()));
+        column.setEditingSupport(new ListEditor(viewer, Workitem.StatusProperty));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();

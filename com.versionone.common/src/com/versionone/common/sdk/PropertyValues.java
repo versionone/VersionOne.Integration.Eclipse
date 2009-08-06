@@ -96,5 +96,18 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         }
         return 0;
         
+    }    
+
+    public ValueId getValueIdByIndex(int value) {
+        
+        int i = 0;
+        for (ValueId data : dictionary.values()) {
+            if (value == i) {
+                return data;
+            }
+            i++;
+        }
+        
+        return null;
     }
 }

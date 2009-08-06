@@ -56,12 +56,14 @@ public class ListEditor extends EditingSupport {
     @Override
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
-        ValueId newValue = (ValueId)workitem.getProperty(propertyName);
+        //ValueId currentValue = (ValueId)workitem.getProperty(propertyName);
+        //ValueId newValue = valueList[value];
+        ValueId newValue = dataLayer.getListPropertyValues("Story", propertyName).getValueIdByIndex((Integer)value);
         if (dataLayer.getListPropertyValues("Story", propertyName).contains(newValue) &&
-                !currentValue.equals(newValue)) {
-            workitem.setProperty(propertyName, value);
+                !currentValue.equals(newValue) && newValue != null) {
+            workitem.setProperty(propertyName, newValue);
         }
-        
+        viewer.refresh();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.versionone.taskview.views;
 
+import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,7 +17,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import com.versionone.common.sdk.IProjectTreeNode;
+import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 
@@ -29,8 +32,8 @@ import com.versionone.common.preferences.PreferencePage;
 public class ProjectSelectDialog extends Dialog implements SelectionListener {
 
     private Tree projectTree = null;
-    private IProjectTreeNode _rootNode;
-    private IProjectTreeNode _selectedProjectTreeNode;
+    private List<Workitem> v1Roots;
+    private Workitem selectedProjectTreeNode;
     private TreeItem _selectedTreeItem;
 
     static int WINDOW_HEIGHT = 200;
@@ -41,19 +44,19 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * 
      * @param parentShell
      *            - @see Dialog
-     * @param rootNode
+     * @param projectTree
      *            - root node of tree to display
      * @param defaultSelected
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public ProjectSelectDialog(Shell parentShell, IProjectTreeNode rootNode, IProjectTreeNode defaultSelected) {
+    public ProjectSelectDialog(Shell parentShell, List<Workitem> projectTree, Workitem defaultSelected) {
         super(parentShell);
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
-        _rootNode = rootNode;
-        _selectedProjectTreeNode = defaultSelected;
-        if (null == _selectedProjectTreeNode)
-            _selectedProjectTreeNode = _rootNode;
+        v1Roots = projectTree;
+        selectedProjectTreeNode = defaultSelected;
+        /*if (null == _selectedProjectTreeNode)
+            _selectedProjectTreeNode = _rootNode;*/
     }
 
     /**
@@ -61,8 +64,8 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * 
      * @return
      */
-    public IProjectTreeNode getSelectedProject() {
-        return _selectedProjectTreeNode;
+    public Workitem getSelectedProject() {
+        return selectedProjectTreeNode;
     }
 
     /**
@@ -95,8 +98,38 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
     /**
      * Populate the Tree control with IProjectTreeNode data
      */
+    // TODO this and next methods can be optimazed        
     private void populateTree() {
-        if (_rootNode.hasChildren()) {
+        int i = 0;
+        for (Workitem v1Root : v1Roots) {
+            final TreeItem treeItem = new TreeItem(this.projectTree, SWT.NONE, i);
+            treeItem.setText(v1Root.getPropertyAsString(Workitem.NameProperty));
+            treeItem.setData(v1Root);
+            treeItem.setExpanded(true);
+            int j = 0;
+            for (Workitem child : v1Root.children) {
+                populateTree(treeItem, child, j);
+                j++;
+            }
+            i++;
+            //TreeNode node = rootNodes.Add(v1Root.GetProperty(Workitem.NameProperty) as string);
+            //node.Tag = v1Root;
+//            TreeNode res2 = AddNodesRecursively(node.Nodes, v1Root.Children);
+//            if (res2 != null) {
+//                res = res2;
+//            } else if (v1Root.Id == Settings.Instance.SelectedProjectId) {
+//                res = node;
+//            }
+        }
+
+        if (null == _selectedTreeItem) {
+            _selectedTreeItem = projectTree.getItem(0);
+            selectedProjectTreeNode = (Workitem) _selectedTreeItem.getData();
+        }
+        projectTree.setSelection(_selectedTreeItem);
+        
+        /*
+        if (projectTree1.hasChildren()) {
             IProjectTreeNode[] rootNodes = _rootNode.getChildren();
             for (int i = 0; i < rootNodes.length; ++i) {
                 final TreeItem treeItem = new TreeItem(this.projectTree, SWT.NONE, i);
@@ -114,6 +147,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
             }
             projectTree.setSelection(_selectedTreeItem);
         }
+        */
     }
 
     /**
@@ -126,17 +160,21 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * @param index
      *            - index for this TreeItem in the parent node
      */
-    private void populateTree(TreeItem tree, IProjectTreeNode node, int index) {
+    private void populateTree(TreeItem tree, Workitem node, int index) {
         final TreeItem treeItem = new TreeItem(tree, SWT.NONE, index);
-        if (_selectedProjectTreeNode.equals(node)) {
+        if (selectedProjectTreeNode.equals(node)) {
             _selectedTreeItem = treeItem;
         }
-        treeItem.setText(node.getName());
+        //treeItem.setText(node.getName());
+        //treeItem.setData(node);
+        treeItem.setText(node.getPropertyAsString(Workitem.NameProperty));
         treeItem.setData(node);
-        if (node.hasChildren()) {
-            IProjectTreeNode[] children = node.getChildren();
-            for (int i = 0; i < children.length; ++i) {
-                populateTree(treeItem, children[i], i);
+        if (node.children.size() > 0) {
+            //IProjectTreeNode[] children = node.children();
+            int i = 0;
+            for (Workitem child : node.children) {
+                populateTree(treeItem, child, i);
+                i++;
             }
         }
         treeItem.setExpanded(true);
@@ -152,8 +190,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * {@link #widgetSelected(SelectionEvent)}
      */
     public void widgetSelected(SelectionEvent e) {
-        this._selectedProjectTreeNode = (IProjectTreeNode) ((TreeItem) e.item).getData();
-        ;
+        this.selectedProjectTreeNode = (Workitem) ((TreeItem) e.item).getData();
     }
 
     /**
@@ -163,6 +200,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
     protected void okPressed() {
         super.okPressed();
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN,
-                _selectedProjectTreeNode.getToken());
+                selectedProjectTreeNode.getId());
+        ApiDataLayer.getInstance().setCurrentProject(selectedProjectTreeNode);
     }
 }

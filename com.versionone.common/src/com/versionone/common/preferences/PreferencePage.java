@@ -16,7 +16,6 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.ButtonFieldEditor.Validator;
-import com.versionone.common.sdk.V1Server;
 
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -182,35 +181,37 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
      * @author Jerry D. Odenwelder Jr.
      * 
      */
+    //TODO implement connection validator
     class ConnectionValidator implements Validator {
 
         public boolean isValid() {
-            boolean rc = true;
-
-            String url = urlEditor.getStringValue();
-
-            V1APIConnector metaConnector = new V1APIConnector(url.toString() + V1Server.META_URL_SUFFIX);
-            MetaModel model = new MetaModel(metaConnector);
-
-            V1APIConnector dataConnector = null;
-            if (integratedAuthEditor.getBooleanValue()) {
-                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX);
-            } else {
-                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX, userEditor
-                        .getStringValue(), pwdField.getStringValue());
-            }
-
-            Services v1Service = new Services(model, dataConnector);
-
-            try {
-                v1Service.getLoggedIn();
-                resetConnection = true;
-            } catch (V1Exception e) {
-                rc = false;
-                Activator.logError(e);
-                setErrorMessage("Validation Failed.");
-            }
-            return rc;
+//            boolean rc = true;
+//
+//            String url = urlEditor.getStringValue();
+//
+//            V1APIConnector metaConnector = new V1APIConnector(url.toString() + V1Server.META_URL_SUFFIX);
+//            MetaModel model = new MetaModel(metaConnector);
+//
+//            V1APIConnector dataConnector = null;
+//            if (integratedAuthEditor.getBooleanValue()) {
+//                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX);
+//            } else {
+//                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX, userEditor
+//                        .getStringValue(), pwdField.getStringValue());
+//            }
+//
+//            Services v1Service = new Services(model, dataConnector);
+//
+//            try {
+//                v1Service.getLoggedIn();
+//                resetConnection = true;
+//            } catch (V1Exception e) {
+//                rc = false;
+//                Activator.logError(e);
+//                setErrorMessage("Validation Failed.");
+//            }
+//            return rc;
+            return true;
         }
     }
 
@@ -218,15 +219,15 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public boolean performOk() {
         boolean rc = super.performOk();
         if (rc && resetConnection) {
-            try {
-                V1Server.reset();
-                resetConnection = false;
-            } catch (V1Exception e) {
-                Activator.logError(e);
-                MessageDialog.openInformation(this.getShell(), "VersionOne Preferences",
-                        "Cannot obtain user identity from server.  Check Error Log for more details");
-                rc = false;
-            }
+//            try {
+//                //V1Server.reset(); TODO Implement reset
+//                resetConnection = false;
+//            } catch (V1Exception e) {
+//                Activator.logError(e);
+//                MessageDialog.openInformation(this.getShell(), "VersionOne Preferences",
+//                        "Cannot obtain user identity from server.  Check Error Log for more details");
+//                rc = false;
+//            }
         }
         return rc;
     }

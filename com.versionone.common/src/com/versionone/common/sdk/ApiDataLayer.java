@@ -41,14 +41,9 @@ public class ApiDataLayer {
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
 
-    private static final List<String> effortTrackingAttributesList = Arrays.asList(
-            Workitem.DetailEstimateProperty,
-            "ToDo",
-            "Done",
-            "Effort",
-            "Actuals"
-        );
-        
+    private static final List<String> effortTrackingAttributesList = Arrays.asList(Workitem.DetailEstimateProperty,
+            "ToDo", "Done", "Effort", "Actuals");
+
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts  = new HashMap<Asset, Double>();
 
@@ -86,14 +81,10 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
-    
+
     private ApiDataLayer() {
-        String[] prefixes = new String[] {
-            Workitem.TaskPrefix, 
-            Workitem.DefectPrefix, 
-            Workitem.StoryPrefix, 
-            Workitem.TestPrefix
-        };
+        String[] prefixes = new String[] { Workitem.TaskPrefix, Workitem.DefectPrefix, Workitem.StoryPrefix,
+                Workitem.TestPrefix };
         for (String prefix : prefixes) {
             attributesToQuery.addLast(new AttributeInfo("CheckQuickClose", prefix, false));
             attributesToQuery.addLast(new AttributeInfo("CheckQuickSignup", prefix, false));
@@ -154,10 +145,33 @@ public class ApiDataLayer {
         }// catch (WebException ex) {
         // isConnected = false;
         // throw Warning("Cannot connect to V1 server.", ex);
-        //}
+        // }
         catch (Exception ex) {
             // throw Warning("Cannot connect to V1 server.", ex); TODO implement
             throw new Exception("Cannot connect to V1 server.", ex);
+        }
+    }
+
+    public List<Workitem> getProjectTree() throws DataLayerException {
+        try {
+            Query scopeQuery = new Query(projectType, projectType.getAttributeDefinition("Parent"));
+            FilterTerm stateTerm = new FilterTerm(projectType.getAttributeDefinition("AssetState"));
+            stateTerm.NotEqual(AssetState.Closed);
+            scopeQuery.setFilter(stateTerm);
+            // clear all diffinitions which was used in previous queries
+            alreadyUsedDefinition.clear();
+            addSelection(scopeQuery, Workitem.ProjectPrefix);
+            QueryResult result = services.retrieve(scopeQuery);
+            List<Workitem> roots = new ArrayList<Workitem>(result.getAssets().length);
+            for (Asset oneAsset : result.getAssets()) {
+                roots.add(new Workitem(oneAsset, null));
+            }
+            return roots;
+        }/*
+          * catch (WebException ex) { isConnected = false; throw
+          * Warning("Can't get projects list.", ex); }
+          */catch (Exception ex) {
+            throw warning("Can't get projects list.", ex);
         }
     }
 
@@ -177,7 +191,7 @@ public class ApiDataLayer {
         if (currentProjectId == null) {
             // throw new DataLayerException("Current project is not selected");
             // // TODO implement
-            //throw new Exception("Current project is not selected");
+            // throw new Exception("Current project is not selected");
             currentProjectId = "Scope:0";
 
         }
@@ -264,7 +278,7 @@ public class ApiDataLayer {
                     }
                 } catch (MetaException e) {
                     // Warning("Wrong attribute: " + attrInfo, e); /TODO warning
-                    throw new Exception ("Wrong attribute: " + attrInfo);
+                    throw new Exception("Wrong attribute: " + attrInfo);
                 }
             }
         }
@@ -274,7 +288,11 @@ public class ApiDataLayer {
         attributesToQuery.addLast(new AttributeInfo(attr, prefix, isList));
     }
 
-    private Map<String, PropertyValues> getListPropertyValues() throws Exception { //ConnectionException, APIException, OidException, MetaException {
+    private Map<String, PropertyValues> getListPropertyValues() throws Exception { // ConnectionException,
+                                                                                   // APIException,
+                                                                                   // OidException,
+                                                                                   // MetaException
+                                                                                   // {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {
@@ -284,7 +302,7 @@ public class ApiDataLayer {
             String propertyAlias = attrInfo.prefix + attrInfo.attr;
             if (!res.containsKey(propertyAlias)) {
                 String propertyName = resolvePropertyKey(propertyAlias);
-                
+
                 PropertyValues values;
                 if (res.containsKey(propertyName)) {
                     values = res.get(propertyName);
@@ -292,7 +310,7 @@ public class ApiDataLayer {
                     values = queryPropertyValues(propertyName);
                     res.put(propertyName, values);
                 }
-                
+
                 if (!res.containsKey(propertyAlias)) {
                     res.put(propertyAlias, values);
                 }
@@ -308,23 +326,25 @@ public class ApiDataLayer {
             return "StorySource";
         } else if (propertyAlias.equals("ScopeBuildProjects")) {
             return "BuildProject";
-        } else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners") || propertyAlias.equals("DefectOwners")
-                || propertyAlias.equals("TestOwners")) {
+        } else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners")
+                || propertyAlias.equals("DefectOwners") || propertyAlias.equals("TestOwners")) {
             return "Member";
         }
 
         return propertyAlias;
     }
 
-    private PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException, OidException, MetaException {
+    private PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException,
+            OidException, MetaException {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
         IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NameProperty);
         IAttributeDefinition inactiveDef;
 
         Query query = new Query(assetType);
-        query.getSelection().add(nameDef);        
-        //if (assetType.TryGetAttributeDefinition("Inactive", out inactiveDef)) {
+        query.getSelection().add(nameDef);
+        // if (assetType.TryGetAttributeDefinition("Inactive", out inactiveDef))
+        // {
         inactiveDef = assetType.getAttributeDefinition("Inactive");
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
@@ -338,7 +358,7 @@ public class ApiDataLayer {
         for (Asset asset : services.retrieve(query).getAssets()) {
             String name = (String) asset.getAttribute(nameDef).getValue();
             res.addInternal(new ValueId(asset.getOid(), name));
-        }    
+        }
         return res;
     }
 
@@ -351,7 +371,7 @@ public class ApiDataLayer {
         // TODO Auto-generated method stub
         return new DataLayerException();
     }
-    
+
     static DataLayerException warning(String string) {
         // TODO Auto-generated method stub
         return new DataLayerException();
@@ -360,10 +380,11 @@ public class ApiDataLayer {
     public boolean isTrackEffortEnabled() {
         return trackEffort;
     }
-    
+
     /**
      * Reconnect with settings, used in last Connect() call.
-     * @throws Exception 
+     * 
+     * @throws Exception
      */
     public void reconnect() throws Exception {
         connect(path, userName, password, integrated);
@@ -429,4 +450,73 @@ public class ApiDataLayer {
         // TODO Auto-generated method stub
 
     }
+
+    public void setCurrentProjectId(String value) {
+        currentProjectId = value;
+        assetList = null;
+    }
+
+    public String getCurrentProjectId() {
+        return currentProjectId;
+    }
+
+    public void setCurrentProject(Workitem value) {
+        currentProjectId = value.getId();
+        assetList = null;
+    }
+
+    public Workitem getCurrentProject() throws Exception {
+        if (currentProjectId == null) {
+            currentProjectId = "Scope:0";
+        }
+        return getProjectById(currentProjectId);
+    }
+
+    private Workitem getProjectById(String id) throws Exception {
+        if (!isConnected) {
+            return null;
+        }
+        if (currentProjectId == null) {
+            throw new DataLayerException();// "Current project is not selected"
+        }
+
+        Query query = new Query(Oid.fromToken(id, metaModel));
+        // clear all diffinitions which was used in previous queries
+        alreadyUsedDefinition.clear();
+        addSelection(query, Workitem.ProjectPrefix);
+        QueryResult result;
+        try {
+            result = services.retrieve(query);
+        } catch (MetaException ex) {
+            isConnected = false;
+            throw new DataLayerException();// "Unable to get projects", ex
+        } catch (Exception ex) {
+            throw new DataLayerException();// "Unable to get projects", ex
+        }
+
+        if (result.getTotalAvaliable() == 1) {
+            return new Workitem(result.getAssets()[0], null);
+        }
+        return null;
+    }
+    
+    public String localizerResolve(String key) throws DataLayerException {
+        try {
+            return localizer.resolve(key);
+        } catch (Exception ex) {
+            throw new DataLayerException();//TODO "Failed to resolve key.", ex
+        }
+    }
+
+    public boolean tryLocalizerResolve(String key, String result) {
+        result = null;
+
+        if (localizer != null) {
+            result = localizer.resolve(key);
+            return true;
+        }
+
+        return false;
+    }
+
 }

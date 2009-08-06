@@ -17,7 +17,6 @@ public class ListEditor extends EditingSupport {
     private String propertyName;
     private ComboBoxCellEditor editor;
     private TreeViewer viewer;
-    private String[] valueList;
     private final ApiDataLayer dataLayer;
     private ValueId currentValue;
     
@@ -25,8 +24,7 @@ public class ListEditor extends EditingSupport {
         super(viewer);
         this.propertyName = propertyName;
         this.viewer = viewer;
-        dataLayer = ApiDataLayer.getInstance();
-        valueList = dataLayer.getListPropertyValues("Story", propertyName).toStringArray();        
+        dataLayer = ApiDataLayer.getInstance();               
     }
     
     @Override
@@ -35,17 +33,21 @@ public class ListEditor extends EditingSupport {
     }
 
     @Override
-    protected CellEditor getCellEditor(Object element) {      
+    protected CellEditor getCellEditor(Object element) {
+        Workitem workitem = ((Workitem) element);
+        String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
         editor = new ComboBoxCellEditor(viewer.getTree(), valueList);
         return editor;
     }
 
     @Override
     protected Object getValue(Object element) {
-        try {
+        try {            
+            Workitem workitem = ((Workitem) element);
+            //String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
             ValueId value = (ValueId)((Workitem) element).getProperty(propertyName);
             currentValue = value;
-            return dataLayer.getListPropertyValues("Story", propertyName).getPropertyListIndex(value);
+            return dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getPropertyListIndex(value);
             //return getCurrentId(((ValueId)((Workitem) element).getProperty(propertyName)).toString());//;
         } catch (Exception e) {
             Activator.logError(e);
@@ -58,8 +60,8 @@ public class ListEditor extends EditingSupport {
         Workitem workitem = ((Workitem) element);
         //ValueId currentValue = (ValueId)workitem.getProperty(propertyName);
         //ValueId newValue = valueList[value];
-        ValueId newValue = dataLayer.getListPropertyValues("Story", propertyName).getValueIdByIndex((Integer)value);
-        if (dataLayer.getListPropertyValues("Story", propertyName).contains(newValue) &&
+        ValueId newValue = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getValueIdByIndex((Integer)value);
+        if (dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).contains(newValue) &&
                 !currentValue.equals(newValue) && newValue != null) {
             workitem.setProperty(propertyName, newValue);
         }

@@ -16,9 +16,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.IProjectTreeNode;
-import com.versionone.common.sdk.ProjectTreeNode;
-import com.versionone.common.sdk.V1Server;
+import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
@@ -50,7 +48,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     private boolean isEffortColumsShow;
     private TreeViewer viewer;
-    private StatusEditor statusEditor;
     private Action selectProjectAction = null;
     private Action refreshAction = null;
     private Action saveAction = null;
@@ -255,6 +252,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * 
      * @return
      */
+    /*
     protected IProjectTreeNode getProjectTreeNode() {
         try {
             return V1Server.getInstance().getProjects();
@@ -265,6 +263,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             return new ProjectTreeNode("root", "0");
         }
     }
+    */
 
     /**
      * Load the Viewer with Task data
@@ -363,7 +362,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
         rc.getColumn().setWidth(width);
         rc.getColumn().setAlignment(alignment);
-        rc.getColumn().setText(V1Server.getInstance().getLocalString(label));
+        try {
+            rc.getColumn().setText(ApiDataLayer.getInstance().localizerResolve(label));
+        } catch (DataLayerException e) {
+            Activator.logError(e);
+            rc.getColumn().setText("**Error**");
+        }
         return rc;
     }
 

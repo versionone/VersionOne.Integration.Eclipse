@@ -334,7 +334,7 @@ public class Workitem {
             return false;
         }
         Workitem other = (Workitem) obj;
-        if (other.asset.getOid() != asset.getOid()) {
+        if (!other.asset.getOid().equals(asset.getOid())) {
             return false;
         }
         return true;

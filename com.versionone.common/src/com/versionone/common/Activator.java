@@ -61,6 +61,7 @@ public class Activator extends AbstractUIPlugin {
             dataLayer.addProperty(entry.getKey(), Workitem.StoryPrefix, entry.getValue());
             dataLayer.addProperty(entry.getKey(), Workitem.TaskPrefix, entry.getValue());
         }
+        dataLayer.addProperty(Workitem.NameProperty, Workitem.ProjectPrefix, false);
         connect();
     }
     
@@ -75,6 +76,7 @@ public class Activator extends AbstractUIPlugin {
         boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
         
         ApiDataLayer.getInstance().connect(path, user, password, auth);
+        ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
     }
 
     /*

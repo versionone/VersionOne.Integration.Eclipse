@@ -19,7 +19,6 @@ import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.Services;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
-import com.versionone.common.sdk.V1Server;
 import com.versionone.taskview.views.TaskView;
 
 public class TestTaskView {
@@ -62,7 +61,7 @@ public class TestTaskView {
 		MetaModel metaModel = new MetaModel(metaConnector);
 		Services services = new Services(metaModel, dataConnector);	
 		Localizer localizer = new Localizer(localizeConnector);
-		V1Server.initialize(services, metaModel, localizer);
+		//V1Server.initialize(services, metaModel, localizer); //TODO removed
 	}
 	
 	@Before

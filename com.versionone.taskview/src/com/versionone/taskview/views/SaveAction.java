@@ -1,14 +1,11 @@
 package com.versionone.taskview.views;
 
-import java.util.ArrayList;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TreeItem;
 
-import com.versionone.common.sdk.Task;
-import com.versionone.common.sdk.V1Server;
+import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.DataLayerException;
 import com.versionone.taskview.Activator;
 
 public class SaveAction extends Action {
@@ -29,22 +26,12 @@ public class SaveAction extends Action {
         if (workItemViewer.isCellEditorActive()) {
             workItemViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         }
-        TreeItem[] rows = workItemViewer.getTree().getItems();
-        ArrayList<Task> saveUs = new ArrayList<Task>();
-        for (int i = 0; i < rows.length; ++i) {
-            if (((Task) rows[i].getData()).isDirty()) {
-                saveUs.add((Task) rows[i].getData());
-            }
+        try {
+            ApiDataLayer.getInstance().commitChanges();
+        } catch (DataLayerException e) {
+            Activator.logError(e);
+            workItemView.showMessage("Error saving task. Check Error log for more information.");
         }
-        if (0 != saveUs.size()) {
-            try {
-                V1Server.getInstance().save(saveUs);
-            } catch (Exception e) {
-                Activator.logError(e);
-                workItemView.showMessage("Error saving task. Check Error log for more information.");
-            }
-            workItemView.loadTable();
-            //workItemView.updateStatusCodes();
-        }
+        workItemView.loadTable();
     }
 }

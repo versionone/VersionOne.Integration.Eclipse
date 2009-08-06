@@ -8,6 +8,7 @@ import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
+import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
 public class Workitem {
@@ -258,8 +259,8 @@ public class Workitem {
     public void commitChanges() throws DataLayerException {
         try {
             dataLayer.commitAsset(asset);
-        } catch (APIException e) {
-            throw ApiDataLayer.warning("Failed to commit changes.", e);
+        } catch (V1Exception e) {
+            throw ApiDataLayer.warning("Failed to commit changes of workitem: " + this, e);
         }
     }
 
@@ -285,8 +286,8 @@ public class Workitem {
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation("QuickClose"));
             dataLayer.refreshAsset(this);
-        } catch (APIException e) {
-            throw ApiDataLayer.warning("Failed to QuickClose.", e);
+        } catch (V1Exception e) {
+            throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
         }
     }
 
@@ -306,14 +307,18 @@ public class Workitem {
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation("QuickSignup"));
             dataLayer.refreshAsset(this);
-        } catch (APIException e) {
-            throw ApiDataLayer.warning("Failed to QuickSignup.", e);
+        } catch (V1Exception e) {
+            throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
         }
     }
 
-    public void close() throws APIException {
-        dataLayer.executeOperation(asset, asset.getAssetType().getOperation("Inactivate"));
-        dataLayer.refreshAsset(this);
+    public void close() throws DataLayerException {
+        try {
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation("Inactivate"));
+            dataLayer.refreshAsset(this);
+        } catch (V1Exception e) {
+            throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
+        }
     }
 
     public void revertChanges() {

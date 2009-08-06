@@ -2,6 +2,7 @@ package com.versionone.common.sdk;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.versionone.apiclient.Services;
 import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
+import com.versionone.apiclient.V1Exception;
 
 public class ApiDataLayer {
 
@@ -47,7 +49,9 @@ public class ApiDataLayer {
             "Actuals"
         );
         
-    private Map<String, IAssetType> types;
+    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
+    private final Map<Asset, Double> efforts  = new HashMap<Asset, Double>();
+
     private IAssetType projectType;
     private IAssetType taskType;
     private IAssetType testType;
@@ -57,7 +61,6 @@ public class ApiDataLayer {
     private IAssetType primaryWorkitemType;
     private IAssetType effortType;
 
-    private Map<Asset, Double> efforts;
 
     private static ApiDataLayer instance;
     private boolean isConnected;
@@ -71,7 +74,6 @@ public class ApiDataLayer {
     private QueryResult assetList;
     private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
     private static LinkedList<AttributeInfo> attributesToQuery = new LinkedList<AttributeInfo>();
-    private List<Asset> allAssets;
     private Map<String, PropertyValues> listPropertyValues;
 
     private boolean trackEffort;
@@ -112,6 +114,8 @@ public class ApiDataLayer {
         this.password = password;
         this.integrated = integrated;
         assetList = null;
+        efforts.clear();
+        types.clear();
         try {
             V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
             metaModel = new MetaModel(metaConnector);
@@ -124,7 +128,6 @@ public class ApiDataLayer {
 
             V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
 
-            types = new HashMap<String, IAssetType>(4);
             projectType = getAssetType(Workitem.ProjectPrefix);
             taskType = getAssetType(Workitem.TaskPrefix);
             testType = getAssetType(Workitem.TestPrefix);
@@ -136,7 +139,6 @@ public class ApiDataLayer {
             trackEffort = v1Config.isEffortTracking();
             if (trackEffort) {
                 effortType = metaModel.getAssetType("Actual");
-                efforts = new HashMap<Asset, Double>();
             }
 
             storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
@@ -171,7 +173,7 @@ public class ApiDataLayer {
     }
 
     public Workitem[] getWorkitemTree() throws Exception {
-        // CheckConnection();
+        checkConnection();
         if (currentProjectId == null) {
             // throw new DataLayerException("Current project is not selected");
             // // TODO implement
@@ -186,7 +188,7 @@ public class ApiDataLayer {
 
                 Query query = new Query(workitemType, parentDef);
                 // Query query = new Query(taskType, parentDef);
-                // clear all diffinitions which was used in previous queries
+                // clear all definitions which was used in previous queries
                 alreadyUsedDefinition.clear();
                 addSelection(query, Workitem.TaskPrefix);
                 addSelection(query, Workitem.StoryPrefix);
@@ -199,10 +201,6 @@ public class ApiDataLayer {
                 query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
                 assetList = services.retrieve(query);
-                addRecursive(assetList.getAssets(), allAssets); // TODO implement getting all
-                // assets as list (for
-                // example create AssetList
-                // class from C# SDK)
             } catch (MetaException ex) {
                 throw new Exception(ex.getMessage());
                 // throw Warning("Unable to get workitems.", ex);
@@ -230,15 +228,10 @@ public class ApiDataLayer {
         // return new Workitem[] {new Workitem(null, null)};
     }
 
-    private void addRecursive(Asset[] assets, List<Asset> target) {
-        target = new ArrayList<Asset>();
-        for (Asset asset : assets) {
-            target.add(asset);
-            if (asset.getChildren() != null && asset.getChildren().size() > 0) {
-                addRecursive(asset.getChildren().toArray(new Asset[asset.getChildren().size()]), target);
-            }
+    private void checkConnection() throws DataLayerException {
+        if (!isConnected) {
+            throw warning("Connection is not set.");
         }
-        
     }
 
     private IFilterTerm getScopeFilter(IAssetType assetType) {
@@ -281,11 +274,6 @@ public class ApiDataLayer {
         attributesToQuery.addLast(new AttributeInfo(attr, prefix, isList));
     }
 
-    public Double getEffort(Asset asset) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
     private Map<String, PropertyValues> getListPropertyValues() throws Exception { //ConnectionException, APIException, OidException, MetaException {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
@@ -364,6 +352,11 @@ public class ApiDataLayer {
         return new DataLayerException();
     }
     
+    static DataLayerException warning(String string) {
+        // TODO Auto-generated method stub
+        return new DataLayerException();
+    }
+    
     public boolean isTrackEffortEnabled() {
         return trackEffort;
     }
@@ -376,31 +369,63 @@ public class ApiDataLayer {
         connect(path, userName, password, integrated);
     }
 
-    public void setEffort(Asset asset, double value) {
-        // TODO Auto-generated method stub
+    Double getEffort(Asset asset) {
+        return efforts.get(asset);
+    }
 
+    void setEffort(Asset asset, Double value) {
+        if (value == null || value == 0){
+            efforts.remove(asset);
+        } else {
+            efforts.put(asset, value);
+        }
     }
 
     public boolean isEffortTrackingRelated(String propertyName) {
         return effortTrackingAttributesList.contains(propertyName);
     }
 
-    public void commitAsset(Asset asset) throws APIException {
-        // TODO Auto-generated method stub
-
+    void commitAsset(Asset asset) throws V1Exception {
+        services.save(asset);
+        commitEffort(asset);
     }
 
-    public void executeOperation(Asset asset, IOperation operation) throws APIException {
-        // TODO Auto-generated method stub
-
+    private void commitEffort(Asset asset) throws V1Exception {
+        if (efforts.containsKey(asset)) {
+            Asset effort = services.createNew(effortType, asset.getOid());
+            effort.setAttributeValue(effortType.getAttributeDefinition("Value"), efforts.get(asset));
+            effort.setAttributeValue(effortType.getAttributeDefinition("Date"), new Date());
+            services.save(effort);
+            efforts.remove(asset);
+        }
     }
 
-    public void refreshAsset(Workitem workitem) {
-        // TODO Auto-generated method stub
-
+    void revertAsset(Asset asset) {
+        asset.rejectChanges();
+        efforts.remove(asset);
     }
 
-    public void revertAsset(Asset asset) {
+    public void commitChanges() throws DataLayerException {
+        checkConnection();
+        try {
+            commitAssetsRecursively(Arrays.asList(assetList.getAssets()));
+        } catch (V1Exception e) {
+            throw warning("Cannot commit changes.", e);
+        }
+    }
+
+    private void commitAssetsRecursively(List<Asset> assets) throws V1Exception {
+        for (Asset asset : assets){
+            commitAsset(asset);
+            commitAssetsRecursively(asset.getChildren());
+        }
+    }
+
+    void executeOperation(Asset asset, IOperation operation) throws V1Exception {
+        // TODO Auto-generated method stub
+    }
+
+    void refreshAsset(Workitem workitem) {
         // TODO Auto-generated method stub
 
     }

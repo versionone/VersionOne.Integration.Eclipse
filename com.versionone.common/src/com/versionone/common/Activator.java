@@ -69,13 +69,18 @@ public class Activator extends AbstractUIPlugin {
      * connect to the VersionOne server with current user preference
      * @throws Exception
      */
-    public static void connect() throws Exception {
+    public static void connect() {
         String path = PreferencePage.getPreferences().getString(PreferenceConstants.P_URL);
         String user = PreferencePage.getPreferences().getString(PreferenceConstants.P_USER);
         String password = PreferencePage.getPreferences().getString(PreferenceConstants.P_PASSWORD);
         boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
         
-        ApiDataLayer.getInstance().connect(path, user, password, auth);
+        try {
+            ApiDataLayer.getInstance().connect(path, user, password, auth);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
     }
 

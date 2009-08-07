@@ -226,7 +226,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
                 configureTable();
             }
             selectProvider();
-        } else if (property.equals(PreferenceConstants.P_URL) || property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+        } else if (property.equals(PreferenceConstants.P_URL) || property.equals(PreferenceConstants.P_USER) ||
+                property.equals(PreferenceConstants.P_PASSWORD) || property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
             try {
                 Activator.connect();            
             } catch (Exception e) {
@@ -275,9 +276,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             // "admin", "admin", false);
             viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
         } catch (Exception e) {
+            /*
             Activator.logError(e);
             MessageDialog.openError(viewer.getControl().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+            */
         }
     }
 

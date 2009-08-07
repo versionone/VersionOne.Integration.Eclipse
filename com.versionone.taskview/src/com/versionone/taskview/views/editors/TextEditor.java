@@ -2,12 +2,10 @@ package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.versionone.common.sdk.Task;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
@@ -31,7 +29,8 @@ public class TextEditor extends EditingSupport {
 
     @Override
     protected boolean canEdit(Object element) {
-        return true;
+        Workitem workitem = (Workitem) element;        
+        return !(workitem.isPropertyDefinitionReadOnly(property) || workitem.isPropertyReadOnly(property));
     }
 
     @Override

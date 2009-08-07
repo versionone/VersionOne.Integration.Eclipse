@@ -16,6 +16,7 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.ButtonFieldEditor.Validator;
+import com.versionone.common.sdk.ApiDataLayer;
 
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -181,37 +182,22 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
      * @author Jerry D. Odenwelder Jr.
      * 
      */
-    //TODO implement connection validator
     class ConnectionValidator implements Validator {
 
         public boolean isValid() {
-//            boolean rc = true;
-//
-//            String url = urlEditor.getStringValue();
-//
-//            V1APIConnector metaConnector = new V1APIConnector(url.toString() + V1Server.META_URL_SUFFIX);
-//            MetaModel model = new MetaModel(metaConnector);
-//
-//            V1APIConnector dataConnector = null;
-//            if (integratedAuthEditor.getBooleanValue()) {
-//                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX);
-//            } else {
-//                dataConnector = new V1APIConnector(url.toString() + V1Server.DATA_URL_SUFFIX, userEditor
-//                        .getStringValue(), pwdField.getStringValue());
-//            }
-//
-//            Services v1Service = new Services(model, dataConnector);
-//
-//            try {
-//                v1Service.getLoggedIn();
-//                resetConnection = true;
-//            } catch (V1Exception e) {
-//                rc = false;
-//                Activator.logError(e);
-//                setErrorMessage("Validation Failed.");
-//            }
-//            return rc;
-            return true;
+            boolean rc = true;
+
+            String url = urlEditor.getStringValue();
+            
+            rc = ApiDataLayer.getInstance().checkConnection(url, userEditor.getStringValue(), pwdField.getStringValue(), integratedAuthEditor.getBooleanValue());
+
+            if (rc) {
+                resetConnection = true;
+            } else {
+                setErrorMessage("Validation Failed.");                
+            }
+            
+            return rc;
         }
     }
 

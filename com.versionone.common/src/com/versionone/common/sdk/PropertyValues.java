@@ -13,6 +13,8 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     private static final long serialVersionUID = -8979996731417517341L;
 
     private final Map<Oid, ValueId> dictionary = new HashMap<Oid, ValueId>();
+    private final Map<Oid, Integer> index = new HashMap<Oid, Integer>();
+    private int currentIndex = 0;
 
     public PropertyValues(Collection<ValueId> valueIds) {
         for (ValueId id : valueIds) {
@@ -50,6 +52,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     ValueId find(Oid oid) {
         return dictionary.get(oid.getMomentless());
     }
+   
 
     boolean containsOid(Oid value) {
         return dictionary.containsKey(value.getMomentless());
@@ -67,8 +70,10 @@ public class PropertyValues extends AbstractCollection<ValueId> {
 
     void addInternal(ValueId value) {
         dictionary.put(value.oid, value);
+        index.put(value.oid, currentIndex);
+        currentIndex++;
     }
-
+       
     PropertyValues subset(Object[] oids) {
         PropertyValues result = new PropertyValues();
         for (Object oid : oids) {
@@ -78,31 +83,22 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     }
     
     public String[] toStringArray() {
-        String[] values = new String[size()];
-        int i = 0;
+        String[] values = new String[size()];       
         for (ValueId data : dictionary.values()) {
-            values[i++] = data.toString();
+            values[index.get(data.oid)] = data.toString();
         }
         return values;
     }
 
     public int getPropertyListIndex(ValueId value) {
-        int i = 0;
-        for (ValueId data : dictionary.values()) {
-            if (value.equals(data)) {
-                return i;
-            }
-            i++;
-        }
-        return 0;
-        
+        return index.get(value.oid);        
     }    
 
     public ValueId getValueIdByIndex(int value) {
         
         int i = 0;
         for (ValueId data : dictionary.values()) {
-            if (value == i) {
+            if (value == index.get(data.oid)) {
                 return data;
             }
             i++;

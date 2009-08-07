@@ -15,6 +15,7 @@ import com.versionone.apiclient.APIException;
 
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
+import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.ConnectionException;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
@@ -33,6 +34,7 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
+import com.versionone.common.Activator;
 
 public class ApiDataLayer {
 
@@ -80,7 +82,7 @@ public class ApiDataLayer {
     private ILocalizer localizer;
 
     private String currentProjectId;
-    public boolean showAllTasks = true;
+    public boolean showAllTasks = false;
 
     private ApiDataLayer() {
         String[] prefixes = new String[] { Workitem.TaskPrefix, Workitem.DefectPrefix, Workitem.StoryPrefix,
@@ -140,15 +142,15 @@ public class ApiDataLayer {
             isConnected = true;
             return true;
         } catch (MetaException ex) {
-            // throw Warning("Cannot connect to V1 server.", ex); TODO implement
-            throw new Exception("Cannot connect to V1 server.", ex);
+            throw warning("Cannot connect to V1 server.", ex);
+            
         }// catch (WebException ex) {
         // isConnected = false;
         // throw Warning("Cannot connect to V1 server.", ex);
         // }
         catch (Exception ex) {
             // throw Warning("Cannot connect to V1 server.", ex); TODO implement
-            throw new Exception("Cannot connect to V1 server.", ex);
+            throw warning("Cannot connect to V1 server.", ex);
         }
     }
 
@@ -182,8 +184,7 @@ public class ApiDataLayer {
     }
 
     public boolean isCurrentUserOwnerAsset(Asset childAsset) {
-        // TODO Auto-generated method stub
-        return false;
+        return isCurrentUserOwnerAsset(childAsset, workitemType.getAttributeDefinition(Workitem.OwnersProperty));
     }
 
     public Workitem[] getWorkitemTree() throws Exception {
@@ -216,16 +217,14 @@ public class ApiDataLayer {
 
                 assetList = services.retrieve(query);
             } catch (MetaException ex) {
-                throw new Exception(ex.getMessage());
-                // throw Warning("Unable to get workitems.", ex);
+                throw warning("Unable to get workitems.", ex);
             }
             /*
              * catch (WebException ex) { isConnected = false; throw
              * Warning("Unable to get workitems.", ex); }
              */
             catch (Exception ex) {
-                throw new Exception(ex.getMessage());
-                // throw Warning("Unable to get workitems.", ex);
+                throw warning("Unable to get workitems.", ex);
             }
         }
 
@@ -235,12 +234,59 @@ public class ApiDataLayer {
         for (Asset asset : assetList.getAssets()) {
             // if (ShowAllTasks || IsCurrentUserOwnerAsset(asset, definition)) {
             // TODO need for show all/own tasks
-            res.add(new Workitem(asset, null));
+            if (showAllTasks || isCurrentUserOwnerAsset(asset, definition)) {
+                res.add(new Workitem(asset, null));
+            }
             // }
         }
         return res.toArray(new Workitem[res.size()]);
         // return new Workitem[] {new Workitem(null, null)};
     }
+    
+    private boolean isCurrentUserOwnerAsset(Asset assets, IAttributeDefinition definition){
+        Attribute attribute = assets.getAttribute(definition);
+
+        Object[] owners = attribute.getValues();
+        for (Object oid : owners) {
+            if (memberOid.equals(oid)) {
+                return true;
+            }
+        }
+        if (assets.hasChanged()) {
+            for (Asset child : assets.getChildren()) {
+                if (isCurrentUserOwnerAsset(child, definition)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+}
+    
+    public boolean checkConnection(String url, String user, String pass, boolean auth) {
+        boolean result = true;
+        
+        V1APIConnector metaConnector = new V1APIConnector(url.toString() + MetaUrlSuffix);
+        MetaModel model = new MetaModel(metaConnector);
+
+        V1APIConnector dataConnector = null;
+        if (auth) {
+            dataConnector = new V1APIConnector(url.toString() + DataUrlSuffix);
+        } else {
+            dataConnector = new V1APIConnector(url.toString() + DataUrlSuffix, user, pass);
+        }
+
+        Services v1Service = new Services(model, dataConnector);
+
+        try {
+            v1Service.getLoggedIn();
+        } catch (V1Exception e) {
+            result = false;
+        }
+        
+        return result;
+    }
+    
 
     private void checkConnection() throws DataLayerException {
         if (!isConnected) {
@@ -267,7 +313,7 @@ public class ApiDataLayer {
 
     // need to make AlreadyUsedDefinition.Clear(); before first call of this
     // method
-    private void addSelection(Query query, String typePrefix) throws Exception {
+    private void addSelection(Query query, String typePrefix) throws DataLayerException {
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (attrInfo.prefix == typePrefix) {
                 try {
@@ -277,8 +323,7 @@ public class ApiDataLayer {
                         alreadyUsedDefinition.add(def);
                     }
                 } catch (MetaException e) {
-                    // Warning("Wrong attribute: " + attrInfo, e); /TODO warning
-                    throw new Exception("Wrong attribute: " + attrInfo);
+                    warning("Wrong attribute: " + attrInfo, e);
                 }
             }
         }
@@ -343,8 +388,7 @@ public class ApiDataLayer {
 
         Query query = new Query(assetType);
         query.getSelection().add(nameDef);
-        // if (assetType.TryGetAttributeDefinition("Inactive", out inactiveDef))
-        // {
+
         inactiveDef = assetType.getAttributeDefinition("Inactive");
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
@@ -369,12 +413,12 @@ public class ApiDataLayer {
 
     static DataLayerException warning(String string, Exception ex) {
         // TODO Auto-generated method stub
-        return new DataLayerException();
+        return new DataLayerException(string, ex);
     }
 
     static DataLayerException warning(String string) {
         // TODO Auto-generated method stub
-        return new DataLayerException();
+        return new DataLayerException(string);
     }
     
     public boolean isTrackEffortEnabled() {
@@ -476,8 +520,8 @@ public class ApiDataLayer {
         if (!isConnected) {
             return null;
         }
-        if (currentProjectId == null) {
-            throw new DataLayerException();// "Current project is not selected"
+        if (currentProjectId == null) { 
+            throw warning("Current project is not selected");
         }
 
         Query query = new Query(Oid.fromToken(id, metaModel));
@@ -489,9 +533,9 @@ public class ApiDataLayer {
             result = services.retrieve(query);
         } catch (MetaException ex) {
             isConnected = false;
-            throw new DataLayerException();// "Unable to get projects", ex
+            throw warning("Unable to get projects", ex);
         } catch (Exception ex) {
-            throw new DataLayerException();// "Unable to get projects", ex
+            throw warning("Unable to get projects", ex);
         }
 
         if (result.getTotalAvaliable() == 1) {
@@ -504,7 +548,7 @@ public class ApiDataLayer {
         try {
             return localizer.resolve(key);
         } catch (Exception ex) {
-            throw new DataLayerException();//TODO "Failed to resolve key.", ex
+            throw warning("Failed to resolve key.", ex);
         }
     }
 

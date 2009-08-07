@@ -10,6 +10,7 @@ import com.versionone.taskview.Activator;
 
 public class SaveAction extends Action {
 
+    private static final ApiDataLayer data = ApiDataLayer.getInstance();
     private TaskView workItemView;
     private TreeViewer workItemViewer;
 
@@ -27,7 +28,8 @@ public class SaveAction extends Action {
             workItemViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         }
         try {
-            ApiDataLayer.getInstance().commitChanges();
+            data.commitChanges();
+            data.reconnect();
         } catch (DataLayerException e) {
             Activator.logError(e);
             workItemView.showMessage("Error saving task. Check Error log for more information.");

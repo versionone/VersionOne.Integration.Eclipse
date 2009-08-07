@@ -102,13 +102,17 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Configure the table
      */
     private void configureTable() {
-        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 70, SWT.LEFT);
+        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.IdProperty, true));
         column.setEditingSupport(new ReadOnlyEditor(Workitem.IdProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));
         column.setEditingSupport(new TextEditor(Workitem.NameProperty, viewer));
+
+        column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
+        column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
+        column.setEditingSupport(new ListEditor(viewer, Workitem.StatusProperty));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DetailEstimateProperty, false));
@@ -117,10 +121,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.TodoProperty, false));
         column.setEditingSupport(new TextEditor(Workitem.TodoProperty, viewer));
-
-        column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
-        column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
-        column.setEditingSupport(new ListEditor(viewer, Workitem.StatusProperty));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
@@ -131,13 +131,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Adds the columns needed to track effort
      */
     private void addEffortColumns() {
-        createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4).setLabelProvider(
-                new SimpleProvider(Workitem.DoneProperty, false));
+        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4);
+        column.setLabelProvider(new SimpleProvider(Workitem.DoneProperty, false));
 
-        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
         column.setLabelProvider(new SimpleProvider(Workitem.EffortProperty, false));
-
-        //TODO column.setEditingSupport(new TaskEditor.EffortEditor(viewer));
+        column.setEditingSupport(new TextEditor(Workitem.EffortProperty, viewer));
 
         viewer.refresh();
         isEffortColumsShow = true;

@@ -100,7 +100,7 @@ public class ApiDataLayer {
         return instance;
     }
 
-    public boolean connect(String path, String userName, String password, boolean integrated) throws Exception {
+    public boolean connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
         isConnected = false;
         this.path = path;
         this.userName = userName;
@@ -141,17 +141,20 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             return true;
-        } catch (MetaException ex) {
-            throw warning("Cannot connect to V1 server.", ex);
-            
-        }// catch (WebException ex) {
-        // isConnected = false;
-        // throw Warning("Cannot connect to V1 server.", ex);
-        // }
-        catch (Exception ex) {
-            // throw Warning("Cannot connect to V1 server.", ex); TODO implement
-            throw warning("Cannot connect to V1 server.", ex);
+        } catch (MetaException e) {
+            throw warning("Cannot connect to V1 server.", e);
+        } catch (Exception e) {
+            throw warning("Cannot connect to V1 server.", e);
         }
+    }
+
+    /**
+     * Reconnect with settings, used in last Connect() call.
+     * 
+     * @throws Exception
+     */
+    public void reconnect() throws DataLayerException {
+        connect(path, userName, password, integrated);
     }
 
     public List<Workitem> getProjectTree() throws DataLayerException {
@@ -423,15 +426,6 @@ public class ApiDataLayer {
     
     public boolean isTrackEffortEnabled() {
         return trackEffort;
-    }
-
-    /**
-     * Reconnect with settings, used in last Connect() call.
-     * 
-     * @throws Exception
-     */
-    public void reconnect() throws Exception {
-        connect(path, userName, password, integrated);
     }
 
     Double getEffort(Asset asset) {

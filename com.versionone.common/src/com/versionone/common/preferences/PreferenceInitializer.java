@@ -20,7 +20,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.P_INTEGRATED_AUTH, false);
         store.setDefault(PreferenceConstants.P_REQUIRESVALIDATION, false);
         store.setDefault(PreferenceConstants.P_MEMBER_TOKEN, "");
-        store.setDefault(PreferenceConstants.P_PROJECT_TOKEN, "");
+        store.setDefault(PreferenceConstants.P_PROJECT_TOKEN, "Scope:0");
         store.setDefault(PreferenceConstants.P_ATTRIBUTE_SELECTION, DEFAULT_TASK_ATTRIBUTE_SELECTION);
     }
 

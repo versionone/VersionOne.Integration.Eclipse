@@ -511,20 +511,17 @@ public class ApiDataLayer {
     }
 
     public Workitem getCurrentProject() throws Exception {
-        if (currentProjectId == null) {
+        if (currentProjectId == null || currentProjectId.equals("")) {
             currentProjectId = "Scope:0";
         }
         return getProjectById(currentProjectId);
     }
 
     private Workitem getProjectById(String id) throws Exception {
-        if (!isConnected) {
+        if (!isConnected || id == null || id.equals("")) {
             return null;
         }
-        if (currentProjectId == null) { 
-            throw warning("Current project is not selected");
-        }
-
+        
         Query query = new Query(Oid.fromToken(id, metaModel));
         // clear all diffinitions which was used in previous queries
         alreadyUsedDefinition.clear();

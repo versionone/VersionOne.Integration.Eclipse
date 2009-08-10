@@ -82,7 +82,6 @@ public class TestTaskView {
 		config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
 		config.setValue(PreferenceConstants.P_MEMBER_TOKEN, USER_MEMBER_ID);
 		config.setValue(PreferenceConstants.P_REQUIRESVALIDATION, VALIDATION_REQUIRED);
-		config.setValue(PreferenceConstants.P_TRACK_EFFORT, TRACKING);
 		config.setValue(PreferenceConstants.P_PROJECT_TOKEN, SCOPE_ID);
 		config.setValue(PreferenceConstants.P_ENABLED, true);	
 	}
@@ -101,6 +100,7 @@ public class TestTaskView {
 	/**
 	 * Test columns when effort tracking is enabled
 	 */
+	/*
 	@Test
 	public void testEffortEnabled() {
 		enableEffortTracking();
@@ -117,20 +117,15 @@ public class TestTaskView {
 		Assert.assertEquals("To Do", columns[TRACKED_TODO_COLUMN_INDEX].getText());
 		Assert.assertEquals("Status", columns[TRACKED_STATUS_COLUMN_INDEX].getText());
 	}
+	*/
 	
-	private void enableEffortTracking() {
-		if(!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_TRACK_EFFORT)) {
-			preference.getPreferenceStore().setValue(PreferenceConstants.P_TRACK_EFFORT, true);
-			waitForJobs();
-		}
-	}
 	
 	/**
 	 * Test columns when effort tracking is disabled
 	 */	
 	@Test
 	public void testEffortDisabled() {
-		disableEffortTracking();
+		//disableEffortTracking();
 		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		Assert.assertEquals(6, table.getColumnCount());
@@ -143,19 +138,13 @@ public class TestTaskView {
 		Assert.assertEquals("Status", columns[STATUS_COLUMN_INDEX].getText());
 	}
 
-	private void disableEffortTracking() {
-		if(preference.getPreferenceStore().getBoolean(PreferenceConstants.P_TRACK_EFFORT)) {
-			preference.getPreferenceStore().setValue(PreferenceConstants.P_TRACK_EFFORT, false);
-			waitForJobs();
-		}
-	}
 
 	/**
 	 * Test row when all projects are selected
 	 */	
 	@Test
 	public void testViewDataNoEffort() {
-		disableEffortTracking();
+		//disableEffortTracking();
 		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		TreeItem[] rows = table.getItems();
@@ -168,6 +157,7 @@ public class TestTaskView {
 	/**
 	 * Check each column and verify if edits are allowed
 	 */
+	/*
 	@Test
 	public void testEditability() {		
 		enableEffortTracking();
@@ -181,6 +171,7 @@ public class TestTaskView {
 		checkEditor(selectedElement, TRACKED_TODO_COLUMN_INDEX , true);
 		checkEditor(selectedElement, TRACKED_STATUS_COLUMN_INDEX, true);		
 	}
+	*/
 
 	/**
 	 * verify that the used can edit fields
@@ -213,7 +204,8 @@ public class TestTaskView {
 	
 	/**
 	 * Test row when all projects are selected
-	 */	
+	 */
+	/*
 	@Test
 	public void testViewDataEffort() {
 		enableEffortTracking();
@@ -225,6 +217,7 @@ public class TestTaskView {
 		validateRow(rows[0], "Add Shipping Notes", "Service Changes", "TK-01061", "24.0", "30.0", "", "10.0", "In Progress");
 		validateRow(rows[1], "View Daily Call Count", "Service Changes", "TK-01068", "24.0", "", "", "24.0", "In Progress");
 	}
+	*/
 
 	/**
 	 * Validate one row in the table

@@ -1,5 +1,6 @@
 package com.versionone.common.sdk;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -170,6 +171,11 @@ public class Workitem {
             if (val instanceof Oid) {
                 return getPropertyValues(propertyName).find((Oid) val);
             }
+            
+            if (val instanceof Double) {                
+                return BigDecimal.valueOf((Double) val).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
+            }
+            
             return val;
         } catch (APIException e) {
             throw new IllegalArgumentException("Cannot get property: " + propertyName, e);
@@ -181,7 +187,8 @@ public class Workitem {
         if (value == null) {
             return "";
         } else if (value instanceof Double) {
-            return numberFormat.format(value);
+            //return numberFormat.format(value);
+            return BigDecimal.valueOf((Double) value).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
         }
         return value.toString();
     }
@@ -201,7 +208,8 @@ public class Workitem {
                 if ("".equals(newValue))
                     effort = null;
                 else
-                    effort = numberFormat.parse((String) newValue).doubleValue();
+                    //effort = numberFormat.parse((String) newValue).doubleValue();
+                    effort = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String)newValue)).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
                 dataLayer.setEffort(asset, effort);
                 return;
             }
@@ -218,7 +226,8 @@ public class Workitem {
             if (newValue instanceof ValueId) {
                 newValue = ((ValueId) newValue).oid;
             } else if (attrDef.getAttributeType() == AttributeType.Numeric) {
-                newValue = numberFormat.parse((String) newValue);
+                //newValue = numberFormat.parse((String) newValue);
+                newValue = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String)newValue)).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
             }
 
             if (!newValue.equals(attribute.getValue())) {

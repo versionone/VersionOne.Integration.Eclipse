@@ -28,7 +28,6 @@ public class TestTaskViewPreferences {
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_USER));
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_PASSWORD));
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_INTEGRATED_AUTH));
-		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_TRACK_EFFORT));
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_REQUIRESVALIDATION));
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_MEMBER_TOKEN));
 		Assert.assertTrue(preference.getPreferenceStore().contains(PreferenceConstants.P_PROJECT_TOKEN));

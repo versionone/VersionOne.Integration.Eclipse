@@ -198,15 +198,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     /**
-     * Determine if VersionOne Task List is tracking effort
-     * 
-     * @return
-     */
-    private boolean isTrackEffort() {
-        return PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_TRACK_EFFORT);
-    }
-
-    /**
      * Determine if VersionOne Task List is enabled
      * 
      * @return

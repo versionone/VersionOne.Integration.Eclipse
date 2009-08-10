@@ -23,7 +23,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     private StringFieldEditor urlEditor;
     private StringFieldEditor userEditor;
     private StringFieldEditor pwdField;
-    private BooleanFieldEditor effortEditor;
+    //private BooleanFieldEditor effortEditor;
     private BooleanFieldEditor enabledEditor;
     private ButtonFieldEditor requiresValidation;
     private BooleanFieldEditor integratedAuthEditor;
@@ -73,9 +73,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
 
+/*
         effortEditor = new BooleanFieldEditor(PreferenceConstants.P_TRACK_EFFORT, "Effort Tracking", this
                 .getFieldEditorParent());
         addField(effortEditor);
+*/
 
         requiresValidation = new ButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
                 new ConnectionValidator(), this.getFieldEditorParent());
@@ -101,7 +103,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             userEditor.setEnabled(value, this.getFieldEditorParent());
             pwdField.setEnabled(value, this.getFieldEditorParent());
         }
-        effortEditor.setEnabled(value, this.getFieldEditorParent());
+        //effortEditor.setEnabled(value, this.getFieldEditorParent());
         requiresValidation.setEnabled(value, this.getFieldEditorParent());
         integratedAuthEditor.setEnabled(value, this.getFieldEditorParent());
     }

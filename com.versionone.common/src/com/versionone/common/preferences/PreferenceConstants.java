@@ -23,11 +23,6 @@ public class PreferenceConstants {
     public static final String P_PASSWORD = "credentials";
 
     /**
-     * Stores the Effort Tracking selection
-     */
-    public static final String P_TRACK_EFFORT = "trackEffort";
-
-    /**
      * Determines if the parameters are valid
      */
     public static final String P_REQUIRESVALIDATION = "needsValidation";

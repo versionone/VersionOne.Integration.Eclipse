@@ -1,90 +1,92 @@
-//package com.versionone.common.test;
-//
-//import junit.framework.JUnit4TestAdapter;
-//
-//import org.eclipse.jface.preference.IPreferenceStore;
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.BeforeClass;
-//import org.junit.Test;
-//
-//import com.versionone.apiclient.APIException;
-//import com.versionone.apiclient.FileAPIConnector;
-//import com.versionone.apiclient.Localizer;
-//import com.versionone.apiclient.MetaModel;
-//import com.versionone.apiclient.Services;
-//import com.versionone.common.preferences.PreferenceConstants;
-//import com.versionone.common.preferences.PreferencePage;
-//import com.versionone.common.sdk.IProjectTreeNode;
-//import com.versionone.common.sdk.IStatusCodes;
-//import com.versionone.common.sdk.Task;
-//import com.versionone.common.sdk.V1Server;
-//
-//public class TestModel {
-//
-//	public static junit.framework.Test suite() {
-//		return new JUnit4TestAdapter(TestModel.class);
-//		}
-//
-//	/**
-//	 * Configuration Parameters
-//	 */
-//	static final String SERVER_URL = "http://localhost/V1_71";
-//	static final String USER_ID = "andre";
-//	static final String USER_PASSWORD = "andre";
-//	static final String USER_MEMBER_ID = "Member:1000";
-//	static final String SCOPE_ID = "Scope:1012";
-//	static final boolean VALIDATION_REQUIRED = false;
-//	static final boolean TRACKING = false;
-//	private static final double EPSILON = 0.005;
-//	
-//	
-//	@BeforeClass
-//	public static void loadTestData() {
-//		FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
-//		FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
-//		FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
-//		MetaModel metaModel = new MetaModel(metaConnector);
-//		Services services = new Services(metaModel, dataConnector);	
-//		Localizer localizer = new Localizer(localizeConnector);
-//		V1Server.initialize(services, metaModel, localizer);
-//	}
-//
-//	@Before
-//	public void setUp() throws Exception {
-//		PreferencePage preference = new PreferencePage();
-//		if(!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED)) {
-//			enableView(preference.getPreferenceStore());
-//		}
-//	}
-//	
-//	private void enableView(IPreferenceStore config) {
-//		config.setValue(PreferenceConstants.P_URL, SERVER_URL);
-//		config.setValue(PreferenceConstants.P_USER, USER_ID);
-//		config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
-//		config.setValue(PreferenceConstants.P_MEMBER_TOKEN, USER_MEMBER_ID);
-//		config.setValue(PreferenceConstants.P_REQUIRESVALIDATION, VALIDATION_REQUIRED);
-//		config.setValue(PreferenceConstants.P_TRACK_EFFORT, TRACKING);
-//		config.setValue(PreferenceConstants.P_PROJECT_TOKEN, SCOPE_ID);
-//		config.setValue(PreferenceConstants.P_ENABLED, true);	
-//	}
-//	
-//	@Test
-//	public void testGetServerInstance() {
-//		Assert.assertNotNull(V1Server.getInstance());
-//	}
-//	
-//	@Test
-//	public void testGetProject() throws Exception {
-//		IProjectTreeNode projectNode = V1Server.getInstance().getProjects();
-//		Assert.assertNotNull(projectNode);
-//		IProjectTreeNode[] children = projectNode.getChildren();
-//		Assert.assertEquals(1, children.length);
-//		IProjectTreeNode companyNode = children[0];
-//		Assert.assertEquals("Company", companyNode.getName());
-//		Assert.assertEquals("Scope:1011", companyNode.getToken());
-//		Assert.assertEquals(3, companyNode.getChildren().length);
-//	}
+package com.versionone.common.test;
+
+import java.util.List;
+
+import junit.framework.JUnit4TestAdapter;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.versionone.apiclient.APIException;
+import com.versionone.apiclient.FileAPIConnector;
+import com.versionone.apiclient.Localizer;
+import com.versionone.apiclient.MetaModel;
+import com.versionone.apiclient.Services;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
+import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.Workitem;
+
+
+public class TestModel {
+
+	public static junit.framework.Test suite() {
+		return new JUnit4TestAdapter(TestModel.class);
+		}
+
+	/**
+	 * Configuration Parameters
+	 */
+	static final String SERVER_URL = "http://localhost/V1_71";
+	static final String USER_ID = "andre";
+	static final String USER_PASSWORD = "andre";
+	static final String USER_MEMBER_ID = "Member:1000";
+	static final String SCOPE_ID = "Scope:1012";
+	static final boolean VALIDATION_REQUIRED = false;
+	static final boolean TRACKING = false;
+	private static final double EPSILON = 0.005;
+	private static ApiDataLayer datalayer = null;
+	
+	
+	@BeforeClass
+	public static void loadTestData() {
+		FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
+		FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
+		FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
+		MetaModel metaModel = new MetaModel(metaConnector);
+		Services services = new Services(metaModel, dataConnector);	
+		Localizer localizer = new Localizer(localizeConnector);
+		datalayer = ApiDataLayer.getInitializedInstance(services, metaModel, localizer);
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		PreferencePage preference = new PreferencePage();
+		if(!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED)) {
+			enableView(preference.getPreferenceStore());
+		}
+	}
+	
+	private void enableView(IPreferenceStore config) {
+		config.setValue(PreferenceConstants.P_URL, SERVER_URL);
+		config.setValue(PreferenceConstants.P_USER, USER_ID);
+		config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
+		config.setValue(PreferenceConstants.P_MEMBER_TOKEN, USER_MEMBER_ID);
+		config.setValue(PreferenceConstants.P_REQUIRESVALIDATION, VALIDATION_REQUIRED);
+		//config.setValue(PreferenceConstants.P_TRACK_EFFORT, TRACKING);
+		config.setValue(PreferenceConstants.P_PROJECT_TOKEN, SCOPE_ID);
+		config.setValue(PreferenceConstants.P_ENABLED, true);	
+	}
+	
+	@Test
+	public void testGetServerInstance() {
+		Assert.assertNotNull(datalayer.getInstance());
+	}
+	
+	@Test
+	public void testGetProject() throws Exception {
+		List<Workitem> projectNode = datalayer.getProjectTree();
+		Assert.assertNotNull(projectNode);
+		List<Workitem> children = projectNode.get(0).children;
+		Assert.assertEquals(1, children.size());
+		Workitem companyNode = children.get(0);
+		Assert.assertEquals("Company", companyNode.getProperty(Workitem.NameProperty));
+		//Assert.assertEquals("Scope:1011", companyNode.getToken());
+		Assert.assertEquals(3, companyNode.children.size());
+	}
 //
 //	@Test
 //	public void testGetTask() throws Exception {
@@ -274,4 +276,5 @@
 //		Assert.assertEquals(expectedTodo, task.getToDo(), EPSILON);
 //		Assert.assertEquals(expectedStatus, task.getStatus());
 //	}
-//}
+
+}

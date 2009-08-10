@@ -22,6 +22,8 @@ import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.IFilterTerm;
 import com.versionone.apiclient.ILocalizer;
+import com.versionone.apiclient.IMetaModel;
+import com.versionone.apiclient.IServices;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
@@ -77,8 +79,8 @@ public class ApiDataLayer {
     public EffortTrackingLevel defectTrackingLevel;
     public EffortTrackingLevel storyTrackingLevel;
 
-    private MetaModel metaModel;
-    private Services services;
+    private IMetaModel metaModel;
+    private IServices services;
     private ILocalizer localizer;
 
     private String currentProjectId;
@@ -91,6 +93,12 @@ public class ApiDataLayer {
             attributesToQuery.addLast(new AttributeInfo("CheckQuickClose", prefix, false));
             attributesToQuery.addLast(new AttributeInfo("CheckQuickSignup", prefix, false));
         }
+    }
+
+    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) {
+        this.metaModel = metaModel;
+        this.services = services;
+        this.localizer = localizer;
     }
 
     public static ApiDataLayer getInstance() {
@@ -486,7 +494,6 @@ public class ApiDataLayer {
 
     void refreshAsset(Workitem workitem) {
         // TODO Auto-generated method stub
-
     }
 
     public void setCurrentProjectId(String value) {
@@ -557,4 +564,12 @@ public class ApiDataLayer {
         return false;
     }
 
+    
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) {
+        if (null == instance) {
+            instance = new ApiDataLayer(services, metaModel, localizer);
+        }
+        
+        return instance;
+    }
 }

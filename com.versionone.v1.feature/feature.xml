@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.versionone.v1.feature"
       label="VersionOne V1: Agile Enterprise"
-      version="2.0"
+      version="2.0.0"
       provider-name="VersionOne">
 
    <description url="http://www.versionone.com">

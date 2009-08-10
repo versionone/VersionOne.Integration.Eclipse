@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Taskview Plug-in
 Bundle-SymbolicName: com.versionone.taskview; singleton:=true
-Bundle-Version: 2.0
+Bundle-Version: 2.0.0
 Bundle-Activator: com.versionone.taskview.Activator
 Bundle-Vendor: VersionOne
 Bundle-ActivationPolicy: lazy
@@ -11,4 +11,3 @@ Require-Bundle: org.eclipse.ui,
  com.versionone.common;bundle-version="2.0.0"
 Export-Package: com.versionone.taskview.views
 Bundle-ClassPath: .
-Bundle-RequiredExecutionEnvironment: J2SE-1.5

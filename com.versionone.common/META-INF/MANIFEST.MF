@@ -9,7 +9,7 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: 
  org.eclipse.ui,
  org.eclipse.core.runtime,
- com.versionone.apiclient;bundle-version="2.0.0"
+ com.versionone.apiclient;bundle-version="8.0.195"
 Export-Package: 
  com.versionone.common,
  com.versionone.common.preferences;
@@ -19,3 +19,4 @@ Export-Package:
    org.eclipse.core.runtime.preferences,
    org.eclipse.swt.widgets",
  com.versionone.common.sdk;uses:="org.eclipse.jface.preference,com.versionone.apiclient"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -5,7 +5,11 @@ Bundle-SymbolicName: com.versionone.apiclient
 Bundle-Version: 2.0.0
 Bundle-ClassPath: VersionOne.APIClient.jar
 Bundle-Vendor: VersionOne
-Export-Package: com.versionone,
- com.versionone.apiclient,
- com.versionone.apiclient.example,
- com.versionone.util
+Export-Package: com.versionone;uses:="new com.versionone,com.versionone.apiclient",
+ com.versionone.apiclient;
+  uses:="com.versionone.util,
+   com.versionone,
+   javax.xml.parsers,
+   org.w3c.dom",
+ com.versionone.apiclient.example;uses:="com.versionone,com.versionone.apiclient",
+ com.versionone.util;uses:="junit.framework"

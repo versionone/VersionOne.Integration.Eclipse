@@ -5,12 +5,7 @@ Bundle-SymbolicName: com.versionone.apiclient
 Bundle-Version: 8.0.195
 Bundle-ClassPath: VersionOne.APIClient.jar
 Bundle-Vendor: VersionOne
-Export-Package: 
- com.versionone;uses:="new com.versionone,com.versionone.apiclient",
- com.versionone.apiclient;uses:="
-   com.versionone,
-   com.versionone.util,
-   javax.xml.parsers,
-   org.w3c.dom",
+Export-Package: com.versionone,
+ com.versionone.apiclient,
+ com.versionone.apiclient.example,
  com.versionone.util
-Bundle-RequiredExecutionEnvironment: J2SE-1.5

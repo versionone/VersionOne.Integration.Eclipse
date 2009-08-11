@@ -10,6 +10,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -72,6 +78,25 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         contributeToActionBars();
         hookDoubleClickAction();
         selectProvider();
+        
+        // TODO
+        // createContextMenu(viewer);
+    }
+    
+    /**
+     * A stub method for creating context menu associated with TreeViewer
+     */
+    private void createContextMenu(TreeViewer viewer) {
+    	final Control control = viewer.getControl();
+    	Menu menu = new Menu(control.getShell(), SWT.POP_UP);
+    	MenuItem item = new MenuItem(menu, SWT.PUSH);
+    	item.setText("test");
+    	item.addListener(SWT.Selection, new Listener() {
+    		public void handleEvent(Event e) {
+    			System.out.println("test item selected");
+    		}
+    	});
+    	control.setMenu(menu);
     }
 
     /**

@@ -20,6 +20,7 @@ import com.versionone.apiclient.Services;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 
 
@@ -42,7 +43,7 @@ public class TestModel {
     private static final double EPSILON = 0.005;
     private static ApiDataLayer datalayer = null;
 
-    private static void loadTestData() throws APIException, ConnectionException, OidException {
+    private static void loadTestData() throws Exception {
         FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
         FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
         FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
@@ -95,7 +96,25 @@ public class TestModel {
 	public void testGetTask() throws Exception {
 		Workitem[] allWorkItem = datalayer.getWorkitemTree();
 		Assert.assertEquals(7, allWorkItem.length);
-		//validateTask(allTask[0], "TK-01061", "Add Shipping Notes", "Service Changes", "24", "30.0", "0", "10", "TaskStatus:123");
+/*
+Workitem task, 
+                        String expectedId,  
+                        String expectedName, 
+                        String expectedEstimate, 
+                        String expectedDone, 
+                        String expectedEffort, 
+                        String expectedTodo,
+                        String expectedStatus		
+ */
+		validateTask(allWorkItem[0], "B-01014", "Story:1649", "fly1", null, null, null, null, "Accepted", Workitem.StoryPrefix);
+		validateTask(allWorkItem[3], "D-01093", "Defect:2248", "defect 1", "0.02", "14.10", null, "0.01", "Accepted", Workitem.DefectPrefix);
+		validateTask(allWorkItem[1].children.get(0), "AT-01009", "Test:2271", "AT1", "21.00", "-3.00", null, "230.00", "Failed", Workitem.TestPrefix);
+		validateTask(allWorkItem[0].children.get(0), "TK-01008", "Task:1647", "1", "4.00", "5.00", null, "0.00", "Completed", Workitem.TaskPrefix);
+		//test [1][0]
+		//
+		//task [0][0]
+		//1, , Administrator, , , 4, 5, 0, 0
+		
 		//validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", "24", "", "0", "24", "TaskStatus:123");
 	}
 	
@@ -262,22 +281,26 @@ public class TestModel {
 //	}
 //
 	private void validateTask(Workitem task, 
-			String expectedId, 
-			String expectedStory, 
+			String expectedNumber,
+			String expectedId,
 			String expectedName, 
 			String expectedEstimate, 
 			String expectedDone, 
 			String expectedEffort, 
 			String expectedTodo,
-			String expectedStatus) throws Exception {
+			String expectedStatus,
+			String expectedType) throws Exception {
 		Assert.assertEquals(expectedName, task.getProperty(Workitem.NameProperty));
 		Assert.assertEquals(expectedId, task.getId());
+		Assert.assertEquals(expectedNumber, task.getProperty(Workitem.IdProperty));
+		
 		//Assert.assertEquals(expectedStory, task.getStoryName());
 		Assert.assertEquals(expectedEstimate, task.getProperty(Workitem.DetailEstimateProperty));
 		Assert.assertEquals(expectedDone, task.getProperty(Workitem.DoneProperty));
 		Assert.assertEquals(expectedEffort, task.getProperty(Workitem.EffortProperty));
 		Assert.assertEquals(expectedTodo, task.getProperty(Workitem.TodoProperty));
-		Assert.assertEquals(expectedStatus, task.getProperty(Workitem.StatusProperty));
+		Assert.assertEquals(expectedStatus, ((ValueId)task.getProperty(Workitem.StatusProperty)).toString());
+		Assert.assertEquals(expectedType, task.getTypePrefix());
 	}
 
 }

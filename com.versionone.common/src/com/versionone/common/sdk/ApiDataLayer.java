@@ -95,7 +95,7 @@ public class ApiDataLayer {
         }
     }
 
-    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) throws APIException, ConnectionException, OidException {
+    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
         this.metaModel = metaModel;
         this.services = services;
         this.localizer = localizer;
@@ -103,6 +103,7 @@ public class ApiDataLayer {
         initTypes();
         isConnected = true;
         memberOid = this.services.getLoggedIn();
+        listPropertyValues = getListPropertyValues();
     }
 
     public static ApiDataLayer getInstance() {
@@ -251,15 +252,11 @@ public class ApiDataLayer {
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
-            // if (ShowAllTasks || IsCurrentUserOwnerAsset(asset, definition)) {
-            // TODO need for show all/own tasks
             if (showAllTasks || isCurrentUserOwnerAsset(asset, definition)) {
                 res.add(new Workitem(asset, null));
             }
-            // }
         }
         return res.toArray(new Workitem[res.size()]);
-        // return new Workitem[] {new Workitem(null, null)};
     }
     
     private boolean isCurrentUserOwnerAsset(Asset assets, IAttributeDefinition definition){
@@ -570,7 +567,7 @@ public class ApiDataLayer {
     }
 
     private static boolean isTestEnable = false;
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws APIException, ConnectionException, OidException {
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
         if (!isTestEnable && instance != null) {
             instance = null;
             isTestEnable = true;

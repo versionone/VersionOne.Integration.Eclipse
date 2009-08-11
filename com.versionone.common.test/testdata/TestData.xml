@@ -31,5 +31,31 @@
 		</Response>
 	</Get>
 	
+	<Get path="rest-1.v1/Data/StoryStatus?sel=StoryStatus.Name&amp;where=Inactive='False'&amp;sort=StoryStatus.Order">
+		<Response>
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?><Assets total="4" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StoryStatus/133" id="StoryStatus:133"><Attribute name="Name">Future</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/StoryStatus/134" id="StoryStatus:134"><Attribute name="Name">In Progress</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/StoryStatus/135" id="StoryStatus:135"><Attribute name="Name">Done</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/StoryStatus/137" id="StoryStatus:137"><Attribute name="Name">Accepted</Attribute></Asset></Assets>]]>
+		</Response>
+	</Get>
+	
+	<Get path="rest-1.v1/Data/TestStatus?sel=TestStatus.Name&amp;where=Inactive='False'&amp;sort=TestStatus.Order">
+		<Response>
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?><Assets total="2" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/TestStatus/155" id="TestStatus:155"><Attribute name="Name">Failed</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/TestStatus/129" id="TestStatus:129"><Attribute name="Name">Passed</Attribute></Asset></Assets>]]>
+		</Response>
+	</Get>
+	
+	<Get path="rest-1.v1/Data/TaskStatus?sel=TaskStatus.Name&amp;where=Inactive='False'&amp;sort=TaskStatus.Order">
+		<Response>
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?><Assets total="2" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/TaskStatus/123" id="TaskStatus:123"><Attribute name="Name">In Progress</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/TaskStatus/125" id="TaskStatus:125"><Attribute name="Name">Completed</Attribute></Asset></Assets>]]>
+		</Response>
+	</Get>
+	
+	<Get path="rest-1.v1/Data/Member?sel=Member.Name&amp;where=Inactive='False'&amp;sort=Member.Name">
+		<Response>
+		<![CDATA[<?xml version="1.0" encoding="UTF-8"?><Assets total="9" pageSize="2147483647" pageStart="0"><Asset href="/VersionOneNew/rest-1.v1/Data/Member/20" id="Member:20"><Attribute name="Name">Administrator</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/1875" id="Member:1875"><Attribute name="Name">Bil</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/2211" id="Member:2211"><Attribute name="Name">Bill1</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/1876" id="Member:1876"><Attribute name="Name">Cat</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/2293" id="Member:2293"><Attribute name="Name">Dude</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/2261" id="Member:2261"><Attribute name="Name">Fil</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/1002" id="Member:1002"><Attribute name="Name">John Doe</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/1628" id="Member:1628"><Attribute name="Name">Petja</Attribute></Asset><Asset href="/VersionOneNew/rest-1.v1/Data/Member/1874" id="Member:1874"><Attribute name="Name">Tom</Attribute></Asset></Assets>]]>
+		</Response>
+	</Get>
+	
+	
+	
 	
 </TestData>

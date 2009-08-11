@@ -95,10 +95,14 @@ public class ApiDataLayer {
         }
     }
 
-    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) {
+    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) throws APIException, ConnectionException, OidException {
         this.metaModel = metaModel;
         this.services = services;
         this.localizer = localizer;
+        
+        initTypes();
+        isConnected = true;
+        memberOid = this.services.getLoggedIn();
     }
 
     public static ApiDataLayer getInstance() {
@@ -129,13 +133,7 @@ public class ApiDataLayer {
 
             V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
 
-            projectType = getAssetType(Workitem.ProjectPrefix);
-            taskType = getAssetType(Workitem.TaskPrefix);
-            testType = getAssetType(Workitem.TestPrefix);
-            defectType = getAssetType(Workitem.DefectPrefix);
-            storyType = getAssetType(Workitem.StoryPrefix);
-            workitemType = metaModel.getAssetType("Workitem");
-            primaryWorkitemType = metaModel.getAssetType("PrimaryWorkitem");
+            initTypes();
 
             trackEffort = v1Config.isEffortTracking();
             if (trackEffort) {
@@ -154,6 +152,16 @@ public class ApiDataLayer {
         } catch (Exception e) {
             throw warning("Cannot connect to V1 server.", e);
         }
+    }
+
+    private void initTypes() {
+        projectType = getAssetType(Workitem.ProjectPrefix);
+        taskType = getAssetType(Workitem.TaskPrefix);
+        testType = getAssetType(Workitem.TestPrefix);
+        defectType = getAssetType(Workitem.DefectPrefix);
+        storyType = getAssetType(Workitem.StoryPrefix);
+        workitemType = metaModel.getAssetType("Workitem");
+        primaryWorkitemType = metaModel.getAssetType("PrimaryWorkitem");
     }
 
     /**
@@ -561,8 +569,13 @@ public class ApiDataLayer {
         return false;
     }
 
-    
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) {
+    private static boolean isTestEnable = false;
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws APIException, ConnectionException, OidException {
+        if (!isTestEnable && instance != null) {
+            instance = null;
+            isTestEnable = true;
+        }
+        
         if (null == instance) {
             instance = new ApiDataLayer(services, metaModel, localizer);
         }

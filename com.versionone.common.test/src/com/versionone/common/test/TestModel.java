@@ -11,9 +11,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.versionone.apiclient.APIException;
+import com.versionone.apiclient.ConnectionException;
 import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaModel;
+import com.versionone.apiclient.OidException;
 import com.versionone.apiclient.Services;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -23,79 +25,80 @@ import com.versionone.common.sdk.Workitem;
 
 public class TestModel {
 
-	public static junit.framework.Test suite() {
-		return new JUnit4TestAdapter(TestModel.class);
-		}
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(TestModel.class);
+    }
 
-	/**
-	 * Configuration Parameters
-	 */
-	static final String SERVER_URL = "http://localhost/V1_71";
-	static final String USER_ID = "andre";
-	static final String USER_PASSWORD = "andre";
-	static final String USER_MEMBER_ID = "Member:1000";
-	static final String SCOPE_ID = "Scope:1012";
-	static final boolean VALIDATION_REQUIRED = false;
-	static final boolean TRACKING = false;
-	private static final double EPSILON = 0.005;
-	private static ApiDataLayer datalayer = null;
-	
-	
-	@BeforeClass
-	public static void loadTestData() {
-		FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
-		FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
-		FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
-		MetaModel metaModel = new MetaModel(metaConnector);
-		Services services = new Services(metaModel, dataConnector);	
-		Localizer localizer = new Localizer(localizeConnector);
-		datalayer = ApiDataLayer.getInitializedInstance(services, metaModel, localizer);
-	}
+    /**
+     * Configuration Parameters
+     */
+    static final String SERVER_URL = "http://localhost/V1_71";
+    static final String USER_ID = "andre";
+    static final String USER_PASSWORD = "andre";
+    static final String USER_MEMBER_ID = "Member:1000";
+    static final String SCOPE_ID = "Scope:1012";
+    static final boolean VALIDATION_REQUIRED = false;
+    static final boolean TRACKING = false;
+    private static final double EPSILON = 0.005;
+    private static ApiDataLayer datalayer = null;
 
-	@Before
-	public void setUp() throws Exception {
-		PreferencePage preference = new PreferencePage();
-		if(!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED)) {
-			enableView(preference.getPreferenceStore());
-		}
-	}
+    private static void loadTestData() throws APIException, ConnectionException, OidException {
+        FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
+        FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
+        FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
+        MetaModel metaModel = new MetaModel(metaConnector);
+        Services services = new Services(metaModel, dataConnector);
+        Localizer localizer = new Localizer(localizeConnector);
+        datalayer = ApiDataLayer.getInitializedInstance(services, metaModel, localizer);
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        loadTestData();
+        PreferencePage preference = new PreferencePage();
+        if (!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED)) {
+            enableView(preference.getPreferenceStore());
+        }
+    }
+
+    private void enableView(IPreferenceStore config) {
+        config.setValue(PreferenceConstants.P_URL, SERVER_URL);
+        config.setValue(PreferenceConstants.P_USER, USER_ID);
+        config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
+        config.setValue(PreferenceConstants.P_MEMBER_TOKEN, USER_MEMBER_ID);
+        config.setValue(PreferenceConstants.P_REQUIRESVALIDATION, VALIDATION_REQUIRED);
+        config.setValue(PreferenceConstants.P_PROJECT_TOKEN, SCOPE_ID);
+        config.setValue(PreferenceConstants.P_ENABLED, true);
+    }
+
+    @Test
+    public void testGetServerInstance() {
+        Assert.assertNotNull(ApiDataLayer.getInstance());
+    }
 	
-	private void enableView(IPreferenceStore config) {
-		config.setValue(PreferenceConstants.P_URL, SERVER_URL);
-		config.setValue(PreferenceConstants.P_USER, USER_ID);
-		config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
-		config.setValue(PreferenceConstants.P_MEMBER_TOKEN, USER_MEMBER_ID);
-		config.setValue(PreferenceConstants.P_REQUIRESVALIDATION, VALIDATION_REQUIRED);
-		//config.setValue(PreferenceConstants.P_TRACK_EFFORT, TRACKING);
-		config.setValue(PreferenceConstants.P_PROJECT_TOKEN, SCOPE_ID);
-		config.setValue(PreferenceConstants.P_ENABLED, true);	
-	}
-	
+    @Test
+    public void testGetProject() throws Exception {
+        List<Workitem> projectNode = datalayer.getProjectTree();
+        Assert.assertNotNull(projectNode);
+        List<Workitem> children = projectNode.get(0).children;
+        Assert.assertEquals(1, projectNode.size());
+        Workitem companyNode = projectNode.get(0);
+        Assert.assertEquals("Company", companyNode.getProperty(Workitem.NameProperty));
+        
+        // Assert.assertEquals("Scope:1011", companyNode.getToken());
+        Assert.assertEquals(3, companyNode.children.size());
+        companyNode = children.get(0);
+        Assert.assertEquals("Call Center", companyNode.getProperty(Workitem.NameProperty));
+    }
+
 	@Test
-	public void testGetServerInstance() {
-		Assert.assertNotNull(datalayer.getInstance());
+	public void testGetTask() throws Exception {
+		Workitem[] allWorkItem = datalayer.getWorkitemTree();
+		Assert.assertEquals(7, allWorkItem.length);
+		//validateTask(allTask[0], "TK-01061", "Add Shipping Notes", "Service Changes", "24", "30.0", "0", "10", "TaskStatus:123");
+		//validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", "24", "", "0", "24", "TaskStatus:123");
 	}
 	
-	@Test
-	public void testGetProject() throws Exception {
-		List<Workitem> projectNode = datalayer.getProjectTree();
-		Assert.assertNotNull(projectNode);
-		List<Workitem> children = projectNode.get(0).children;
-		Assert.assertEquals(1, children.size());
-		Workitem companyNode = children.get(0);
-		Assert.assertEquals("Company", companyNode.getProperty(Workitem.NameProperty));
-		//Assert.assertEquals("Scope:1011", companyNode.getToken());
-		Assert.assertEquals(3, companyNode.children.size());
-	}
-//
-//	@Test
-//	public void testGetTask() throws Exception {
-//		Task[] allTask = V1Server.getInstance().getTasks();
-//		Assert.assertEquals(2, allTask.length);
-//		validateTask(allTask[0], "TK-01061", "Add Shipping Notes", "Service Changes", 24, "30.0", 0, 10, "TaskStatus:123");
-//		validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", 24, "", 0, 24, "TaskStatus:123");
-//	}
-//	
 //	@Test
 //	public void testGetStatusCodes() throws Exception {
 //		IStatusCodes statusCodes = V1Server.getInstance().getTaskStatusValues();
@@ -258,23 +261,23 @@ public class TestModel {
 //		Assert.assertEquals("On Hold", displayNames[3]);
 //	}
 //
-//	private void validateTask(Task task, 
-//			String expectedId, 
-//			String expectedStory, 
-//			String expectedName, 
-//			float expectedEstimate, 
-//			String expectedDone, 
-//			float expectedEffort, 
-//			float expectedTodo,
-//			String expectedStatus) throws Exception {
-//		Assert.assertEquals(expectedName, task.getName());
-//		Assert.assertEquals(expectedId, task.getID());
-//		Assert.assertEquals(expectedStory, task.getStoryName());
-//		Assert.assertEquals(expectedEstimate, task.getEstimate(), EPSILON);
-//		Assert.assertEquals(expectedDone, task.getDone());
-//		Assert.assertEquals(expectedEffort, task.getEffort(), EPSILON);
-//		Assert.assertEquals(expectedTodo, task.getToDo(), EPSILON);
-//		Assert.assertEquals(expectedStatus, task.getStatus());
-//	}
+	private void validateTask(Workitem task, 
+			String expectedId, 
+			String expectedStory, 
+			String expectedName, 
+			String expectedEstimate, 
+			String expectedDone, 
+			String expectedEffort, 
+			String expectedTodo,
+			String expectedStatus) throws Exception {
+		Assert.assertEquals(expectedName, task.getProperty(Workitem.NameProperty));
+		Assert.assertEquals(expectedId, task.getId());
+		//Assert.assertEquals(expectedStory, task.getStoryName());
+		Assert.assertEquals(expectedEstimate, task.getProperty(Workitem.DetailEstimateProperty));
+		Assert.assertEquals(expectedDone, task.getProperty(Workitem.DoneProperty));
+		Assert.assertEquals(expectedEffort, task.getProperty(Workitem.EffortProperty));
+		Assert.assertEquals(expectedTodo, task.getProperty(Workitem.TodoProperty));
+		Assert.assertEquals(expectedStatus, task.getProperty(Workitem.StatusProperty));
+	}
 
 }

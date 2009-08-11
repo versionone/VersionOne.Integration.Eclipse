@@ -48,13 +48,7 @@ public class Workitem {
     Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
-        if (asset == null) {// TODO temporary
-            children = new ArrayList<Workitem>();
-            if (parent == null) {
-                children.add(new Workitem(null, this));
-            }
-            return;
-        }
+        
         children = new ArrayList<Workitem>(asset.getChildren().size());
         for (Asset childAsset : asset.getChildren()) {
             if (getTypePrefix().equals(ProjectPrefix) || dataLayer.showAllTasks
@@ -66,9 +60,6 @@ public class Workitem {
     }
 
     public String getTypePrefix() {
-        if (asset == null) {// temporary
-            return "nULL";
-        }
         return asset.getAssetType().getToken();
     }
 

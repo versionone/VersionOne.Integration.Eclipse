@@ -27,6 +27,11 @@ public class ReadOnlyEditor extends TextEditor {
     protected void setValue(Object element, Object value) {
         // Do nothing
     }
+    
+    @Override
+    protected boolean canEdit(Object element) {   
+        return true;
+    }
 
     /**
      * This is the cell editor used to edit the Task ID cell. It was created

@@ -1,5 +1,7 @@
 package com.versionone.taskview.views;
 
+import java.util.HashMap;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -51,6 +53,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_STATUS = "ColumnTitle'Status";
     private static final String V1_COLUMN_TITLE_DONE = "ColumnTitle'Done";
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
+    
+    private static final String MENU_ITEM_CLOSE_KEY = "Close";
+    private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
+    private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
+    
+    private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
     private boolean isEffortColumsShow;
     private TreeViewer viewer;
@@ -77,26 +85,47 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         makeActions();
         contributeToActionBars();
+        createContextMenu(viewer);
         hookDoubleClickAction();
         selectProvider();
-        
-        // TODO
-        // createContextMenu(viewer);
     }
     
     /**
-     * A stub method for creating context menu associated with TreeViewer
+     * Create context menu, assign actions, store items in a collection to manage visibility.
      */
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
     	Menu menu = new Menu(control.getShell(), SWT.POP_UP);
-    	MenuItem item = new MenuItem(menu, SWT.PUSH);
-    	item.setText("test");
-    	item.addListener(SWT.Selection, new Listener() {
+    	
+    	MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
+    	closeItem.setText(MENU_ITEM_CLOSE_KEY);
+    	closeItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
-    			System.out.println("test item selected");
+    			System.out.println(MENU_ITEM_CLOSE_KEY);
     		}
     	});
+    	menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
+    	
+    	MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
+    	quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
+    	quickCloseItem.addListener(SWT.Selection, new Listener() {
+    		public void handleEvent(Event e) {
+    			System.out.println(MENU_ITEM_QUICK_CLOSE_KEY);
+    		}
+    	});
+    	menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
+    	
+    	MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
+    	
+    	MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
+    	signupItem.setText(MENU_ITEM_SIGNUP_KEY);
+    	signupItem.addListener(SWT.Selection, new Listener() {
+    		public void handleEvent(Event e) {
+    			System.out.println(MENU_ITEM_SIGNUP_KEY);
+    		}
+    	});
+    	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
+    	
     	control.setMenu(menu);
     }
 

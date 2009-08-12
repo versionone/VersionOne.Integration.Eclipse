@@ -8,9 +8,13 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -90,12 +94,27 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         selectProvider();
     }
     
+    private boolean validRowSelected() {
+    	return !viewer.getSelection().isEmpty();
+    }
+    
+    private Workitem getCurrentWorkitem() {
+    	ISelection selection = viewer.getSelection();
+    	if(selection != null && selection instanceof IStructuredSelection) {
+    		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    		Object element = structuredSelection.getFirstElement();
+    		return element == null ? null : (Workitem)element; 
+    	}
+    	
+    	return null;
+    }
+    
     /**
      * Create context menu, assign actions, store items in a collection to manage visibility.
      */
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
-    	Menu menu = new Menu(control.getShell(), SWT.POP_UP);
+    	final Menu menu = new Menu(control.getShell(), SWT.POP_UP);
     	
     	MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
@@ -126,6 +145,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	});
     	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
     	
+    	menu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuHidden(MenuEvent e) { }
+
+			@Override
+			public void menuShown(MenuEvent e) {
+				// setting visibility triggers the event again
+				if(menu.getVisible() && !validRowSelected()) {
+					menu.setVisible(false);
+				}
+			}
+    	});
     	control.setMenu(menu);
     }
 

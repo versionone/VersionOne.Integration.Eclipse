@@ -37,6 +37,8 @@ import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.common.Activator;
+import com.versionone.common.preferences.PreferenceConstants;
+import com.versionone.common.preferences.PreferencePage;
 
 public class ApiDataLayer {
 
@@ -145,6 +147,13 @@ public class ApiDataLayer {
             defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
 
             memberOid = services.getLoggedIn();
+            
+            //TODO review this place possible way when user change location and user has the same token
+            String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
+            if (!currentOid.equals(memberOid.getToken())) {
+                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberOid.getToken());
+            }            
+            
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             return true;

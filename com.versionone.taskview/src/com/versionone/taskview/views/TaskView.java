@@ -59,14 +59,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private Action saveAction = null;
     
 
-    public TaskView() {}
+    public TaskView() {
+        PreferencePage.getPreferences().addPropertyChangeListener(this);
+    }
 
     /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
      */
-    public void createPartControl(Composite parent) {
-        PreferencePage.getPreferences().addPropertyChangeListener(this);
+    public void createPartControl(Composite parent) {        
 
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
@@ -107,6 +108,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         selectProjectAction.setEnabled(isEnabled);
         refreshAction.setEnabled(isEnabled);
+        saveAction.setEnabled(isEnabled);
         viewer.getTree().setEnabled(isEnabled);
         viewer.getTree().setLinesVisible(isEnabled);
         viewer.getTree().setHeaderVisible(isEnabled);
@@ -237,19 +239,19 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getProperty();
         if (property.equals(PreferenceConstants.P_ENABLED)) {
+            
             if (0 == viewer.getTree().getColumnCount()) {
                 configureTable();
             }
             selectProvider();
-        } else if (property.equals(PreferenceConstants.P_URL) || property.equals(PreferenceConstants.P_USER) ||
-                property.equals(PreferenceConstants.P_PASSWORD) || property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
-            try {
-                Activator.connect();            
-            } catch (Exception e) {
-                Activator.logError(e);
-                MessageDialog.openError(viewer.getTree().getShell(), "Task View Error",
-                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
-            }
+        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+//            try {
+//                Activator.connect();            
+//            } catch (Exception e) {
+//                Activator.logError(e);
+//                MessageDialog.openError(viewer.getTree().getShell(), "Task View Error",
+//                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+//            }
             reCreateTable();
         }
         /*
@@ -442,6 +444,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
         }
+        selectProvider();
         loadTable();
     }
 

@@ -207,15 +207,15 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public boolean performOk() {
         boolean rc = super.performOk();
         if (rc && resetConnection) {
-//            try {
-//                //V1Server.reset(); TODO Implement reset
-//                resetConnection = false;
-//            } catch (V1Exception e) {
-//                Activator.logError(e);
-//                MessageDialog.openInformation(this.getShell(), "VersionOne Preferences",
-//                        "Cannot obtain user identity from server.  Check Error Log for more details");
-//                rc = false;
-//            }
+            try {
+                Activator.connect();
+                resetConnection = false;
+            } catch (Exception e) {
+                Activator.logError(e);
+                MessageDialog.openInformation(this.getShell(), "VersionOne Preferences",
+                        "Cannot obtain user identity from server.  Check Error Log for more details");
+                rc = false;
+            }
         }
         return rc;
     }

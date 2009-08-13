@@ -7,7 +7,7 @@ Bundle-Activator: de.spiritlink.richhtml4eclipse.Activator
 Bundle-Vendor: Tom Seidel - Spiritlink GmbH
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Eclipse-LazyStart: true
+Eclipse-LazyStart: false
 Export-Package: de.spiritlink.richhtml4eclipse.util,
  de.spiritlink.richhtml4eclipse.widgets
 Bundle-ClassPath: richhtml4eclipse.jar

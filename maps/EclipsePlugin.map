@@ -2,7 +2,7 @@ feature@com.versionone.v1.feature=SVN,,svn://svn/1/Trunk, V1Integration/Java/ecl
 plugin@com.versionone.apiclient=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.apiclient
 plugin@com.versionone.common=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.common
 plugin@com.versionone.taskview=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.taskview
-plugin@de.spiritlink.richhtml4eclipse_1.0.0=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, de.spiritlink.richhtml4eclipse_1.0.0
+plugin@de.spiritlink.richhtml4eclipse=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, de.spiritlink.richhtml4eclipse
 
 feature@com.versionone.v1.feature.test=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.v1.feature.test
 plugin@com.versionone.common.test=SVN,,svn://svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.common.test

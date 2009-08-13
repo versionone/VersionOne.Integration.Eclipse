@@ -112,11 +112,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     /**
      * Create context menu, assign actions, store items in a collection to manage visibility.
      */
+    // TODO refactor
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
     	final Menu menu = new Menu(control.getShell(), SWT.POP_UP);
     	
-    	MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
+    	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
     	closeItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
@@ -125,7 +126,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	});
     	menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
     	
-    	MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
+    	final MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
     	quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
     	quickCloseItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
@@ -136,7 +137,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	
     	MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
     	
-    	MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
+    	final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
     	signupItem.setText(MENU_ITEM_SIGNUP_KEY);
     	signupItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
@@ -146,15 +147,16 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
     	
     	menu.addMenuListener(new MenuListener() {
-			@Override
 			public void menuHidden(MenuEvent e) { }
 
-			@Override
 			public void menuShown(MenuEvent e) {
-				// setting visibility triggers the event again
-				if(menu.getVisible() && !validRowSelected()) {
+				Workitem item = getCurrentWorkitem();
+				if(menu.getVisible() && (item == null || !validRowSelected())) {
 					menu.setVisible(false);
 				}
+				
+				quickCloseItem.setEnabled(item.canQuickClose());
+				signupItem.setEnabled(item.canSignup());
 			}
     	});
     	control.setMenu(menu);

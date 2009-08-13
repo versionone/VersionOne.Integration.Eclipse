@@ -189,7 +189,7 @@ public class ApiDataLayer {
             FilterTerm stateTerm = new FilterTerm(projectType.getAttributeDefinition("AssetState"));
             stateTerm.NotEqual(AssetState.Closed);
             scopeQuery.setFilter(stateTerm);
-            // clear all diffinitions which was used in previous queries
+            // clear all definitions used in previous queries
             alreadyUsedDefinition.clear();
             addSelection(scopeQuery, Workitem.ProjectPrefix);
             QueryResult result = services.retrieve(scopeQuery);
@@ -537,7 +537,7 @@ public class ApiDataLayer {
         }
         
         Query query = new Query(Oid.fromToken(id, metaModel));
-        // clear all diffinitions which was used in previous queries
+        // clear all definitions used in previous queries
         alreadyUsedDefinition.clear();
         addSelection(query, Workitem.ProjectPrefix);
         QueryResult result;

@@ -139,7 +139,9 @@ public class Workitem {
      *            Name of the property to get, e.g. "Status"
      * @return String, Double, ValueId or IList&lt;ValueId&gt;.
      * @throws IllegalArgumentException
-     *             If property cannot be got.
+     *             If property cannot be got. Is this really relevant?
+     * @throws NullReferenceException
+     *            If there is no such attribute.
      * @see #NameProperty
      * @see #StatusProperty
      * @see #EffortProperty
@@ -148,13 +150,14 @@ public class Workitem {
      * @see #OwnersProperty
      * @see #TodoProperty
      */
-    public Object getProperty(String propertyName) throws IllegalArgumentException {
+    public Object getProperty(String propertyName) throws IllegalArgumentException, NullPointerException {
         if (propertyName.equals(EffortProperty)) {
             return dataLayer.getEffort(asset);
         }
-
+        // TODO throw exception? Map would return null if non-existent attribute is requested.
+        // And in the following line we'll get NullPointerEx
         Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
-
+        
         if (attribute.getDefinition().isMultiValue()) {
             return getPropertyValues(propertyName).subset(attribute.getValues());
         }
@@ -277,6 +280,9 @@ public class Workitem {
         } catch (IllegalArgumentException e) {
             ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
+        } catch (NullPointerException e) {
+        	ApiDataLayer.warning("QuickClose not supported.", e);
+            return false;
         }
     }
 
@@ -298,6 +304,9 @@ public class Workitem {
             return (Boolean) getProperty("CheckQuickSignup");
         } catch (IllegalArgumentException e) {
             ApiDataLayer.warning("QuickSignup not supported.", e);
+            return false;
+        } catch (NullPointerException e) {
+        	ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
         }
     }

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Richhtml4eclipse Plug-in
+Bundle-SymbolicName: de.spiritlink.richhtml4eclipse
+Bundle-Version: 1.0
+Bundle-Activator: de.spiritlink.richhtml4eclipse.Activator
+Bundle-Vendor: Tom Seidel - Spiritlink GmbH
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Eclipse-LazyStart: true
+Export-Package: de.spiritlink.richhtml4eclipse.util,
+ de.spiritlink.richhtml4eclipse.widgets
+Bundle-ClassPath: richhtml4eclipse.jar

@@ -29,8 +29,10 @@ public class Workitem {
     public static final String ScheduleNameProperty = "Schedule.Name";
     public static final String OwnersProperty = "Owners";
     public static final String TodoProperty = "ToDo";
+    public static final String DescriptionProperty = "Description";
 
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    
     static {
         numberFormat.setMinimumFractionDigits(2);
         numberFormat.setMaximumFractionDigits(6);

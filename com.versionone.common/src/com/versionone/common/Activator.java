@@ -52,6 +52,7 @@ public class Activator extends AbstractUIPlugin {
         properties.put(Workitem.StatusProperty, true);
         properties.put(Workitem.EffortProperty, false);
         properties.put(Workitem.DoneProperty, false);
+        properties.put(Workitem.DescriptionProperty, false);
         //properties.put(Workitem.ScheduleNameProperty, false);
         properties.put(Workitem.OwnersProperty, true);
         properties.put(Workitem.TodoProperty, false);

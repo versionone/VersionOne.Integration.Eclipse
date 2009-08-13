@@ -10,6 +10,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -35,6 +36,7 @@ import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.editors.ListEditor;
 import com.versionone.taskview.views.editors.ReadOnlyEditor;
 import com.versionone.taskview.views.editors.TextEditor;
+import com.versionone.taskview.views.htmleditor.HTMLEditor;
 import com.versionone.taskview.views.providers.SimpleProvider;
 
 /**
@@ -61,6 +63,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String MENU_ITEM_CLOSE_KEY = "Close";
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
     private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
+    private static final String MENU_ITEM_EDIT_DESCRIPTION_KEY = "Edit description";
     
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
@@ -135,7 +138,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	});
     	menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
     	
-    	MenuItem separator = new MenuItem(menu, SWT.SEPARATOR);
+    	new MenuItem(menu, SWT.SEPARATOR);
     	
     	final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
     	signupItem.setText(MENU_ITEM_SIGNUP_KEY);
@@ -146,7 +149,22 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	});
     	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
     	
+    	new MenuItem(menu, SWT.SEPARATOR);
+    	
+    	MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
+    	editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
+    	final TreeViewer tmpViewer = viewer;
+    	editDescription.addListener(SWT.Selection, new Listener() {
+                public void handleEvent(Event e) {
+                    //HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
+                    //htmlEditor.create();
+                    //htmlEditor.open(); 
+                }
+        });
+        menuItemsMap.put(MENU_ITEM_EDIT_DESCRIPTION_KEY, editDescription);
+    	
     	menu.addMenuListener(new MenuListener() {
+
 			public void menuHidden(MenuEvent e) { }
 
 			public void menuShown(MenuEvent e) {

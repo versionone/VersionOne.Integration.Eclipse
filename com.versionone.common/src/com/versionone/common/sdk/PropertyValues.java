@@ -44,7 +44,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         Iterator<ValueId> i = iterator();
         res.append(i.next());
         while (i.hasNext()) {
-            res.append(i.next());
+            res.append(", ").append(i.next());
         }
         return res.toString();
     }
@@ -68,6 +68,11 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         return values;
     }
 
+    public boolean add(ValueId value) {
+    	addInternal(value);
+    	return true;
+    }
+    
     void addInternal(ValueId value) {
         dictionary.put(value.oid, value);
         index.put(value.oid, currentIndex);

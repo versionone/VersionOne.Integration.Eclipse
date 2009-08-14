@@ -59,6 +59,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_STATUS = "ColumnTitle'Status";
     private static final String V1_COLUMN_TITLE_DONE = "ColumnTitle'Done";
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
+    private static final String V1_COLUMN_TITLE_OWNER = "ColumnTitle'Owner";
     
     private static final String MENU_ITEM_CLOSE_KEY = "Close";
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
@@ -217,6 +218,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));
         column.setEditingSupport(new TextEditor(Workitem.NameProperty, viewer));
+        
+        column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
+        column.setLabelProvider(new SimpleProvider(Workitem.OwnersProperty, false));
+        column.setEditingSupport(new ReadOnlyEditor(Workitem.OwnersProperty, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));

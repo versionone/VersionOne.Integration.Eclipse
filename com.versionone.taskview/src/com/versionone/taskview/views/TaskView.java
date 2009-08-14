@@ -122,31 +122,31 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	
     	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
-    	closeItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			System.out.println(MENU_ITEM_CLOSE_KEY);
-    		}
-    	});
+        closeItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                System.out.println(MENU_ITEM_CLOSE_KEY);
+            }
+        });
     	menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
     	
     	final MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
     	quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
-    	quickCloseItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			System.out.println(MENU_ITEM_QUICK_CLOSE_KEY);
-    		}
-    	});
+        quickCloseItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                System.out.println(MENU_ITEM_QUICK_CLOSE_KEY);
+            }
+        });
     	menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
     	
     	new MenuItem(menu, SWT.SEPARATOR);
     	
     	final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
     	signupItem.setText(MENU_ITEM_SIGNUP_KEY);
-    	signupItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			System.out.println(MENU_ITEM_SIGNUP_KEY);
-    		}
-    	});
+        signupItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                System.out.println(MENU_ITEM_SIGNUP_KEY);
+            }
+        });
     	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
     	
     	new MenuItem(menu, SWT.SEPARATOR);
@@ -154,29 +154,30 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
     	editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
     	final TreeViewer tmpViewer = viewer;
-    	editDescription.addListener(SWT.Selection, new Listener() {
-                public void handleEvent(Event e) {
-                    //HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
-                    //htmlEditor.create();
-                    //htmlEditor.open(); 
-                }
+        editDescription.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
+                htmlEditor.create();
+                htmlEditor.open();
+            }
         });
         menuItemsMap.put(MENU_ITEM_EDIT_DESCRIPTION_KEY, editDescription);
     	
-    	menu.addMenuListener(new MenuListener() {
+        menu.addMenuListener(new MenuListener() {
 
-			public void menuHidden(MenuEvent e) { }
+            public void menuHidden(MenuEvent e) {
+            }
 
-			public void menuShown(MenuEvent e) {
-				Workitem item = getCurrentWorkitem();
-				if(menu.getVisible() && (item == null || !validRowSelected())) {
-					menu.setVisible(false);
-				}
-				
-				quickCloseItem.setEnabled(item.canQuickClose());
-				signupItem.setEnabled(item.canSignup());
-			}
-    	});
+            public void menuShown(MenuEvent e) {
+                Workitem item = getCurrentWorkitem();
+                if (menu.getVisible() && (item == null || !validRowSelected())) {
+                    menu.setVisible(false);
+                }
+
+                quickCloseItem.setEnabled(item.canQuickClose());
+                signupItem.setEnabled(item.canSignup());
+            }
+        });
     	control.setMenu(menu);
     }
 

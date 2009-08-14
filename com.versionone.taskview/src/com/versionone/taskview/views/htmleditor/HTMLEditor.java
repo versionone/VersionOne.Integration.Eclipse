@@ -6,6 +6,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -43,6 +44,7 @@ public class HTMLEditor extends Dialog {
 
         this.workitem = workitem;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
+        //getButton(IDialogConstants.OK_ID).
         // TODO Auto-generated constructor stub
     }
 
@@ -51,7 +53,7 @@ public class HTMLEditor extends Dialog {
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        final Composite container = (Composite) super.createDialogArea(parent);
+        final Composite container = (Composite) super.createDialogArea(parent);        
         container.setLayout(new GridLayout(1, true));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));//SWT.FILL, SWT.FILL
 
@@ -87,6 +89,14 @@ public class HTMLEditor extends Dialog {
         manager.update(true);
 
         return container;
+    }
+    
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        // create OK and Cancel buttons by default
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, false);
+        createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
 
     /**

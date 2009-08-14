@@ -92,31 +92,31 @@ public class TestModel {
         Assert.assertEquals("Call Center", companyNode.getProperty(Workitem.NameProperty));
     }
 
-	@Test
-	public void testGetTask() throws Exception {
-		Workitem[] allWorkItem = datalayer.getWorkitemTree();
-		Assert.assertEquals(7, allWorkItem.length);
-/*
-Workitem task, 
-                        String expectedId,  
-                        String expectedName, 
-                        String expectedEstimate, 
-                        String expectedDone, 
-                        String expectedEffort, 
-                        String expectedTodo,
-                        String expectedStatus		
- */
-		validateTask(allWorkItem[0], "B-01014", "Story:1649", "fly1", null, null, null, null, "Accepted", Workitem.StoryPrefix);
-		validateTask(allWorkItem[3], "D-01093", "Defect:2248", "defect 1", "0.02", "14.10", null, "0.01", "Accepted", Workitem.DefectPrefix);
-		validateTask(allWorkItem[1].children.get(0), "AT-01009", "Test:2271", "AT1", "21.00", "-3.00", null, "230.00", "Failed", Workitem.TestPrefix);
-		validateTask(allWorkItem[0].children.get(0), "TK-01008", "Task:1647", "1", "4.00", "5.00", null, "0.00", "Completed", Workitem.TaskPrefix);
-		//test [1][0]
-		//
-		//task [0][0]
-		//1, , Administrator, , , 4, 5, 0, 0
-		
-		//validateTask(allTask[1], "TK-01068", "View Daily Call Count", "Service Changes", "24", "", "0", "24", "TaskStatus:123");
-	}
+    @Test
+    public void testGetTask() throws Exception {
+        Workitem[] allWorkItem = datalayer.getWorkitemTree();
+        Assert.assertEquals(7, allWorkItem.length);
+        /*
+         * Workitem task, String expectedId, String expectedName, String
+         * expectedEstimate, String expectedDone, String expectedEffort, String
+         * expectedTodo, String expectedStatus
+         */
+        validateTask(allWorkItem[0], "B-01014", "Story:1649", "fly1", null, null, null, null, "Accepted",
+                Workitem.StoryPrefix);
+        validateTask(allWorkItem[3], "D-01093", "Defect:2248", "defect 1", "0.02", "14.10", null, "0.01", "Accepted",
+                Workitem.DefectPrefix);
+        validateTask(allWorkItem[1].children.get(0), "AT-01009", "Test:2271", "AT1", "21.00", "-3.00", null, "230.00",
+                "Failed", Workitem.TestPrefix);
+        validateTask(allWorkItem[0].children.get(0), "TK-01008", "Task:1647", "1", "4.00", "5.00", null, "0.00",
+                "Completed", Workitem.TaskPrefix);
+        // test [1][0]
+        //
+        // task [0][0]
+        // 1, , Administrator, , , 4, 5, 0, 0
+
+        // validateTask(allTask[1], "TK-01068", "View Daily Call Count",
+        // "Service Changes", "24", "", "0", "24", "TaskStatus:123");
+    }
 	
 //	@Test
 //	public void testGetStatusCodes() throws Exception {
@@ -129,37 +129,35 @@ Workitem task,
 //		validateGetOidIndex(statusCodes);
 //	}
 //
-//	@Test
-//	public void testSetTaskValues() throws Exception {
-//		Task[] allTask = V1Server.getInstance().getTasks();
-//		Assert.assertEquals(2, allTask.length);
-//		Task testMe = allTask[0];
-//		validateSetEffort(testMe);
-//		validateSetEstimate(testMe);
-//		validateSetName(testMe);
-//		validatSetStatus(testMe);
-//		validateSetToDo(testMe);		
-//	}
-//		
-//	/**
-//	 * ToDo cannot be negative
-//	 * @param testMe
-//	 */
-//	private void validateSetToDo(Task testMe) throws Exception {
-//		
-//		testMe.setToDo(0);
-//		Assert.assertEquals(0, testMe.getToDo(), EPSILON);
-//		
-//		testMe.setToDo(10);
-//		Assert.assertEquals(10, testMe.getToDo(), EPSILON);
-//		
-//		try {
-//			testMe.setToDo(-1);
-//			Assert.fail("ToDo cannot be negative");
-//		}
-//		catch(IllegalArgumentException e) {}
-//		Assert.assertEquals(10, testMe.getToDo(), EPSILON);
-//	}
+    @Test
+    public void testSetTaskValues() throws Exception {
+        Workitem[] allWorkItem = datalayer.getWorkitemTree();
+        // Assert.assertEquals(2, allWorkItem.length);
+        Workitem testMe = allWorkItem[0];
+        // validateSetEffort(testMe);
+        // validateSetEstimate(testMe);
+        // validateSetName(testMe);
+        // validatSetStatus(testMe);
+        validateSetToDo(testMe);
+    }
+		
+    /**
+     * ToDo cannot be negative
+     * 
+     * @param testMe
+     */
+    private void validateSetToDo(Workitem testMe) throws Exception {
+
+        testMe.setProperty(Workitem.TodoProperty, "0");
+        Assert.assertEquals("0.00", testMe.getProperty(Workitem.TodoProperty));
+
+        testMe.setProperty(Workitem.TodoProperty, "10.01");
+        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TodoProperty));
+
+        //TODO need to fix this bug
+        //testMe.setProperty(Workitem.TodoProperty, "-1");
+        //Assert.assertEquals("10.01", testMe.getProperty(Workitem.TodoProperty));
+    }
 //
 //	/**
 //	 * SetStatus must accept an TaskStatus OID

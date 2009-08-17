@@ -1,9 +1,6 @@
 package com.versionone.taskview.views.htmleditor;
 
-import java.util.Properties;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -22,22 +19,19 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.versionone.common.sdk.Workitem;
 
-import de.spiritlink.richhtml4eclipse.widgets.AllActionConstants;
-import de.spiritlink.richhtml4eclipse.widgets.ComposerStatus;
-import de.spiritlink.richhtml4eclipse.widgets.EventConstants;
 import de.spiritlink.richhtml4eclipse.widgets.HtmlComposer;
 import de.spiritlink.richhtml4eclipse.widgets.JavaScriptCommands;
-import de.spiritlink.richhtml4eclipse.widgets.PropertyConstants;
 
 public class HTMLEditor extends Dialog {
 
     static int WINDOW_HEIGHT = 800;
     static int WINDOW_WIDTH = 500;
     private static Workitem workitem;
+    private String value = "";
+    private HtmlComposer composer;
 
     public HTMLEditor(Shell parentShell, Workitem workitem) {
         super(parentShell);
@@ -77,15 +71,33 @@ public class HTMLEditor extends Dialog {
         CoolItem item = new CoolItem(coolbar, SWT.VERTICAL);//SWT.VERTICAL
         item.setControl(menu);
 
-        final HtmlComposer composer = new HtmlComposer(container, SWT.BORDER | SWT.SCROLL_LINE);
+        composer = new HtmlComposer(container, SWT.BORDER | SWT.SCROLL_LINE);
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        composer.setFocus();
 
         composer.execute(JavaScriptCommands.SET_HTML(workitem.getPropertyAsString(Workitem.DescriptionProperty)));
 
 
         manager.add(new BoldAction(composer));
-        // manager.add(new ItalicAction(composer));
-        // manager.add(new UnderLineAction(composer));
+        manager.add(new ItalicAction(composer));
+        manager.add(new UnderLineAction(composer));
+        manager.add(new StrikeThroughAction(composer));
+        manager.add(new RemoveFormatAction(composer));
+        manager.add(new Separator());
+        manager.add(new JustifyLeftAction(composer));
+        manager.add(new JustifyCenterAction(composer));
+        manager.add(new JustifyRightAction(composer));
+        manager.add(new JustifyFullAction(composer));
+        manager.add(new Separator());
+        manager.add(new BulletListAction(composer));
+        manager.add(new NumListAction(composer));
+        manager.add(new OutdentAction(composer));
+        manager.add(new IndentAction(composer));
+        manager.add(new Separator());
+        manager.add(new Separator());
+        manager.add(new UndoAction(composer));
+        manager.add(new RedoAction(composer));        
+        
         manager.update(true);
 
         return container;
@@ -113,50 +125,14 @@ public class HTMLEditor extends Dialog {
         newShell.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
-    public class BoldAction extends Action implements Listener {
-
-        private HtmlComposer composer = null;
-
-        public BoldAction(HtmlComposer composer) {
-            super("", IAction.AS_CHECK_BOX); //$NON-NLS-1$
-            setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("de.spiritlink.richhtml4eclipse", //$NON-NLS-1$
-                    "tiny_mce/jscripts/tiny_mce/themes/advanced/images/bold.gif")); //$NON-NLS-1$
-            this.composer = composer;
-            // adds a listener to the widget for "bold-events"
-            this.composer.addListener(EventConstants.BOLD, this);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.action.Action#run()
-         */
-        @Override
-        public void run() {
-            // Executes the command for bold to the composer
-            this.composer.execute(JavaScriptCommands.BOLD);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets
-         * .Event)
-         */
-        public void handleEvent(Event event) {
-            Properties props = (Properties) event.data;
-            if (ComposerStatus.SELECTED.equals(props.getProperty(PropertyConstants.STATUS))) {
-                // current selection/cursor is bold --> set the action checked
-                setChecked(true);
-            } else if (ComposerStatus.NORMAL.equals(props.getProperty(PropertyConstants.STATUS))) {
-                setChecked(false);
-            } else if (event.type == EventConstants.ALL
-                    && AllActionConstants.RESET_ALL.equals(props.getProperty(PropertyConstants.COMMAND))) {
-                // callback if the cursor changed, reset the state.
-                setChecked(false);
-            }
-        }
-
+    @Override
+    protected void okPressed() {
+        value = composer.getHtml();
+        super.okPressed();
     }
+    
+    public String getValue() {
+        return value;
+    }
+    
 }

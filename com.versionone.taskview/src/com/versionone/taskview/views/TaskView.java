@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -173,9 +174,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	final TreeViewer tmpViewer = viewer;
     	editDescription.addListener(SWT.Selection, new Listener() {
                 public void handleEvent(Event e) {
-                    //HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
-                    //htmlEditor.create();
-                    //htmlEditor.open(); 
+                    HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
+                    htmlEditor.create();
+                    int response = htmlEditor.open();
+                    if (response == Window.OK) {
+                        updateDescription(getCurrentWorkitem(), htmlEditor.getValue()); 
+                    }
                 }
         });
         menuItemsMap.put(MENU_ITEM_EDIT_DESCRIPTION_KEY, editDescription);
@@ -195,6 +199,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 			}
     	});
     	control.setMenu(menu);
+    }
+
+    protected void updateDescription(Workitem currentWorkitem, String value) {
+        currentWorkitem.setProperty(Workitem.DescriptionProperty, value);
+        
     }
 
     /**

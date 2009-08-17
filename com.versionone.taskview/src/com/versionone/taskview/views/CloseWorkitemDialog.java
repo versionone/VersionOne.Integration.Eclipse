@@ -1,14 +1,12 @@
 package com.versionone.taskview.views;
 
-import java.util.List;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -57,7 +55,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
-        container.setLayout(new FillLayout(SWT.HORIZONTAL));
+        container.setLayout(new RowLayout(SWT.HORIZONTAL));
         
         toDoLabel = new Label(parent, SWT.NONE);
         toDoLabel.setText("To Do:");

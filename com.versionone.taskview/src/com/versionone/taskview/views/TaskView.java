@@ -46,7 +46,11 @@ import com.versionone.taskview.views.providers.SimpleProvider;
  * @author Jerry D. Odenwelder Jr.
  * 
  */
-public class TaskView extends ViewPart implements IPropertyChangeListener {
+interface IRefreshable {
+	void refreshViewer();
+}
+
+public class TaskView extends ViewPart implements IPropertyChangeListener, IRefreshable {
 
     /*
      * These constants are the VersionOne names for the column titles. We
@@ -121,12 +125,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
     	final Menu menu = new Menu(control.getShell(), SWT.POP_UP);
+    	final IRefreshable openingViewer = this;
     	
     	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
     	closeItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
-    			CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(control.getShell(), getCurrentWorkitem());
+    			CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(control.getShell(), getCurrentWorkitem(), openingViewer);
     			closeDialog.setBlockOnOpen(true);
     			closeDialog.open();
     		}
@@ -139,7 +144,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     		public void handleEvent(Event e) {
     			try {
     				getCurrentWorkitem().quickClose();
-    				refreshTreeViewer();
+    				refreshViewer();
     			} catch(DataLayerException ex) {
     				Activator.logError(ex);
     				MessageDialog.openError(control.getShell(), "Task View Error",
@@ -157,7 +162,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     		public void handleEvent(Event e) {
     			try {
     				getCurrentWorkitem().signup();
-    				refreshTreeViewer();
+    				refreshViewer();
     			} catch(DataLayerException ex) {
     				Activator.logError(ex);
     				MessageDialog.openError(control.getShell(), "Task View Error",
@@ -209,7 +214,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     /**
      * Refresh viewer, causing it to re-read data from model and remove possibly non-relevant items.
      */
-    private void refreshTreeViewer() {
+    public void refreshViewer() {
     	viewer.refresh();
     }
     

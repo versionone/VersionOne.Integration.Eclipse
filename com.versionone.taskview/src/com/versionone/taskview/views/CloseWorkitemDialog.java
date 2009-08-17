@@ -6,7 +6,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -16,7 +16,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
+import com.versionone.taskview.Activator;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.DataLayerException;
+import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -28,9 +31,12 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     private Label statusLabel;
     private Text toDoText;
     private Workitem workitem;
+    private IRefreshable openingViewer;
+    
+    private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
 
-    static int WINDOW_HEIGHT = 150;
-    static int WINDOW_WIDTH = 400;
+    static int WINDOW_HEIGHT = 110;
+    static int WINDOW_WIDTH = 350;
 
     /**
      * Create
@@ -43,9 +49,10 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public CloseWorkitemDialog(Shell parentShell, Workitem workitem) {
+    public CloseWorkitemDialog(Shell parentShell, Workitem workitem, IRefreshable viewer) {
         super(parentShell);
         this.workitem = workitem;
+        this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
     }
 
@@ -55,23 +62,42 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
-        container.setLayout(new RowLayout(SWT.HORIZONTAL));
+        GridLayout layout = new GridLayout(4, false);
+        layout.horizontalSpacing = 15;
+        container.setLayout(layout);
         
-        toDoLabel = new Label(parent, SWT.NONE);
-        toDoLabel.setText("To Do:");
+        toDoLabel = new Label(container, SWT.NONE);
+        toDoLabel.setText("To Do");
+        toDoLabel.setSize(40, 30);
         
-        toDoText = new Text(parent, SWT.READ_ONLY);
+        toDoText = new Text(container, SWT.BORDER);
+        toDoText.setSize(40, 30);
+        toDoText.setEditable(false);
         Object toDo = workitem.getProperty("ToDo");
         if(toDo != null) {
         	toDoText.setText(toDo.toString());
         }
         
-        statusLabel = new Label(parent, SWT.NONE);
-        statusLabel.setText("Status:");
+        statusLabel = new Label(container, SWT.NONE);
+        statusLabel.setText("Status");
+        statusLabel.setSize(40, 30);
         
-        statusCombobox = new Combo(parent, SWT.DROP_DOWN);
+        statusCombobox = new Combo(container, SWT.DROP_DOWN);
+        statusCombobox.setSize(200, 40);
+        fillStatusCombobox();
         
         return container;
+    }
+    
+    /*
+     * Fill Status combobox.
+     */
+    private void fillStatusCombobox() {
+    	PropertyValues pv = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.StatusProperty);
+    	String[] values = pv.toStringArray();
+    	for(String value : values) {
+    		statusCombobox.add(value);
+    	}
     }
 
     /**
@@ -106,6 +132,15 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     @Override
     protected void okPressed() {
         super.okPressed();
-        // TODO
+        try {
+        	// TODO workitem.setProperty(Workitem.StatusProperty, newValue);
+        	// workitem.commitChanges();
+			workitem.close();
+			if(openingViewer != null) {
+				openingViewer.refreshViewer();
+			}
+		} catch (DataLayerException e) {
+			Activator.logError("Failed to close workitem", e);
+		}
     }
 }

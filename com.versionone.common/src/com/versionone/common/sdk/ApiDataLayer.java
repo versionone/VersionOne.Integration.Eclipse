@@ -503,11 +503,53 @@ public class ApiDataLayer {
     }
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
-        // TODO Auto-generated method stub
+        services.executeOperation(operation, asset.getOid());
     }
 
-    void refreshAsset(Workitem workitem) {
-        // TODO Auto-generated method stub
+    void refreshAsset(Workitem workitem) throws DataLayerException {
+    	try {
+            IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
+            Query query = new Query(workitem.asset.getOid().getMomentless(), false);
+            addSelection(query, workitem.getTypePrefix());
+            query.getSelection().add(stateDef);
+            QueryResult newAssets = services.retrieve(query);
+
+            List<Asset> parent = new ArrayList<Asset>();
+            if (workitem.parent == null) {
+                // parent = AssetList.Assets;
+            } else {
+                parent = workitem.parent.asset.getChildren();
+            }
+
+            //Removing old Asset from allAssets
+            //allAssets.remove(workitem.asset);
+
+            if (newAssets.getTotalAvaliable() != 1 ) {
+                // Just remove old Asset from AssetList
+                parent.remove(workitem.asset);
+                return;
+            }
+
+            Asset newAsset = newAssets.getAssets()[0];
+            AssetState newAssetState = (AssetState)newAsset.getAttribute(stateDef).getValue();
+            if (newAssetState == AssetState.Closed) {
+                // Just remove old Asset from AssetList
+                parent.remove(workitem.asset);
+                return;
+            }
+
+            //Adding new Asset to allAssets
+            //allAssets.add(newAsset);
+
+            //Adding new Asset to parent
+            //parent[parent.indexOf(workitem.asset)] = newAsset;
+            //newAsset.getChildren().addRange(workitem.asset.getChildren());
+        }
+        catch (MetaException ex) {
+            throw warning("Unable to get workitems.", ex);
+        } catch (Exception ex) {
+            throw warning("Unable to get workitems.", ex);
+        }
     }
 
     public void setCurrentProjectId(String value) {

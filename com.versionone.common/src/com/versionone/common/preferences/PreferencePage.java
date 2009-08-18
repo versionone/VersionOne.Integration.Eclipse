@@ -204,20 +204,34 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     }
 
     @Override
-    public boolean performOk() {
-        boolean rc = super.performOk();
-        if (rc && resetConnection) {
+    public boolean performOk() {        
+        
+        boolean rc = true;
+        if (resetConnection) {
             try {
-                Activator.connect();
+                Activator.connect(userEditor.getStringValue(), pwdField.getStringValue(), 
+                        urlEditor.getStringValue(), integratedAuthEditor.getBooleanValue());
                 resetConnection = false;
+                rc = super.performOk();
             } catch (Exception e) {
                 Activator.logError(e);
                 MessageDialog.openInformation(this.getShell(), "VersionOne Preferences",
                         "Cannot obtain user identity from server.  Check Error Log for more details");
                 rc = false;
             }
+            
         }
         return rc;
+    }
+
+    private boolean isPreferencesChanged() {
+        String path = PreferencePage.getPreferences().getString(PreferenceConstants.P_URL);
+        String user = PreferencePage.getPreferences().getString(PreferenceConstants.P_USER);
+        String password = PreferencePage.getPreferences().getString(PreferenceConstants.P_PASSWORD);
+        boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
+        
+        return !userEditor.getStringValue().equals(user) || !pwdField.getStringValue().equals(password) ||
+            !urlEditor.getStringValue().equals(path) || integratedAuthEditor.getBooleanValue() != auth;
     }
 
     @Override

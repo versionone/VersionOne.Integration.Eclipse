@@ -84,6 +84,16 @@ public class Activator extends AbstractUIPlugin {
         }
         ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
     }
+    
+    public static void connect(String user, String password, String path, boolean auth) {
+        try {
+            ApiDataLayer.getInstance().connect(path, user, password, auth);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+    }
 
     /*
      * (non-Javadoc)

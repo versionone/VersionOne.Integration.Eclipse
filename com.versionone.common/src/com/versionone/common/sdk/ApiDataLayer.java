@@ -117,7 +117,6 @@ public class ApiDataLayer {
 
     public boolean connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
         isConnected = false;
-        this.path = path;
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
@@ -147,15 +146,16 @@ public class ApiDataLayer {
             defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
 
             memberOid = services.getLoggedIn();
+            listPropertyValues = getListPropertyValues();                       
+            isConnected = true;
             
             //TODO review this place possible way when user change location and user has the same token
             String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
-            if (!currentOid.equals(memberOid.getToken())) {
-                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberOid.getToken());
-            }            
+            if (!currentOid.equals(memberOid.getToken() + ":" + path)) {
+                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberOid.getToken() + ":" + path);
+            } 
             
-            listPropertyValues = getListPropertyValues();
-            isConnected = true;
+            this.path = path; //
             return true;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);

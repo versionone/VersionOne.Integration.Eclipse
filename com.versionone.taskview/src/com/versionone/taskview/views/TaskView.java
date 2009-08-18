@@ -231,11 +231,16 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
         viewer.getTree().setLinesVisible(isEnabled);
         viewer.getTree().setHeaderVisible(isEnabled);
         viewer.getTree().setEnabled(isEnabled);
-
-        viewer.setContentProvider(new ViewContentProvider());
-
+        
+        viewer.getTree().clearAll(true);
+        
+        if (viewer.getContentProvider() == null) {
+            viewer.setContentProvider(new ViewContentProvider());
+        }
+        
         if (isEnabled) {
             loadTable();
+            
         } else {
             viewer.getTree().clearAll(true);
             viewer.setSorter(null);
@@ -287,7 +292,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
         column.setLabelProvider(new SimpleProvider(Workitem.EffortProperty, false));
         column.setEditingSupport(new TextEditor(Workitem.EffortProperty, viewer));
 
-        viewer.refresh();
+        //viewer.refresh();
         isEffortColumsShow = true;
     }
 
@@ -297,7 +302,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
     private void removeEffortColumns() {
         viewer.getTree().getColumn(5).dispose();
         viewer.getTree().getColumn(4).dispose();
-        viewer.refresh();
+        //viewer.refresh();
         isEffortColumsShow = false;
     }
 
@@ -567,7 +572,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
             addEffortColumns();
         }
         selectProvider();
-        loadTable();
+        //loadTable();
     }
 
 }

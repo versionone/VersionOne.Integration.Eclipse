@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -14,8 +15,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
@@ -27,8 +26,8 @@ import de.spiritlink.richhtml4eclipse.widgets.JavaScriptCommands;
 
 public class HTMLEditor extends Dialog {
 
-    static int WINDOW_HEIGHT = 800;
-    static int WINDOW_WIDTH = 500;
+    static int WINDOW_HEIGHT = 300;
+    static int WINDOW_WIDTH = 450;
     private static Workitem workitem;
     private String value = "";
     private HtmlComposer composer;
@@ -51,25 +50,17 @@ public class HTMLEditor extends Dialog {
         container.setLayout(new GridLayout(1, true));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));//SWT.FILL, SWT.FILL
 
-        //
-        // composer.setVisible(true);
-        CoolBar coolbar = new CoolBar(container, SWT.NONE);
-        GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);//SWT.FILL, SWT.BEGINNING
-        //GridLayout gd = new GridLayout(1, true);//SWT.FILL, SWT.BEGINNING
-        gd.widthHint = 100;
-        coolbar.setLayoutData(gd);
-
-        coolbar.addListener(SWT.Resize, new Listener() {
-            public void handleEvent(Event event) {
-                //container.getShell().layout();
-            }
-        });
+        //CoolBar coolbar = new CoolBar(container, SWT.NONE);
+        //GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);//SWT.FILL, SWT.BEGINNING
+        //gd.widthHint = 100;
+        //coolbar.setLayoutData(gd);
+       
         
-        ToolBar menu = new ToolBar(coolbar, SWT.HORIZONTAL | SWT.FLAT);//
+        ToolBar menu = new ToolBar(container, SWT.HORIZONTAL | SWT.FLAT);//
         ToolBarManager manager = new ToolBarManager(menu);
 
-        CoolItem item = new CoolItem(coolbar, SWT.VERTICAL);//SWT.VERTICAL
-        item.setControl(menu);
+        //CoolItem item = new CoolItem(coolbar, SWT.VERTICAL);//SWT.VERTICAL
+        //item.setControl(menu);
 
         composer = new HtmlComposer(container, SWT.BORDER | SWT.SCROLL_LINE);
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -123,6 +114,7 @@ public class HTMLEditor extends Dialog {
         Rectangle screen = display.getMonitors()[0].getBounds();
         newShell.setBounds((screen.width - size.x) / 2, (screen.height - size.y) / 2, size.x, size.y);
         newShell.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        newShell.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
     @Override

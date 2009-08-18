@@ -33,7 +33,7 @@ public class PreferenceConstants {
     public static final String P_INTEGRATED_AUTH = "useIntegratedAuth";
 
     /**
-     * VersionOne token for user
+     * VersionOne token for user + url to VersionOne server for uniq value
      */
     public static final String P_MEMBER_TOKEN = "memberToken";
 

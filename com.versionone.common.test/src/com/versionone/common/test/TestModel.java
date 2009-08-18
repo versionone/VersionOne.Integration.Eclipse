@@ -101,14 +101,14 @@ public class TestModel {
          * expectedEstimate, String expectedDone, String expectedEffort, String
          * expectedTodo, String expectedStatus
          */
-        validateTask(allWorkItem[0], "B-01014", "Story:1649", "fly1", null, null, null, null, "Accepted",
+        validateTask(allWorkItem[0], "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done",
                 Workitem.StoryPrefix);
-        validateTask(allWorkItem[3], "D-01093", "Defect:2248", "defect 1", "0.02", "14.10", null, "0.01", "Accepted",
+        validateTask(allWorkItem[2], "D-01093", "Defect:2248", "defect 1", "0.02", "-2.00", null, "0.01", "Done",
                 Workitem.DefectPrefix);
-        validateTask(allWorkItem[1].children.get(0), "AT-01009", "Test:2271", "AT1", "21.00", "-3.00", null, "230.00",
-                "Failed", Workitem.TestPrefix);
-        validateTask(allWorkItem[0].children.get(0), "TK-01008", "Task:1647", "1", "4.00", "5.00", null, "0.00",
-                "Completed", Workitem.TaskPrefix);
+        validateTask(allWorkItem[1].children.get(0), "AT-01010", "Test:2273", "AT4", "13.00", null, null, "18.00",
+                "", Workitem.TestPrefix);
+        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
+                "In Progress", Workitem.TaskPrefix);
         // test [1][0]
         //
         // task [0][0]
@@ -139,8 +139,20 @@ public class TestModel {
         // validateSetName(testMe);
         // validatSetStatus(testMe);
         validateSetToDo(testMe);
+        validateDescription(testMe);
     }
 		
+    private void validateDescription(Workitem testMe) {
+        testMe.setProperty(Workitem.DescriptionProperty, "<br>test <b>new test</b>");
+        Assert.assertEquals("<br>test <b>new test</b>", testMe.getProperty(Workitem.DescriptionProperty));
+
+        testMe.setProperty(Workitem.DescriptionProperty, "--");
+        Assert.assertEquals("--", testMe.getProperty(Workitem.DescriptionProperty));
+
+        //testMe.setProperty(Workitem.DescriptionProperty, "");
+        //Assert.assertEquals("", testMe.getProperty(Workitem.DescriptionProperty));
+    }
+
     /**
      * ToDo cannot be negative
      * 

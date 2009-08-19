@@ -224,16 +224,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         return rc;
     }
 
-    private boolean isPreferencesChanged() {
-        String path = PreferencePage.getPreferences().getString(PreferenceConstants.P_URL);
-        String user = PreferencePage.getPreferences().getString(PreferenceConstants.P_USER);
-        String password = PreferencePage.getPreferences().getString(PreferenceConstants.P_PASSWORD);
-        boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
-        
-        return !userEditor.getStringValue().equals(user) || !pwdField.getStringValue().equals(password) ||
-            !urlEditor.getStringValue().equals(path) || integratedAuthEditor.getBooleanValue() != auth;
-    }
-
     @Override
     public boolean performCancel() {
         resetConnection = false;

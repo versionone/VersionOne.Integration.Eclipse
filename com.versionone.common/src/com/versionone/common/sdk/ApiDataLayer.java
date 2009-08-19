@@ -307,6 +307,8 @@ public class ApiDataLayer {
             v1Service.getLoggedIn();
         } catch (V1Exception e) {
             result = false;
+        } catch (MetaException e) {
+            result = false;
         }
         
         return result;

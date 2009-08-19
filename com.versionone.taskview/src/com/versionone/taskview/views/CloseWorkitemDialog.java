@@ -20,6 +20,7 @@ import com.versionone.taskview.Activator;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
+import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -33,7 +34,10 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     private Workitem workitem;
     private IRefreshable openingViewer;
     
+    private PropertyValues statuses;
     private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+    
+    private int selectedStatusIndex = -1;
 
     static int WINDOW_HEIGHT = 110;
     static int WINDOW_WIDTH = 350;
@@ -54,6 +58,8 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         this.workitem = workitem;
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
+        
+        statuses = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.StatusProperty);
     }
 
     /**
@@ -85,6 +91,15 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         statusCombobox = new Combo(container, SWT.DROP_DOWN);
         statusCombobox.setSize(200, 40);
         fillStatusCombobox();
+        statusCombobox.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				selectedStatusIndex = ((Combo)e.widget).getSelectionIndex();
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				selectedStatusIndex = ((Combo)e.widget).getSelectionIndex();
+			}
+        });
         
         return container;
     }
@@ -93,11 +108,12 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
      * Fill Status combobox.
      */
     private void fillStatusCombobox() {
-    	PropertyValues pv = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.StatusProperty);
-    	String[] values = pv.toStringArray();
+    	String[] values = statuses.toStringArray();
     	for(String value : values) {
     		statusCombobox.add(value);
     	}
+    	ValueId selectedValue = (ValueId)workitem.getProperty(Workitem.StatusProperty);
+    	statusCombobox.select(statuses.getPropertyListIndex(selectedValue));
     }
 
     /**
@@ -133,8 +149,11 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     protected void okPressed() {
         super.okPressed();
         try {
-        	// TODO workitem.setProperty(Workitem.StatusProperty, newValue);
-        	// workitem.commitChanges();
+        	if(selectedStatusIndex >= 0) {
+        		ValueId selectedStatus = statuses.getValueIdByIndex(selectedStatusIndex);
+        		workitem.setProperty(Workitem.StatusProperty, selectedStatus);
+        		workitem.commitChanges();
+        	}
 			workitem.close();
 			if(openingViewer != null) {
 				openingViewer.refreshViewer();

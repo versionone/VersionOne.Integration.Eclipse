@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,10 @@ public class ApiDataLayer {
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts  = new HashMap<Asset, Double>();
 
+    public static final String QuickCloseOperation = "QuickClose";
+    public static final String CloseOperation = "Inactivate";
+    public static final String SignupOperation = "QuickSignup";
+    
     private IAssetType projectType;
     private IAssetType taskType;
     private IAssetType testType;
@@ -61,7 +66,6 @@ public class ApiDataLayer {
     private IAssetType workitemType;
     private IAssetType primaryWorkitemType;
     private IAssetType effortType;
-
 
     private static ApiDataLayer instance;
     private boolean isConnected;
@@ -87,6 +91,8 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = false;
+    
+    private HashSet<Asset> assetsToIgnore = new HashSet<Asset>();
 
     private ApiDataLayer() {
         String[] prefixes = new String[] { Workitem.TaskPrefix, Workitem.DefectPrefix, Workitem.StoryPrefix,
@@ -121,6 +127,7 @@ public class ApiDataLayer {
         this.password = password;
         this.integrated = integrated;
         assetList = null;
+        assetsToIgnore.clear();
         efforts.clear();
         types.clear();
         try {
@@ -261,6 +268,10 @@ public class ApiDataLayer {
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
+        	if(assetsToIgnore.contains(asset)) {
+        		continue;
+        	}
+        	
             if (showAllTasks || isCurrentUserOwnerAsset(asset, definition)) {
                 res.add(new Workitem(asset, null));
             }
@@ -506,6 +517,9 @@ public class ApiDataLayer {
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
         services.executeOperation(operation, asset.getOid());
+        if(operation.getName() == CloseOperation || operation.getName() == QuickCloseOperation) {
+        	assetsToIgnore.add(asset);
+        }
     }
 
     void refreshAsset(Workitem workitem) throws DataLayerException {

@@ -37,7 +37,6 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
-import com.versionone.common.Activator;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 
@@ -230,7 +229,6 @@ public class ApiDataLayer {
             // // TODO implement
             // throw new Exception("Current project is not selected");
             currentProjectId = "Scope:0";
-
         }
 
         if (assetList == null) {
@@ -239,7 +237,7 @@ public class ApiDataLayer {
 
                 Query query = new Query(workitemType, parentDef);
                 // Query query = new Query(taskType, parentDef);
-                // clear all definitions which was used in previous queries
+                // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
                 addSelection(query, Workitem.TaskPrefix);
                 addSelection(query, Workitem.StoryPrefix);
@@ -268,7 +266,7 @@ public class ApiDataLayer {
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
-        	if(assetsToIgnore.contains(asset)) {
+        	if(assetsToIgnore.contains(asset) || assetsToIgnore.contains(asset.)) {
         		continue;
         	}
         	
@@ -510,6 +508,11 @@ public class ApiDataLayer {
 
     private void commitAssetsRecursively(List<Asset> assets) throws V1Exception {
         for (Asset asset : assets){
+        	// do not commit assets that were closed and their children
+        	if(assetsToIgnore.contains(asset)) {
+        		continue;
+        	}
+        	
             commitAsset(asset);
             commitAssetsRecursively(asset.getChildren());
         }
@@ -521,7 +524,20 @@ public class ApiDataLayer {
         	assetsToIgnore.add(asset);
         }
     }
+    
+    private boolean isAssetClosed(Asset asset) throws APIException, MetaException {
+    	IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
+    	AssetState state = AssetState.valueOf((Integer)asset.getAttribute(stateDef).getValue());
+    	return state == AssetState.Closed;
+    }
 
+    private void addIgnoreRecursively(Asset asset) {
+    	assetsToIgnore.add(asset);
+    	for(Asset child : asset.getChildren()) {
+    		addIgnoreRecursively(child);
+    	}
+    }
+    
     void refreshAsset(Workitem workitem) throws DataLayerException {
     	try {
             IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
@@ -530,36 +546,35 @@ public class ApiDataLayer {
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
-            List<Asset> parent = new ArrayList<Asset>();
+            Asset[] parent = new Asset[0];
             if (workitem.parent == null) {
-                // parent = AssetList.Assets;
+                parent = assetList.getAssets();
             } else {
-                parent = workitem.parent.asset.getChildren();
+                parent = workitem.parent.asset.getChildren().toArray(parent);
             }
 
-            //Removing old Asset from allAssets
-            //allAssets.remove(workitem.asset);
-
             if (newAssets.getTotalAvaliable() != 1 ) {
-                // Just remove old Asset from AssetList
-                parent.remove(workitem.asset);
+            	assetsToIgnore.add(workitem.asset);
                 return;
             }
 
             Asset newAsset = newAssets.getAssets()[0];
-            AssetState newAssetState = AssetState.valueOf((Integer)newAsset.getAttribute(stateDef).getValue());
-            if (newAssetState == AssetState.Closed) {
-                // Just remove old Asset from AssetList
-                parent.remove(workitem.asset);
+            if (isAssetClosed(newAsset)) {
+            	assetsToIgnore.add(workitem.asset);
                 return;
             }
 
-            //Adding new Asset to allAssets
-            //allAssets.add(newAsset);
-
             //Adding new Asset to parent
-            //parent[parent.indexOf(workitem.asset)] = newAsset;
-            //newAsset.getChildren().addRange(workitem.asset.getChildren());
+            int index = -1;
+            for(int i = 0; i < parent.length; i++) {
+            	if(parent[i].equals(workitem.asset)) {
+            		index = i;
+            		break;
+            	}
+            }
+            
+            parent[index] = newAsset;
+            newAsset.getChildren().addAll(workitem.asset.getChildren());
         }
         catch (MetaException ex) {
             throw warning("Unable to get workitems.", ex);

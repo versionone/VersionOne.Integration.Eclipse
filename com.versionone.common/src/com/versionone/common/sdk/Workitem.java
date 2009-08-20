@@ -286,8 +286,9 @@ public class Workitem {
         }
     }
 
-    /*
-     * Performs QuickClose operation.
+    /**
+     * Performs 'QuickClose' operation.
+     * @throws DataLayerException
      */
     public void quickClose() throws DataLayerException {
         commitChanges();
@@ -311,8 +312,9 @@ public class Workitem {
         }
     }
 
-    /*
-     * Performs QuickSignup operation.
+    /**
+     * Performs 'QuickSignup' operation.
+     * @throws DataLayerException
      */
     public void signup() throws DataLayerException {
         try {
@@ -323,6 +325,10 @@ public class Workitem {
         }
     }
 
+    /**
+     * Perform 'Inactivate' operation.
+     * @throws DataLayerException
+     */
     public void close() throws DataLayerException {
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.CloseOperation));

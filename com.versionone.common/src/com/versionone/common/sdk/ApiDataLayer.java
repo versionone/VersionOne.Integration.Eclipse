@@ -547,7 +547,7 @@ public class ApiDataLayer {
             }
 
             Asset newAsset = newAssets.getAssets()[0];
-            AssetState newAssetState = (AssetState)newAsset.getAttribute(stateDef).getValue();
+            AssetState newAssetState = AssetState.valueOf((Integer)newAsset.getAttribute(stateDef).getValue());
             if (newAssetState == AssetState.Closed) {
                 // Just remove old Asset from AssetList
                 parent.remove(workitem.asset);

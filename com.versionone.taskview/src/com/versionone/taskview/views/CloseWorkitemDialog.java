@@ -32,7 +32,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     private Label statusLabel;
     private Text toDoText;
     private Workitem workitem;
-    private IRefreshable openingViewer;
+    private TaskView openingViewer;
     
     private PropertyValues statuses;
     private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
@@ -53,7 +53,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public CloseWorkitemDialog(Shell parentShell, Workitem workitem, IRefreshable viewer) {
+    public CloseWorkitemDialog(Shell parentShell, Workitem workitem, TaskView viewer) {
         super(parentShell);
         this.workitem = workitem;
         this.openingViewer = viewer;

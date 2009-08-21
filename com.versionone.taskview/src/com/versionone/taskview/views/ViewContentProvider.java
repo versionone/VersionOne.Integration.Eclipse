@@ -47,16 +47,7 @@ class ViewContentProvider implements ITreeContentProvider {
 
     }
 
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        // TODO Auto-generated method stub
-    	if(newInput != null) {
-    		// add this as a listener
-    	}
-    	
-    	if(oldInput != null) {
-    		// unsubscribe this
-    	}
-    }
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
     /*
      * public void inputChanged(Viewer v, Object oldInput, Object newInput)

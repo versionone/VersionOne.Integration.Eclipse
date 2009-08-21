@@ -38,6 +38,7 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
+import com.versionone.common.Activator;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 
@@ -90,9 +91,9 @@ public class ApiDataLayer {
     private ILocalizer localizer;
 
     private String currentProjectId;
-    public boolean showAllTasks = false;
+    public boolean showAllTasks = true;
     
-    private HashSet<Asset> assetsToIgnore = new HashSet<Asset>();
+    private HashSet<Workitem> assetsToIgnore = new HashSet<Workitem>();
 
     public void setShowAllTasks(boolean showAllTasks) {
         this.showAllTasks = showAllTasks;
@@ -529,20 +530,25 @@ public class ApiDataLayer {
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
         services.executeOperation(operation, asset.getOid());
-        if(operation.getName() == CloseOperation || operation.getName() == QuickCloseOperation) {
-        	addIgnoreRecursively(asset);
-        }
     }
     
-    private boolean isAssetClosed(Asset asset) throws APIException, MetaException {
-    	IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
-    	AssetState state = AssetState.valueOf((Integer)asset.getAttribute(stateDef).getValue());
-    	return state == AssetState.Closed;
+    public boolean isAssetClosed(Asset asset) {
+    	try {
+    	    IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
+    	    AssetState state = AssetState.valueOf((Integer)asset.getAttribute(stateDef).getValue());
+    	    return state == AssetState.Closed || assetsToIgnore.contains(asset.getOid().getMomentless());
+    	} catch(APIException e) {
+    		Activator.logError("Unable to resolve asset state.", e);
+    		return false;
+    	} catch(MetaException e) {
+    		Activator.logError("Unable to resolve asset state.", e);
+    		return false;
+    	}
     }
 
-    private void addIgnoreRecursively(Asset asset) {
-    	assetsToIgnore.add(asset);
-    	for(Asset child : asset.getChildren()) {
+    public void addIgnoreRecursively(Workitem item) {
+    	assetsToIgnore.add(item);
+    	for(Workitem child : item.children) {
     		addIgnoreRecursively(child);
     	}
     }
@@ -563,13 +569,13 @@ public class ApiDataLayer {
             }
 
             if (newAssets.getTotalAvaliable() != 1 ) {
-            	assetsToIgnore.add(workitem.asset);
+            	assetsToIgnore.add(workitem);
                 return;
             }
 
             Asset newAsset = newAssets.getAssets()[0];
             if (isAssetClosed(newAsset)) {
-            	assetsToIgnore.add(workitem.asset);
+            	assetsToIgnore.add(workitem);
                 return;
             }
 

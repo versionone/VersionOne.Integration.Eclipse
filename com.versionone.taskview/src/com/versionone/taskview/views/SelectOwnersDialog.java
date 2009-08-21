@@ -23,7 +23,7 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
 
     private List ownersList;
     private Workitem workitem;
-    private IRefreshable openingViewer;
+    private TaskView openingViewer;
     
     private PropertyValues owners;
     private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
@@ -42,7 +42,7 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public SelectOwnersDialog(Shell parentShell, Workitem workitem, IRefreshable viewer) {
+    public SelectOwnersDialog(Shell parentShell, Workitem workitem, TaskView viewer) {
         super(parentShell);
         this.workitem = workitem;
         this.openingViewer = viewer;

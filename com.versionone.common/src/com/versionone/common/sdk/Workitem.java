@@ -294,7 +294,7 @@ public class Workitem {
         commitChanges();
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.QuickCloseOperation));
-            dataLayer.refreshAsset(this);
+            dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
         }
@@ -332,7 +332,7 @@ public class Workitem {
     public void close() throws DataLayerException {
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.CloseOperation));
-            dataLayer.refreshAsset(this);
+            dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
         }

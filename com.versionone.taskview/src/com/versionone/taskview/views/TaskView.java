@@ -46,11 +46,8 @@ import com.versionone.taskview.views.providers.SimpleProvider;
  * @author Jerry D. Odenwelder Jr.
  * 
  */
-interface IRefreshable {
-	void refreshViewer();
-}
 
-public class TaskView extends ViewPart implements IPropertyChangeListener, IRefreshable {
+public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     /*
      * These constants are the VersionOne names for the column titles. We
@@ -122,11 +119,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
     /**
      * Create context menu, assign actions, store items in a collection to manage visibility.
      */
-    // TODO refactor
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
     	final Menu menu = new Menu(control.getShell(), SWT.POP_UP);
-    	final IRefreshable openingViewer = this;
+    	final TaskView openingViewer = this;
     	
     	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
@@ -216,6 +212,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
      * Refresh viewer, causing it to re-read data from model and remove possibly non-relevant items.
      */
     public void refreshViewer() {
+    	viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
     	loadTable();
     	viewer.refresh();
     }

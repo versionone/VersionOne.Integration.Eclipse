@@ -18,6 +18,7 @@ import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
 import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.ConnectionException;
+import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
@@ -93,6 +94,10 @@ public class ApiDataLayer {
     
     private HashSet<Asset> assetsToIgnore = new HashSet<Asset>();
 
+    public void setShowAllTasks(boolean showAllTasks) {
+        this.showAllTasks = showAllTasks;
+    }
+
     private ApiDataLayer() {
         String[] prefixes = new String[] { Workitem.TaskPrefix, Workitem.DefectPrefix, Workitem.StoryPrefix,
                 Workitem.TestPrefix };
@@ -102,10 +107,14 @@ public class ApiDataLayer {
         }
     }
 
-    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
+    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
         this.metaModel = metaModel;
         this.services = services;
         this.localizer = localizer;
+        
+        if (configConnector != null) {
+            trackEffort = configConnector.isEffortTracking();
+        }
         
         initTypes();
         isConnected = true;
@@ -649,16 +658,24 @@ public class ApiDataLayer {
     }
 
     private static boolean isTestEnable = false;
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
         if (!isTestEnable && instance != null) {
-            instance = null;
+            resetConnection();
             isTestEnable = true;
         }
         
         if (null == instance) {
-            instance = new ApiDataLayer(services, metaModel, localizer);
+            instance = new ApiDataLayer(services, metaModel, localizer, configConnector);
         }
         
         return instance;
+    }
+    
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
+        return getInitializedInstance(services, metaModel, localizer, null);
+    }
+    
+    public static void resetConnection() {
+        instance = null;
     }
 }

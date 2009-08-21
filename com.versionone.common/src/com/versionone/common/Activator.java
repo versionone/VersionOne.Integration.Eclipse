@@ -83,6 +83,8 @@ public class Activator extends AbstractUIPlugin {
             e.printStackTrace();
         }
         ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
+        boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false : true;
+        ApiDataLayer.getInstance().setShowAllTasks(showAllTask);
     }
     
     public static void connect(String user, String password, String path, boolean auth) {

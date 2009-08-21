@@ -47,4 +47,9 @@ public class PreferenceConstants {
      */
     public static final String P_ATTRIBUTE_SELECTION = "attributeSelection";
 
+    /**
+     * Filter for workitem (show only assigned task or all)
+     */
+    public static final String P_WORKITEM_FILTER_SELECTION = "workitemFilter";
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -26,6 +25,7 @@ class ProjectAction extends Action {
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.FILTER_IMAGE_ID));
     }
 
+    @Override
     public void run() {
         //IProjectTreeNode root = workItemView.getProjectTreeNode();
         List<Workitem> projectList = null;

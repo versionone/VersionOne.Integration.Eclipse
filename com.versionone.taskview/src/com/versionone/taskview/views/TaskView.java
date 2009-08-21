@@ -78,6 +78,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
     private Action selectProjectAction = null;
     private Action refreshAction = null;
     private Action saveAction = null;
+    private Action filåterAction = null;
     
 
     public TaskView() {
@@ -228,6 +229,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
         selectProjectAction.setEnabled(isEnabled);
         refreshAction.setEnabled(isEnabled);
         saveAction.setEnabled(isEnabled);
+        filåterAction.setEnabled(isEnabled);
         viewer.getTree().setEnabled(isEnabled);
         viewer.getTree().setLinesVisible(isEnabled);
         viewer.getTree().setHeaderVisible(isEnabled);
@@ -314,6 +316,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
         selectProjectAction = new ProjectAction(this, viewer);
         refreshAction = new RefreshAction(this, viewer);
         saveAction = new SaveAction(this, viewer);
+        filåterAction = new FilterAction(this, viewer);
     }
 
     // add actions to Action bars and pull down menu
@@ -324,12 +327,14 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
     }
 
     private void fillLocalPullDown(IMenuManager manager) {
+        manager.add(filåterAction);
         manager.add(selectProjectAction);
         manager.add(refreshAction);
-        manager.add(saveAction);
+        manager.add(saveAction);        
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
+        manager.add(filåterAction);
         manager.add(selectProjectAction);
         manager.add(refreshAction);
         manager.add(saveAction);
@@ -381,7 +386,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
 //                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
 //            }
             reCreateTable();
+        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
+            loadTable();
+            viewer.refresh();
         }
+        
         /*
         else if (property.equals(PreferenceConstants.P_TRACK_EFFORT)) {
             if (isTrackEffort()) {

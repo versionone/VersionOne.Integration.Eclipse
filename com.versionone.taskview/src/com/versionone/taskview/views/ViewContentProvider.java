@@ -1,7 +1,9 @@
 package com.versionone.taskview.views;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeNode;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.TreeItem;
 
 import com.versionone.common.sdk.Workitem;
 
@@ -15,12 +17,11 @@ class ViewContentProvider implements ITreeContentProvider {
     Object justForTest;
 
     public Object[] getChildren(Object parentElement) {
-        // TODO Auto-generated method stub
+
         return ((Workitem) parentElement).children.toArray();
     }
 
     public Object getParent(Object element) {
-        // TODO Auto-generated method stub
         return ((Workitem) element).parent;
     }
 

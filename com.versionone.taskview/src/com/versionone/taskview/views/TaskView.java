@@ -215,7 +215,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener, IRefr
      * Refresh viewer, causing it to re-read data from model and remove possibly non-relevant items.
      */
     public void refreshViewer() {
-    	reCreateTable();
+    	loadTable();
+    	viewer.refresh();
     }
     
     /**

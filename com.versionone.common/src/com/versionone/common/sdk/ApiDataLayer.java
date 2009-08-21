@@ -521,7 +521,7 @@ public class ApiDataLayer {
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
         services.executeOperation(operation, asset.getOid());
         if(operation.getName() == CloseOperation || operation.getName() == QuickCloseOperation) {
-        	assetsToIgnore.add(asset);
+        	addIgnoreRecursively(asset);
         }
     }
     

@@ -266,7 +266,7 @@ public class ApiDataLayer {
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
-        	if(assetsToIgnore.contains(asset) || assetsToIgnore.contains(asset.)) {
+        	if(assetsToIgnore.contains(asset)) {
         		continue;
         	}
         	

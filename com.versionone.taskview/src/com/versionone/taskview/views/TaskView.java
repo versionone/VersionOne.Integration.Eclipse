@@ -204,7 +204,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     protected void updateDescription(Workitem currentWorkitem, String value) {
-        currentWorkitem.setProperty(Workitem.DescriptionProperty, value);
+        currentWorkitem.setProperty(Workitem.DESCRIPTION_PROPERTY, value);
         
     }
 
@@ -253,28 +253,28 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void configureTable() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT);
-        column.setLabelProvider(new SimpleProvider(Workitem.IdProperty, true));
-        column.setEditingSupport(new ReadOnlyEditor(Workitem.IdProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.ID_PROPERTY, true));
+        column.setEditingSupport(new ReadOnlyEditor(Workitem.ID_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
-        column.setLabelProvider(new SimpleProvider(Workitem.NameProperty, false));
-        column.setEditingSupport(new TextEditor(Workitem.NameProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
+        column.setEditingSupport(new TextEditor(Workitem.NAME_PROPERTY, viewer));
         
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
-        column.setLabelProvider(new SimpleProvider(Workitem.OwnersProperty, false));
-        column.setEditingSupport(new ReadOnlyEditor(Workitem.OwnersProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
+        column.setEditingSupport(new ReadOnlyEditor(Workitem.OWNERS_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
-        column.setLabelProvider(new SimpleProvider(Workitem.StatusProperty, false));
-        column.setEditingSupport(new ListEditor(viewer, Workitem.StatusProperty));
+        column.setLabelProvider(new SimpleProvider(Workitem.STATUS_PROPERTY, false));
+        column.setEditingSupport(new ListEditor(viewer, Workitem.STATUS_PROPERTY));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
-        column.setLabelProvider(new SimpleProvider(Workitem.DetailEstimateProperty, false));
-        column.setEditingSupport(new TextEditor(Workitem.DetailEstimateProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));
+        column.setEditingSupport(new TextEditor(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
-        column.setLabelProvider(new SimpleProvider(Workitem.TodoProperty, false));
-        column.setEditingSupport(new TextEditor(Workitem.TodoProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.TODO_PROPERTY, false));
+        column.setEditingSupport(new TextEditor(Workitem.TODO_PROPERTY, viewer));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
@@ -286,11 +286,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void addEffortColumns() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4);
-        column.setLabelProvider(new SimpleProvider(Workitem.DoneProperty, false));
+        column.setLabelProvider(new SimpleProvider(Workitem.DONE_PROPERTY, false));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
-        column.setLabelProvider(new SimpleProvider(Workitem.EffortProperty, false));
-        column.setEditingSupport(new TextEditor(Workitem.EffortProperty, viewer));
+        column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
+        column.setEditingSupport(new TextEditor(Workitem.EFFORT_PROPERTY, viewer));
 
         //viewer.refresh();
         isEffortColumsShow = true;

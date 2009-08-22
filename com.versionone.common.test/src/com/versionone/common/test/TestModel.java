@@ -84,12 +84,12 @@ public class TestModel {
         List<Workitem> children = projectNode.get(0).children;
         Assert.assertEquals(1, projectNode.size());
         Workitem companyNode = projectNode.get(0);
-        Assert.assertEquals("Company", companyNode.getProperty(Workitem.NameProperty));
+        Assert.assertEquals("Company", companyNode.getProperty(Workitem.NAME_PROPERTY));
         
         // Assert.assertEquals("Scope:1011", companyNode.getToken());
         Assert.assertEquals(3, companyNode.children.size());
         companyNode = children.get(0);
-        Assert.assertEquals("Call Center", companyNode.getProperty(Workitem.NameProperty));
+        Assert.assertEquals("Call Center", companyNode.getProperty(Workitem.NAME_PROPERTY));
     }
 
     @Test
@@ -102,13 +102,13 @@ public class TestModel {
          * expectedTodo, String expectedStatus
          */
         validateTask(allWorkItem[0], "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done",
-                Workitem.StoryPrefix);
+                Workitem.STORY_PREFIX);
         validateTask(allWorkItem[2], "D-01093", "Defect:2248", "defect 1", "0.02", "-2.00", null, "0.01", "Done",
-                Workitem.DefectPrefix);
+                Workitem.DEFECT_PREFIX);
         validateTask(allWorkItem[1].children.get(0), "AT-01010", "Test:2273", "AT4", "13.00", null, null, "18.00",
-                "", Workitem.TestPrefix);
+                "", Workitem.TEST_PREFIX);
         validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
-                "In Progress", Workitem.TaskPrefix);
+                "In Progress", Workitem.TASK_PREFIX);
         // test [1][0]
         //
         // task [0][0]
@@ -143,11 +143,11 @@ public class TestModel {
     }
 		
     private void validateDescription(Workitem testMe) {
-        testMe.setProperty(Workitem.DescriptionProperty, "<br>test <b>new test</b>");
-        Assert.assertEquals("<br>test <b>new test</b>", testMe.getProperty(Workitem.DescriptionProperty));
+        testMe.setProperty(Workitem.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
+        Assert.assertEquals("<br>test <b>new test</b>", testMe.getProperty(Workitem.DESCRIPTION_PROPERTY));
 
-        testMe.setProperty(Workitem.DescriptionProperty, "--");
-        Assert.assertEquals("--", testMe.getProperty(Workitem.DescriptionProperty));
+        testMe.setProperty(Workitem.DESCRIPTION_PROPERTY, "--");
+        Assert.assertEquals("--", testMe.getProperty(Workitem.DESCRIPTION_PROPERTY));
 
         //testMe.setProperty(Workitem.DescriptionProperty, "");
         //Assert.assertEquals("", testMe.getProperty(Workitem.DescriptionProperty));
@@ -160,11 +160,11 @@ public class TestModel {
      */
     private void validateSetToDo(Workitem testMe) throws Exception {
 
-        testMe.setProperty(Workitem.TodoProperty, "0");
-        Assert.assertEquals("0.00", testMe.getProperty(Workitem.TodoProperty));
+        testMe.setProperty(Workitem.TODO_PROPERTY, "0");
+        Assert.assertEquals("0.00", testMe.getProperty(Workitem.TODO_PROPERTY));
 
-        testMe.setProperty(Workitem.TodoProperty, "10.01");
-        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TodoProperty));
+        testMe.setProperty(Workitem.TODO_PROPERTY, "10.01");
+        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));
 
         //TODO need to fix this bug
         //testMe.setProperty(Workitem.TodoProperty, "-1");
@@ -300,16 +300,16 @@ public class TestModel {
 			String expectedTodo,
 			String expectedStatus,
 			String expectedType) throws Exception {
-		Assert.assertEquals(expectedName, task.getProperty(Workitem.NameProperty));
+		Assert.assertEquals(expectedName, task.getProperty(Workitem.NAME_PROPERTY));
 		Assert.assertEquals(expectedId, task.getId());
-		Assert.assertEquals(expectedNumber, task.getProperty(Workitem.IdProperty));
+		Assert.assertEquals(expectedNumber, task.getProperty(Workitem.ID_PROPERTY));
 		
 		//Assert.assertEquals(expectedStory, task.getStoryName());
-		Assert.assertEquals(expectedEstimate, task.getProperty(Workitem.DetailEstimateProperty));
-		Assert.assertEquals(expectedDone, task.getProperty(Workitem.DoneProperty));
-		Assert.assertEquals(expectedEffort, task.getProperty(Workitem.EffortProperty));
-		Assert.assertEquals(expectedTodo, task.getProperty(Workitem.TodoProperty));
-		Assert.assertEquals(expectedStatus, ((ValueId)task.getProperty(Workitem.StatusProperty)).toString());
+		Assert.assertEquals(expectedEstimate, task.getProperty(Workitem.DETAIL_ESTIMATE_PROPERTY));
+		Assert.assertEquals(expectedDone, task.getProperty(Workitem.DONE_PROPERTY));
+		Assert.assertEquals(expectedEffort, task.getProperty(Workitem.EFFORT_PROPERTY));
+		Assert.assertEquals(expectedTodo, task.getProperty(Workitem.TODO_PROPERTY));
+		Assert.assertEquals(expectedStatus, ((ValueId)task.getProperty(Workitem.STATUS_PROPERTY)).toString());
 		Assert.assertEquals(expectedType, task.getTypePrefix());
 	}
 

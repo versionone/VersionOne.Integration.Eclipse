@@ -11,7 +11,7 @@ public class WorkitemTester {
     public void StoryConstructorTest(){
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.showAllTasks = true;
-        IAssetType storyType = new AssetTypeMock(Workitem.StoryPrefix);
+        IAssetType storyType = new AssetTypeMock(Workitem.STORY_PREFIX);
         AssetMock asset1 = new AssetMock(storyType);
         AssetMock asset11 = new AssetMock(storyType);
         asset1.children.add(asset11);
@@ -27,7 +27,7 @@ public class WorkitemTester {
     public void ProjectConstructorTest(){
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.showAllTasks = false;
-        IAssetType prjType = new AssetTypeMock(Workitem.ProjectPrefix);
+        IAssetType prjType = new AssetTypeMock(Workitem.PROJECT_PREFIX);
         AssetMock asset1 = new AssetMock(prjType);
         AssetMock asset11 = new AssetMock(prjType);
         asset1.children.add(asset11);

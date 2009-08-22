@@ -31,7 +31,7 @@ public class TextEditor extends EditingSupport {
     protected boolean canEdit(Object element) {
         Workitem workitem = (Workitem) element;
         boolean result = false;
-        if (property.equals(Workitem.EffortProperty)) {
+        if (property.equals(Workitem.EFFORT_PROPERTY)) {
             result = !workitem.isPropertyReadOnly(property);
         } else {
             result = !(workitem.isPropertyDefinitionReadOnly(property) || workitem.isPropertyReadOnly(property));

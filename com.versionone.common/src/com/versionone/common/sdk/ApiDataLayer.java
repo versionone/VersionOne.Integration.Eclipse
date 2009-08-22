@@ -49,15 +49,15 @@ public class ApiDataLayer {
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
 
-    private static final List<String> effortTrackingAttributesList = Arrays.asList(Workitem.DetailEstimateProperty,
+    private static final List<String> effortTrackingAttributesList = Arrays.asList(Workitem.DETAIL_ESTIMATE_PROPERTY,
             "ToDo", "Done", "Effort", "Actuals");
 
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts  = new HashMap<Asset, Double>();
 
-    public static final String QuickCloseOperation = "QuickClose";
-    public static final String CloseOperation = "Inactivate";
-    public static final String SignupOperation = "QuickSignup";
+    public static final String OP_QUICK_CLOSE = "QuickClose";
+    public static final String OP_CLOSE = "Inactivate";
+    public static final String OP_SIGNUP = "QuickSignup";
     
     private IAssetType projectType;
     private IAssetType taskType;
@@ -93,15 +93,15 @@ public class ApiDataLayer {
     private String currentProjectId;
     public boolean showAllTasks = true;
     
-    private HashSet<Workitem> assetsToIgnore = new HashSet<Workitem>();
+    private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
 
     public void setShowAllTasks(boolean showAllTasks) {
         this.showAllTasks = showAllTasks;
     }
 
     private ApiDataLayer() {
-        String[] prefixes = new String[] { Workitem.TaskPrefix, Workitem.DefectPrefix, Workitem.StoryPrefix,
-                Workitem.TestPrefix };
+        String[] prefixes = new String[] { Workitem.TASK_PREFIX, Workitem.DEFECT_PREFIX, Workitem.STORY_PREFIX,
+                Workitem.TEST_PREFIX };
         for (String prefix : prefixes) {
             attributesToQuery.addLast(new AttributeInfo("CheckQuickClose", prefix, false));
             attributesToQuery.addLast(new AttributeInfo("CheckQuickSignup", prefix, false));
@@ -181,11 +181,11 @@ public class ApiDataLayer {
     }
 
     private void initTypes() {
-        projectType = getAssetType(Workitem.ProjectPrefix);
-        taskType = getAssetType(Workitem.TaskPrefix);
-        testType = getAssetType(Workitem.TestPrefix);
-        defectType = getAssetType(Workitem.DefectPrefix);
-        storyType = getAssetType(Workitem.StoryPrefix);
+        projectType = getAssetType(Workitem.PROJECT_PREFIX);
+        taskType = getAssetType(Workitem.TASK_PREFIX);
+        testType = getAssetType(Workitem.TEST_PREFIX);
+        defectType = getAssetType(Workitem.DEFECT_PREFIX);
+        storyType = getAssetType(Workitem.STORY_PREFIX);
         workitemType = metaModel.getAssetType("Workitem");
         primaryWorkitemType = metaModel.getAssetType("PrimaryWorkitem");
     }
@@ -207,7 +207,7 @@ public class ApiDataLayer {
             scopeQuery.setFilter(stateTerm);
             // clear all definitions used in previous queries
             alreadyUsedDefinition.clear();
-            addSelection(scopeQuery, Workitem.ProjectPrefix);
+            addSelection(scopeQuery, Workitem.PROJECT_PREFIX);
             QueryResult result = services.retrieve(scopeQuery);
             List<Workitem> roots = new ArrayList<Workitem>(result.getAssets().length);
             for (Asset oneAsset : result.getAssets()) {
@@ -229,7 +229,7 @@ public class ApiDataLayer {
     }
 
     public boolean isCurrentUserOwnerAsset(Asset childAsset) {
-        return isCurrentUserOwnerAsset(childAsset, workitemType.getAttributeDefinition(Workitem.OwnersProperty));
+        return isCurrentUserOwnerAsset(childAsset, workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
     }
 
     public Workitem[] getWorkitemTree() throws Exception {
@@ -249,10 +249,10 @@ public class ApiDataLayer {
                 // Query query = new Query(taskType, parentDef);
                 // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
-                addSelection(query, Workitem.TaskPrefix);
-                addSelection(query, Workitem.StoryPrefix);
-                addSelection(query, Workitem.DefectPrefix);
-                addSelection(query, Workitem.TestPrefix);
+                addSelection(query, Workitem.TASK_PREFIX);
+                addSelection(query, Workitem.STORY_PREFIX);
+                addSelection(query, Workitem.DEFECT_PREFIX);
+                addSelection(query, Workitem.TEST_PREFIX);
 
                 query.setFilter(getScopeFilter(workitemType));
 
@@ -272,11 +272,11 @@ public class ApiDataLayer {
             }
         }
 
-        IAttributeDefinition definition = workitemType.getAttributeDefinition(Workitem.OwnersProperty);
+        IAttributeDefinition definition = workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY);
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
-        	if(assetsToIgnore.contains(asset)) {
+        	if(isAssetSuspended(asset)) {
         		continue;
         	}
         	
@@ -361,7 +361,7 @@ public class ApiDataLayer {
     // method
     private void addSelection(Query query, String typePrefix) throws DataLayerException {
         for (AttributeInfo attrInfo : attributesToQuery) {
-            if (attrInfo.prefix == typePrefix) {
+            if (attrInfo.prefix.equals(typePrefix)) {
                 try {
                     IAttributeDefinition def = types.get(attrInfo.prefix).getAttributeDefinition(attrInfo.attr);
                     if (!alreadyUsedDefinition.contains(def)) {
@@ -373,6 +373,13 @@ public class ApiDataLayer {
                 }
             }
         }
+    }
+    
+    private void addSelection(Query query, String typePrefix, boolean clearDefinitions) throws DataLayerException {
+    	if(clearDefinitions) {
+    		alreadyUsedDefinition.clear();
+    	}
+    	addSelection(query, typePrefix);
     }
 
     public void addProperty(String attr, String prefix, boolean isList) {
@@ -429,7 +436,7 @@ public class ApiDataLayer {
             OidException, MetaException {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
-        IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NameProperty);
+        IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NAME_PROPERTY);
         IAttributeDefinition inactiveDef;
 
         Query query = new Query(assetType);
@@ -545,9 +552,13 @@ public class ApiDataLayer {
     		return false;
     	}
     }
+    
+    public boolean isAssetSuspended(Asset asset) {
+    	return assetsToIgnore.contains(asset);
+    }
 
     public void addIgnoreRecursively(Workitem item) {
-    	assetsToIgnore.add(item);
+    	assetsToIgnore.add(item.asset);
     	for(Workitem child : item.children) {
     		addIgnoreRecursively(child);
     	}
@@ -557,7 +568,7 @@ public class ApiDataLayer {
     	try {
             IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
             Query query = new Query(workitem.asset.getOid().getMomentless(), false);
-            addSelection(query, workitem.getTypePrefix());
+            addSelection(query, workitem.getTypePrefix(), true);
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
@@ -569,13 +580,13 @@ public class ApiDataLayer {
             }
 
             if (newAssets.getTotalAvaliable() != 1 ) {
-            	assetsToIgnore.add(workitem);
+            	assetsToIgnore.add(workitem.asset);
                 return;
             }
 
             Asset newAsset = newAssets.getAssets()[0];
             if (isAssetClosed(newAsset)) {
-            	assetsToIgnore.add(workitem);
+            	assetsToIgnore.add(workitem.asset);
                 return;
             }
 
@@ -627,7 +638,7 @@ public class ApiDataLayer {
         Query query = new Query(Oid.fromToken(id, metaModel));
         // clear all definitions used in previous queries
         alreadyUsedDefinition.clear();
-        addSelection(query, Workitem.ProjectPrefix);
+        addSelection(query, Workitem.PROJECT_PREFIX);
         QueryResult result;
         try {
             result = services.retrieve(query);

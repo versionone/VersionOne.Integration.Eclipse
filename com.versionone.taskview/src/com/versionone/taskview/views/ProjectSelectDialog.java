@@ -103,7 +103,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
         int i = 0;
         for (Workitem v1Root : v1Roots) {
             final TreeItem treeItem = new TreeItem(this.projectTree, SWT.NONE, i);
-            treeItem.setText(v1Root.getPropertyAsString(Workitem.NameProperty));
+            treeItem.setText(v1Root.getPropertyAsString(Workitem.NAME_PROPERTY));
             treeItem.setData(v1Root);
             treeItem.setExpanded(true);
             int j = 0;
@@ -167,7 +167,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
         }
         //treeItem.setText(node.getName());
         //treeItem.setData(node);
-        treeItem.setText(node.getPropertyAsString(Workitem.NameProperty));
+        treeItem.setText(node.getPropertyAsString(Workitem.NAME_PROPERTY));
         treeItem.setData(node);
         if (node.children.size() > 0) {
             //IProjectTreeNode[] children = node.children();

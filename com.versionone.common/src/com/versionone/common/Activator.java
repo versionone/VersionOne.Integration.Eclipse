@@ -46,23 +46,23 @@ public class Activator extends AbstractUIPlugin {
     private void setAttributes() throws Exception {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         Map<String, Boolean> properties = new HashMap<String, Boolean>();
-        properties.put(Workitem.IdProperty, false);
-        properties.put(Workitem.DetailEstimateProperty, false);
-        properties.put(Workitem.NameProperty, false);
-        properties.put(Workitem.StatusProperty, true);
-        properties.put(Workitem.EffortProperty, false);
-        properties.put(Workitem.DoneProperty, false);
-        properties.put(Workitem.DescriptionProperty, false);
+        properties.put(Workitem.ID_PROPERTY, false);
+        properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
+        properties.put(Workitem.NAME_PROPERTY, false);
+        properties.put(Workitem.STATUS_PROPERTY, true);
+        properties.put(Workitem.EFFORT_PROPERTY, false);
+        properties.put(Workitem.DONE_PROPERTY, false);
+        properties.put(Workitem.DESCRIPTION_PROPERTY, false);
         //properties.put(Workitem.ScheduleNameProperty, false);
-        properties.put(Workitem.OwnersProperty, true);
-        properties.put(Workitem.TodoProperty, false);
+        properties.put(Workitem.OWNERS_PROPERTY, true);
+        properties.put(Workitem.TODO_PROPERTY, false);
         for (Entry<String, Boolean> entry : properties.entrySet()) {
-            dataLayer.addProperty(entry.getKey(), Workitem.DefectPrefix, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TestPrefix, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.StoryPrefix, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TaskPrefix, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.STORY_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());
         }
-        dataLayer.addProperty(Workitem.NameProperty, Workitem.ProjectPrefix, false);
+        dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
         connect();
     }
     

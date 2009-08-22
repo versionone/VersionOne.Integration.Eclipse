@@ -59,7 +59,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
         
-        statuses = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.StatusProperty);
+        statuses = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.STATUS_PROPERTY);
     }
 
     /**
@@ -112,7 +112,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     	for(String value : values) {
     		statusCombobox.add(value);
     	}
-    	ValueId selectedValue = (ValueId)workitem.getProperty(Workitem.StatusProperty);
+    	ValueId selectedValue = (ValueId)workitem.getProperty(Workitem.STATUS_PROPERTY);
     	statusCombobox.select(statuses.getPropertyListIndex(selectedValue));
     }
 
@@ -151,7 +151,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         try {
         	if(selectedStatusIndex >= 0) {
         		ValueId selectedStatus = statuses.getValueIdByIndex(selectedStatusIndex);
-        		workitem.setProperty(Workitem.StatusProperty, selectedStatus);
+        		workitem.setProperty(Workitem.STATUS_PROPERTY, selectedStatus);
         		workitem.commitChanges();
         	}
 			workitem.close();

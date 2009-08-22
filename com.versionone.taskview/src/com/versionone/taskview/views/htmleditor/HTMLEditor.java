@@ -66,7 +66,7 @@ public class HTMLEditor extends Dialog {
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         composer.setFocus();
 
-        composer.execute(JavaScriptCommands.SET_HTML(workitem.getPropertyAsString(Workitem.DescriptionProperty)));
+        composer.execute(JavaScriptCommands.SET_HTML(workitem.getPropertyAsString(Workitem.DESCRIPTION_PROPERTY)));
 
 
         manager.add(new BoldAction(composer));

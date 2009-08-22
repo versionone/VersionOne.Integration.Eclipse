@@ -11,25 +11,26 @@ import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
+import com.versionone.common.Activator;
 
 public class Workitem {
 
-    public static final String TaskPrefix = "Task";
-    public static final String StoryPrefix = "Story";
-    public static final String DefectPrefix = "Defect";
-    public static final String TestPrefix = "Test";
-    public static final String ProjectPrefix = "Scope";
+    public static final String TASK_PREFIX = "Task";
+    public static final String STORY_PREFIX = "Story";
+    public static final String DEFECT_PREFIX = "Defect";
+    public static final String TEST_PREFIX = "Test";
+    public static final String PROJECT_PREFIX = "Scope";
 
-    public static final String IdProperty = "Number";
-    public static final String DetailEstimateProperty = "DetailEstimate";
-    public static final String NameProperty = "Name";
-    public static final String StatusProperty = "Status";
-    public static final String EffortProperty = "Actuals";
-    public static final String DoneProperty = "Actuals.Value.@Sum";
-    public static final String ScheduleNameProperty = "Schedule.Name";
-    public static final String OwnersProperty = "Owners";
-    public static final String TodoProperty = "ToDo";
-    public static final String DescriptionProperty = "Description";
+    public static final String ID_PROPERTY = "Number";
+    public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
+    public static final String NAME_PROPERTY = "Name";
+    public static final String STATUS_PROPERTY = "Status";
+    public static final String EFFORT_PROPERTY = "Actuals";
+    public static final String DONE_PROPERTY = "Actuals.Value.@Sum";
+    public static final String SCHEDULE_NAME_PROPERTY = "Schedule.Name";
+    public static final String OWNERS_PROPERTY = "Owners";
+    public static final String TODO_PROPERTY = "ToDo";
+    public static final String DESCRIPTION_PROPERTY = "Description";
 
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     
@@ -53,7 +54,11 @@ public class Workitem {
         
         children = new ArrayList<Workitem>(asset.getChildren().size());
         for (Asset childAsset : asset.getChildren()) {
-            if (getTypePrefix().equals(ProjectPrefix) || dataLayer.showAllTasks
+        	if(dataLayer.isAssetSuspended(childAsset)) {
+        		continue;
+        	}
+        	
+            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.showAllTasks
                     || dataLayer.isCurrentUserOwnerAsset(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }
@@ -67,7 +72,7 @@ public class Workitem {
 
     public String getId() {
         if (asset == null) {// temporary
-            return "nULL";
+            return "NULL";
         }
         return asset.getOid().getMomentless().getToken();
     }
@@ -109,15 +114,15 @@ public class Workitem {
         EffortTrackingLevel storyLevel = dataLayer.storyTrackingLevel;
         EffortTrackingLevel defectLevel = dataLayer.defectTrackingLevel;
 
-        if (getTypePrefix().equals(StoryPrefix)) {
+        if (getTypePrefix().equals(STORY_PREFIX)) {
             return storyLevel != EffortTrackingLevel.PRIMARY_WORKITEM && storyLevel != EffortTrackingLevel.BOTH;
-        } else if (getTypePrefix().equals(DefectPrefix)) {
+        } else if (getTypePrefix().equals(DEFECT_PREFIX)) {
             return defectLevel != EffortTrackingLevel.PRIMARY_WORKITEM && defectLevel != EffortTrackingLevel.BOTH;
-        } else if (getTypePrefix().equals(TaskPrefix) || getTypePrefix().equals(TestPrefix)) {
+        } else if (getTypePrefix().equals(TASK_PREFIX) || getTypePrefix().equals(TEST_PREFIX)) {
             EffortTrackingLevel parentLevel;
-            if (parent.getTypePrefix().equals(StoryPrefix)) {
+            if (parent.getTypePrefix().equals(STORY_PREFIX)) {
                 parentLevel = storyLevel;
-            } else if (parent.getTypePrefix().equals(DefectPrefix)) {
+            } else if (parent.getTypePrefix().equals(DEFECT_PREFIX)) {
                 parentLevel = defectLevel;
             } else {
                 throw new IllegalStateException("Unexpected parent asset type.");
@@ -142,21 +147,25 @@ public class Workitem {
      *             If property cannot be got. Is this really relevant?
      * @throws NullReferenceException
      *            If there is no such attribute.
-     * @see #NameProperty
-     * @see #StatusProperty
-     * @see #EffortProperty
-     * @see #DoneProperty
-     * @see #ScheduleNameProperty
-     * @see #OwnersProperty
-     * @see #TodoProperty
+     * @see #NAME_PROPERTY
+     * @see #STATUS_PROPERTY
+     * @see #EFFORT_PROPERTY
+     * @see #DONE_PROPERTY
+     * @see #SCHEDULE_NAME_PROPERTY
+     * @see #OWNERS_PROPERTY
+     * @see #TODO_PROPERTY
      */
     public Object getProperty(String propertyName) throws IllegalArgumentException, NullPointerException {
-        if (propertyName.equals(EffortProperty)) {
+        if (propertyName.equals(EFFORT_PROPERTY)) {
             return dataLayer.getEffort(asset);
         }
         // TODO throw exception? Map would return null if non-existent attribute is requested.
         // And in the following line we'll get NullPointerEx
         Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        
+        if(attribute == null) {
+        	Activator.logError("attr is null: " + this.getTypePrefix() + "." + propertyName , new NullPointerException());
+        }
         
         if (attribute.getDefinition().isMultiValue()) {
             return getPropertyValues(propertyName).subset(attribute.getValues());
@@ -199,7 +208,7 @@ public class Workitem {
      */
     public void setProperty(String propertyName, Object newValue) {
         try {
-            if (propertyName.equals(EffortProperty)) {
+            if (propertyName.equals(EFFORT_PROPERTY)) {
                 final Double effort;
                 if ("".equals(newValue))
                     effort = null;
@@ -270,7 +279,7 @@ public class Workitem {
     }
 
     public boolean isMine() {
-        PropertyValues owners = (PropertyValues) getProperty(OwnersProperty);
+        PropertyValues owners = (PropertyValues) getProperty(OWNERS_PROPERTY);
         return owners.containsOid(dataLayer.memberOid);
     }
 
@@ -293,7 +302,7 @@ public class Workitem {
     public void quickClose() throws DataLayerException {
         commitChanges();
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.QuickCloseOperation));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_QUICK_CLOSE));
             dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
@@ -318,7 +327,7 @@ public class Workitem {
      */
     public void signup() throws DataLayerException {
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.SignupOperation));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_SIGNUP));
             dataLayer.refreshAsset(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
@@ -331,7 +340,7 @@ public class Workitem {
      */
     public void close() throws DataLayerException {
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.CloseOperation));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_CLOSE));
             dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);

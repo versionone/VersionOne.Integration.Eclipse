@@ -48,7 +48,7 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
         
-        owners = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.OwnersProperty);
+        owners = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.OWNERS_PROPERTY);
     }
 
     /**
@@ -79,7 +79,7 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
      */
     private void fillOwnersList() {
     	// TODO refactor this ugly stuff.
-    	PropertyValues currentOwners = (PropertyValues)workitem.getProperty(Workitem.OwnersProperty);
+    	PropertyValues currentOwners = (PropertyValues)workitem.getProperty(Workitem.OWNERS_PROPERTY);
     	int[] selectedIndexes = new int[currentOwners.size()];
     	int i = 0;
     	int currentIndex = 0;
@@ -129,7 +129,7 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
         super.okPressed();
         try {
         	// TODO
-        	workitem.setProperty(Workitem.OwnersProperty, null);
+        	workitem.setProperty(Workitem.OWNERS_PROPERTY, null);
 		} catch (Exception e) {
 			Activator.logError("Failed to set owners", e);
 		}

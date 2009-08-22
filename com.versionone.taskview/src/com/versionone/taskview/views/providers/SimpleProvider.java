@@ -33,13 +33,13 @@ public class SimpleProvider extends ColumnLabelProvider {
         if (isShowTypeIcon) {
             String workItemType = ((Workitem) element).getTypePrefix();
             ImageRegistry imageStore = Activator.getDefault().getImageRegistry();
-            if (workItemType.equals(Workitem.TaskPrefix)) {
+            if (workItemType.equals(Workitem.TASK_PREFIX)) {
                 icon = imageStore.get(Activator.TASK_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.DefectPrefix)) {
+            } else if (workItemType.equals(Workitem.DEFECT_PREFIX)) {
                 icon = imageStore.get(Activator.DEFECT_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.TestPrefix)) {
+            } else if (workItemType.equals(Workitem.TEST_PREFIX)) {
                 icon = imageStore.get(Activator.TEST_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.StoryPrefix)) {
+            } else if (workItemType.equals(Workitem.STORY_PREFIX)) {
                 icon = imageStore.get(Activator.STORY_IMAGE_ID);
             }
         }

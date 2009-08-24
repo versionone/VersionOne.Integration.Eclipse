@@ -93,7 +93,8 @@ public class TestModel {
     }
 
     @Test
-    public void testGetTask() throws Exception {
+    public void testGetUsersTask() throws Exception {
+        datalayer.setShowAllTasks(false);
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(7, allWorkItem.length);
         /*
@@ -117,6 +118,30 @@ public class TestModel {
         // validateTask(allTask[1], "TK-01068", "View Daily Call Count",
         // "Service Changes", "24", "", "0", "24", "TaskStatus:123");
     }
+    
+    @Test
+    public void testGetAllTasks() throws Exception {
+        datalayer.setShowAllTasks(true);
+        Workitem[] allWorkItem = datalayer.getWorkitemTree();
+        Assert.assertEquals(11, allWorkItem.length);
+        /*
+         * Workitem task, String expectedId, String expectedName, String
+         * expectedEstimate, String expectedDone, String expectedEffort, String
+         * expectedTodo, String expectedStatus
+         */
+        validateTask(allWorkItem[1].children.get(1), "TK-01030", "Task:2268", "task1", "10.00", "5.00", null, "0.00", "Completed",
+                Workitem.TASK_PREFIX);
+
+        validateTask(allWorkItem[6], "D-01093", "Defect:2248", "defect 1", "0.02", "-2.00", null, "0.01", "Done",
+                Workitem.DEFECT_PREFIX);
+
+        validateTask(allWorkItem[5].children.get(1), "AT-01008", "Test:2244", "test1", "0.00", "35.00", null, "0.00",
+                "Passed", Workitem.TEST_PREFIX);
+        /*
+        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
+                "In Progress", Workitem.TaskPrefix);
+        */
+    }
 	
 //	@Test
 //	public void testGetStatusCodes() throws Exception {
@@ -135,7 +160,7 @@ public class TestModel {
         // Assert.assertEquals(2, allWorkItem.length);
         Workitem testMe = allWorkItem[0];
         // validateSetEffort(testMe);
-        // validateSetEstimate(testMe);
+        validateSetEstimate(testMe);
         // validateSetName(testMe);
         // validatSetStatus(testMe);
         validateSetToDo(testMe);
@@ -167,8 +192,12 @@ public class TestModel {
         Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));
 
         //TODO need to fix this bug
-        //testMe.setProperty(Workitem.TodoProperty, "-1");
-        //Assert.assertEquals("10.01", testMe.getProperty(Workitem.TodoProperty));
+        try {
+            testMe.setProperty(Workitem.TODO_PROPERTY, "-1");
+            Assert.fail("ToDo cannot be negative");
+        }
+        catch(IllegalArgumentException e) {}        
+        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));       
     }
 //
 //	/**
@@ -207,26 +236,26 @@ public class TestModel {
 //		Assert.assertEquals("New Name", testMe.getName());
 //	}
 //
-//	/**
-//	 * Estimate must be a positive value
-//	 * @param testMe
-//	 */
-//	private void validateSetEstimate(Task testMe) throws Exception {
-//	
-//		testMe.setEstimate(0);
-//		Assert.assertEquals(0, testMe.getEstimate(), EPSILON);
-//		
-//		testMe.setEstimate(10);
-//		Assert.assertEquals(10, testMe.getEstimate(), EPSILON);
-//		
-//		try {
-//			testMe.setEstimate(-1);
-//			Assert.fail("Estimate cannot be negative");
-//		}
-//		catch(IllegalArgumentException e) {}
-//		
-//		Assert.assertEquals(10, testMe.getEstimate(), EPSILON);
-//	}
+	/**
+	 * Estimate must be a positive value
+	 * @param testMe
+	 */
+	private void validateSetEstimate(Workitem testMe) throws Exception {
+	
+		testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "0");
+		Assert.assertEquals("0.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+		
+		testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "10");
+		Assert.assertEquals("10.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+		
+		try {
+		    testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "-1");
+		    Assert.fail("Estimate cannot be negative");
+		}
+		catch(IllegalArgumentException e) {}
+		
+		Assert.assertEquals("10.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+	}
 //
 //	/**
 //	 * Effort is allowed to accept any float value

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<TestConfig>
+
+
+
+	<Get path="config.v1/">
+		<Response>
+			<![CDATA[
+<Configuration version="9.1.3928.0"><Setting key="EffortTracking" value="True" /><Setting key="StoryTrackingLevel" value="Off" /><Setting key="DefectTrackingLevel" value="On" /><Setting key="MaximumAttachmentSize" value="4194304" /><Setting key="CapacityPlanning" value="Off" /></Configuration>
+			]]>
+		</Response>
+	</Get>
+
+
+
+</TestConfig>

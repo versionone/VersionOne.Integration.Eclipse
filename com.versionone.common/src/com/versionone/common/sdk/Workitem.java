@@ -32,12 +32,15 @@ public class Workitem {
     public static final String TODO_PROPERTY = "ToDo";
     public static final String DESCRIPTION_PROPERTY = "Description";
 
+    /*
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
-    
+
+
     static {
         numberFormat.setMinimumFractionDigits(2);
         numberFormat.setMaximumFractionDigits(6);
     }
+    */
 
     protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();
     protected Asset asset;
@@ -207,7 +210,12 @@ public class Workitem {
      *            String, Double, null, ValueId, PropertyValues accepted.
      */
     public void setProperty(String propertyName, Object newValue) {
-        try {
+        if ((propertyName.equals(Workitem.TODO_PROPERTY) || propertyName.equals(Workitem.DETAIL_ESTIMATE_PROPERTY)) && 
+                Double.parseDouble(newValue.toString()) < 0) {
+            throw new IllegalArgumentException("The field cannot be negative");
+        }
+        
+        try {            
             if (propertyName.equals(EFFORT_PROPERTY)) {
                 final Double effort;
                 if ("".equals(newValue))

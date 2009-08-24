@@ -7,6 +7,18 @@
 		</Response>
 	</Get>
 
+	<Get path="loc.v1/?Task">
+		<Response>
+			<![CDATA[Task]]>
+		</Response>
+	</Get>
+	
+	<Get path="loc.v1/?ColumnTitle'Owner">
+		<Response>
+			<![CDATA[Owner]]>
+		</Response>
+	</Get>
+
 	<Get path="loc.v1/?ColumnTitle'Parent">
 		<Response>
 			<![CDATA[Story]]>

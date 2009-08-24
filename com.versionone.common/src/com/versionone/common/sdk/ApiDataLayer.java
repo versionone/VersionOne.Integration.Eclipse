@@ -115,6 +115,11 @@ public class ApiDataLayer {
         
         if (configConnector != null) {
             trackEffort = configConnector.isEffortTracking();
+            if (trackEffort) {
+                effortType = metaModel.getAssetType("Actual");
+            }
+            storyTrackingLevel = EffortTrackingLevel.translate(configConnector.getStoryTrackingLevel());
+            defectTrackingLevel = EffortTrackingLevel.translate(configConnector.getDefectTrackingLevel());
         }
         
         initTypes();

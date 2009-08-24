@@ -54,8 +54,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * localize these values and use that name as column titles
      */
     private static final String V1_COLUMN_TITLE_ID = "ColumnTitle'ID";
-    private static final String V1_COLUMN_TITLE_PARENT = "Story";
-    private static final String V1_COLUMN_TITLE_TITLE = "Task";
+    private static final String V1_COLUMN_TITLE_TITLE = "ColumnTitle'Title";
     private static final String V1_COLUMN_TITLE_DETAIL_ESTIMATE = "ColumnTitle'DetailEstimate";
     private static final String V1_COLUMN_TITLE_TO_DO = "ColumnTitle'ToDo";
     private static final String V1_COLUMN_TITLE_STATUS = "ColumnTitle'Status";
@@ -285,10 +284,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Adds the columns needed to track effort
      */
     private void addEffortColumns() {
-        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 4);
+        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 5);
         column.setLabelProvider(new SimpleProvider(Workitem.DONE_PROPERTY, false));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 5);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 6);
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
         column.setEditingSupport(new TextEditor(Workitem.EFFORT_PROPERTY, viewer));
 
@@ -300,8 +299,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * removes the columns needed when tracking effort
      */
     private void removeEffortColumns() {
+        viewer.getTree().getColumn(6).dispose();
         viewer.getTree().getColumn(5).dispose();
-        viewer.getTree().getColumn(4).dispose();
         //viewer.refresh();
         isEffortColumsShow = false;
     }

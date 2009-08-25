@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -577,11 +576,12 @@ public class ApiDataLayer {
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
-            Asset[] parent = new Asset[0];
+            Asset[] parentArray = new Asset[0];
+            List<Asset> parentList = null;
             if (workitem.parent == null) {
-                parent = assetList.getAssets();
+                parentArray = assetList.getAssets();
             } else {
-                parent = workitem.parent.asset.getChildren().toArray(parent);
+                parentList = workitem.parent.asset.getChildren();
             }
 
             if (newAssets.getTotalAvaliable() != 1 ) {
@@ -596,15 +596,19 @@ public class ApiDataLayer {
             }
 
             //Adding new Asset to parent
-            int index = -1;
-            for(int i = 0; i < parent.length; i++) {
-            	if(parent[i].equals(workitem.asset)) {
-            		index = i;
+            for(int i = 0; i < parentArray.length; i++) {
+            	if(parentArray[i].equals(workitem.asset)) {
+            		parentArray[i] = newAsset;
             		break;
             	}
             }
             
-            parent[index] = newAsset;
+            if(parentList != null) {
+            	int index = parentList.indexOf(workitem.asset);
+            	if(index != -1) {
+            		parentList.set(index, newAsset);
+            	}
+            }
             newAsset.getChildren().addAll(workitem.asset.getChildren());
         }
         catch (MetaException ex) {

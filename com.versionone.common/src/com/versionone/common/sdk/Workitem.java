@@ -166,10 +166,6 @@ public class Workitem {
         // And in the following line we'll get NullPointerEx
         Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
         
-        if(attribute == null) {
-        	Activator.logError("attr is null: " + this.getTypePrefix() + "." + propertyName , new NullPointerException());
-        }
-        
         if (attribute.getDefinition().isMultiValue()) {
             return getPropertyValues(propertyName).subset(attribute.getValues());
         }

@@ -196,7 +196,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 				}
 				
 				quickCloseItem.setEnabled(item.canQuickClose());
-				signupItem.setEnabled(item.canSignup());
+				signupItem.setEnabled(item.canSignup() && !item.isMine());
 			}
     	});
     	control.setMenu(menu);

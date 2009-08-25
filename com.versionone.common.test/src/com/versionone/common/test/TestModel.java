@@ -20,6 +20,7 @@ import com.versionone.apiclient.Services;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 
@@ -165,6 +166,7 @@ public class TestModel {
         // validatSetStatus(testMe);
         validateSetToDo(testMe);
         validateDescription(testMe);
+        validateSetOwner(testMe);
     }
 		
     private void validateDescription(Workitem testMe) {
@@ -255,7 +257,34 @@ public class TestModel {
 		catch(IllegalArgumentException e) {}
 		
 		Assert.assertEquals("10.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
-	}
+    }
+
+    /**
+     * Estimate must be a positive value
+     * 
+     * @param testMe
+     */
+    private void validateSetOwner(Workitem testMe) throws Exception {
+        //TODO 
+        PropertyValues owners = (PropertyValues) testMe.getProperty(Workitem.OWNERS_PROPERTY);
+        Assert.assertEquals("Cat", owners.toString());
+        Assert.assertEquals(1, owners.size());
+        final ValueId cat = owners.getValueIdByIndex(0);
+        Assert.assertEquals("Cat", cat.toString());
+        PropertyValues users = datalayer.getListPropertyValues(testMe.getTypePrefix(), Workitem.OWNERS_PROPERTY);
+        ValueId admin = users.getValueIdByIndex(1);
+        Assert.assertEquals("Administrator", admin.toString());
+        owners.add(admin);
+        owners.remove(cat);
+        testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("Administrator", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+        owners.remove(admin);
+        testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+        owners.add(cat);
+        testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+    }
 //
 //	/**
 //	 * Effort is allowed to accept any float value

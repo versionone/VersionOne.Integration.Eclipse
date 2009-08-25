@@ -145,11 +145,9 @@ public class Workitem {
      * 
      * @param propertyName
      *            Name of the property to get, e.g. "Status"
-     * @return String, Double, ValueId or IList&lt;ValueId&gt;.
+     * @return String, Double, ValueId or PropertyValues.
      * @throws IllegalArgumentException
-     *             If property cannot be got. Is this really relevant?
-     * @throws NullReferenceException
-     *            If there is no such attribute.
+     *             If property cannot be got or there is no such one.
      * @see #NAME_PROPERTY
      * @see #STATUS_PROPERTY
      * @see #EFFORT_PROPERTY
@@ -158,13 +156,16 @@ public class Workitem {
      * @see #OWNERS_PROPERTY
      * @see #TODO_PROPERTY
      */
-    public Object getProperty(String propertyName) throws IllegalArgumentException, NullPointerException {
+    public Object getProperty(String propertyName) throws IllegalArgumentException {
         if (propertyName.equals(EFFORT_PROPERTY)) {
             return dataLayer.getEffort(asset);
         }
-        // TODO throw exception? Map would return null if non-existent attribute is requested.
-        // And in the following line we'll get NullPointerEx
-        Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        final String fullName = getTypePrefix() + '.' + propertyName;
+        Attribute attribute = asset.getAttributes().get(fullName);
+        
+        if(attribute == null) {
+                throw new IllegalArgumentException("There is no property: " + fullName);
+        }
         
         if (attribute.getDefinition().isMultiValue()) {
             return getPropertyValues(propertyName).subset(attribute.getValues());

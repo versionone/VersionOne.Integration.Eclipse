@@ -32,9 +32,7 @@ public class ValueId {
     
     @Override
     public int hashCode() {
-        int hash = 1;
-        hash = hash * 31 + oid.hashCode();
-        return hash;
+        return oid.hashCode();
     }
     
     @Override

@@ -1,4 +1,4 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
@@ -19,17 +19,13 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.Workitem;
 
-public class SelectOwnersDialog extends Dialog implements SelectionListener {
+public class MultiValueDialog extends Dialog implements SelectionListener {
 
-    private List ownersList;
-    private Workitem workitem;
-    private TaskView openingViewer;
-    
-    private PropertyValues owners;
-    private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+    private static int WINDOW_HEIGHT = 300;
+    private static int WINDOW_WIDTH = 400;
 
-    static int WINDOW_HEIGHT = 300;
-    static int WINDOW_WIDTH = 400;
+    private List list;
+    private PropertyValues values;
 
     /**
      * Create
@@ -42,13 +38,12 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public SelectOwnersDialog(Shell parentShell, Workitem workitem, TaskView viewer) {
+    public MultiValueDialog(Shell parentShell, PropertyValues values) {
         super(parentShell);
-        this.workitem = workitem;
-        this.openingViewer = viewer;
+        this.values = values;
+        // this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
-        
-        owners = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.OWNERS_PROPERTY);
+
     }
 
     /**
@@ -58,41 +53,39 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
         container.setLayout(new FillLayout());
-        
-        ownersList = new List(container, SWT.NONE);
-        fillOwnersList();
-        ownersList.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO
-			}
 
-			public void widgetSelected(SelectionEvent e) {
-				// TODO
-			}
+        list = new List(container, SWT.MULTI | SWT.V_SCROLL);
+        fillList();
+        list.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // TODO
+            }
+
+            public void widgetSelected(SelectionEvent e) {
+                // TODO
+            }
         });
-        
+
         return container;
     }
-    
+
     /*
      * Fill Owners list.
      */
-    private void fillOwnersList() {
-    	// TODO refactor this ugly stuff.
-    	PropertyValues currentOwners = (PropertyValues)workitem.getProperty(Workitem.OWNERS_PROPERTY);
-    	int[] selectedIndexes = new int[currentOwners.size()];
-    	int i = 0;
-    	int currentIndex = 0;
-    	for(String owner : owners.toStringArray()) {
-    		ownersList.add(owner);
-    		if(currentOwners.contains(owners.getValueIdByIndex(i))) {
-    			selectedIndexes[currentIndex] = i;
-    			currentIndex++;
-    		}
-    		i++;
-    	}
-    	
-    	ownersList.select(selectedIndexes);
+    private void fillList() {
+        int[] selectedIndexes = new int[values.size()];
+        int i = 0;
+        int currentIndex = 0;
+        for (String owner : values.toStringArray()) {
+            list.add(owner);
+            if (values.contains(values.getValueIdByIndex(i))) {
+                selectedIndexes[currentIndex] = i;
+                currentIndex++;
+            }
+            i++;
+        }
+
+        list.select(selectedIndexes);
     }
 
     /**
@@ -112,7 +105,8 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
     /**
      * {@link #widgetDefaultSelected(SelectionEvent)}
      */
-    public void widgetDefaultSelected(SelectionEvent e) { }
+    public void widgetDefaultSelected(SelectionEvent e) {
+    }
 
     /**
      * {@link #widgetSelected(SelectionEvent)}
@@ -121,17 +115,13 @@ public class SelectOwnersDialog extends Dialog implements SelectionListener {
         // TODO
     }
 
-    /**
-     * {@link #okPressed()}
-     */
-    @Override
-    protected void okPressed() {
-        super.okPressed();
-        try {
-        	// TODO
-        	workitem.setProperty(Workitem.OWNERS_PROPERTY, null);
-		} catch (Exception e) {
-			Activator.logError("Failed to set owners", e);
-		}
+    public void setValue(Object value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public Object getValue() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

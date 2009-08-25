@@ -1,7 +1,6 @@
 package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -15,12 +14,11 @@ public class ListEditor extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
     private String propertyName;
-    private ComboBoxCellEditor editor;
     private TreeViewer viewer;
     private final ApiDataLayer dataLayer;
     private ValueId currentValue;
     
-    public ListEditor(TreeViewer viewer, String propertyName) {
+    public ListEditor(String propertyName, TreeViewer viewer) {
         super(viewer);
         this.propertyName = propertyName;
         this.viewer = viewer;
@@ -36,8 +34,7 @@ public class ListEditor extends EditingSupport {
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
         String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
-        editor = new ComboBoxCellEditor(viewer.getTree(), valueList);
-        return editor;
+        return new ComboBoxCellEditor(viewer.getTree(), valueList);
     }
 
     @Override

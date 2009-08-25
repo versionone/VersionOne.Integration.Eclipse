@@ -53,7 +53,6 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         return dictionary.get(oid.getMomentless());
     }
    
-
     boolean containsOid(Oid value) {
         return dictionary.containsKey(value.getMomentless());
     }
@@ -100,7 +99,6 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     }    
 
     public ValueId getValueIdByIndex(int value) {
-        
         int i = 0;
         for (ValueId data : dictionary.values()) {
             if (value == index.get(data.oid)) {
@@ -111,4 +109,35 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         
         return null;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof PropertyValues)) {
+            return false;
+        }
+        PropertyValues other = (PropertyValues) obj;
+        if (size() != other.size()){
+            return false;
+        }
+        for (ValueId id : this){
+            if (!other.contains(id)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int res = 0;
+        for (ValueId id : this){
+            res = res * 31 + id.hashCode();
+        }
+        return res;
+    }
+    
+    
 }

@@ -35,6 +35,7 @@ import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
 import com.versionone.taskview.views.editors.ListEditor;
+import com.versionone.taskview.views.editors.MultiValueSupport;
 import com.versionone.taskview.views.editors.ReadOnlyEditor;
 import com.versionone.taskview.views.editors.TextEditor;
 import com.versionone.taskview.views.htmleditor.HTMLEditor;
@@ -261,11 +262,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
-        column.setEditingSupport(new ReadOnlyEditor(Workitem.OWNERS_PROPERTY, viewer));
+        column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.STATUS_PROPERTY, false));
-        column.setEditingSupport(new ListEditor(viewer, Workitem.STATUS_PROPERTY));
+        column.setEditingSupport(new ListEditor(Workitem.STATUS_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));

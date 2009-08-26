@@ -11,9 +11,9 @@ import com.versionone.common.sdk.PropertyValues;
 
 public class MultiValueEditor extends DialogCellEditor {
 
-    private final PropertyValues values;
+    private final String[] values;
 
-    public MultiValueEditor(Tree tree, PropertyValues values) {
+    public MultiValueEditor(Tree tree, String[] values) {
         super(tree, SWT.NONE);
         this.values = values;
     }
@@ -21,10 +21,10 @@ public class MultiValueEditor extends DialogCellEditor {
     @Override
     protected Object openDialogBox(Control cellEditorWindow) {
         MultiValueDialog dialog = new MultiValueDialog(cellEditorWindow.getShell(), values);
-        Object value = getValue();
-        dialog.setValue(value);
-        value = dialog.open();
-        return dialog.getValue();
+        int[] value = (int[]) getValue();
+        dialog.setSelectedIndices(value);
+        int x = dialog.open();
+        return dialog.getSelectedIndices();
     }
 
 }

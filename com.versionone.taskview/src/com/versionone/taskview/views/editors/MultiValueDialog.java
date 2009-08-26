@@ -19,31 +19,27 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.Workitem;
 
-public class MultiValueDialog extends Dialog implements SelectionListener {
+public class MultiValueDialog extends Dialog {
 
-    private static int WINDOW_HEIGHT = 300;
-    private static int WINDOW_WIDTH = 400;
+    private static int WINDOW_HEIGHT = 170;
+    private static int WINDOW_WIDTH = 183;
 
     private List list;
-    private PropertyValues values;
+    private String[] allValues;
+    private int[] selectedIndices;
 
     /**
      * Create
      * 
      * @param parentShell
      *            - @see Dialog
-     * @param projectTree
-     *            - root node of tree to display
-     * @param defaultSelected
-     *            - node of project to select by default, if null, the root is
-     *            selected
+     * @param allValues
+     *            - all available values.
      */
-    public MultiValueDialog(Shell parentShell, PropertyValues values) {
+    public MultiValueDialog(Shell parentShell, String[] allValues) {
         super(parentShell);
-        this.values = values;
-        // this.openingViewer = viewer;
+        this.allValues = allValues;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
-
     }
 
     /**
@@ -73,55 +69,35 @@ public class MultiValueDialog extends Dialog implements SelectionListener {
      * Fill Owners list.
      */
     private void fillList() {
-        int[] selectedIndexes = new int[values.size()];
-        int i = 0;
-        int currentIndex = 0;
-        for (String owner : values.toStringArray()) {
+        for (String owner : allValues) {
             list.add(owner);
-            if (values.contains(values.getValueIdByIndex(i))) {
-                selectedIndexes[currentIndex] = i;
-                currentIndex++;
-            }
-            i++;
         }
-
-        list.select(selectedIndexes);
+        list.select(selectedIndices);
     }
 
     /**
-     * {@link #configureShell(Shell)}
+     * Sets name, size and places at a center of a screen.
      */
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Select owners");
-        Display display = PlatformUI.getWorkbench().getDisplay();
-        Point size = newShell.computeSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        Rectangle screen = display.getMonitors()[0].getBounds();
-        newShell.setBounds((screen.width - size.x) / 2, (screen.height - size.y) / 2, size.x, size.y);
         newShell.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        try {
+            Display display = PlatformUI.getWorkbench().getDisplay();
+            Point size = newShell.computeSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+            Rectangle screen = display.getMonitors()[0].getBounds();
+            newShell.setBounds((screen.width - size.x) / 2, (screen.height - size.y) / 2, size.x, size.y);
+        } catch (Exception e) {
+            // Do nothing
+        }
     }
 
-    /**
-     * {@link #widgetDefaultSelected(SelectionEvent)}
-     */
-    public void widgetDefaultSelected(SelectionEvent e) {
+    public void setSelectedIndices(int[] value) {
+        selectedIndices = value;
     }
 
-    /**
-     * {@link #widgetSelected(SelectionEvent)}
-     */
-    public void widgetSelected(SelectionEvent e) {
-        // TODO
-    }
-
-    public void setValue(Object value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Object getValue() {
-        // TODO Auto-generated method stub
-        return null;
+    public int[] getSelectedIndices() {
+        return selectedIndices;
     }
 }

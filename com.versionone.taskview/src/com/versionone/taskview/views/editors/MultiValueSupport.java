@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.DialogCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.List;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
@@ -15,16 +16,17 @@ import com.versionone.taskview.Activator;
 public class MultiValueSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
-    private String propertyName;
-    private TreeViewer viewer;
-    private final ApiDataLayer dataLayer;
+    
+    private final String propertyName;
+    private final TreeViewer viewer;
+    private final PropertyValues allValues;
     private PropertyValues currentValue;
 
     public MultiValueSupport(String propertyName, TreeViewer viewer) {
         super(viewer);
         this.propertyName = propertyName;
         this.viewer = viewer;
-        dataLayer = ApiDataLayer.getInstance();
+        allValues = ApiDataLayer.getInstance().getListPropertyValues(Workitem.STORY_PREFIX, propertyName);
     }
 
     @Override
@@ -34,30 +36,60 @@ public class MultiValueSupport extends EditingSupport {
 
     @Override
     protected CellEditor getCellEditor(Object element) {
-        Workitem workitem = ((Workitem) element);
-        PropertyValues values = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName);
-        return new MultiValueEditor(viewer.getTree(), values);
+//        Workitem workitem = ((Workitem) element);
+        return new MultiValueEditor(viewer.getTree(), allValues.toStringArray());
     }
 
     @Override
     protected Object getValue(Object element) {
         try {
             Workitem workitem = ((Workitem) element);
-            return currentValue = (PropertyValues) workitem.getProperty(propertyName);
+            currentValue = (PropertyValues) workitem.getProperty(propertyName);
+            return getIndices(currentValue);
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;
         }
     }
 
+    private int[] getIndices(PropertyValues property) {
+        // TODO Auto-generated method stub
+        int[] res = new int[property.size()];
+        int i=0;
+        for (ValueId id : property){
+            res[i++] = allValues.getStringArrayIndex(id);
+        }
+        return res;
+    }
+
     @Override
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
-        PropertyValues newValue = (PropertyValues) value;
+        int[] newValue = (int[]) value;
+        
         if (currentValue == null || !currentValue.equals(newValue)) {
             workitem.setProperty(propertyName, newValue);
         }
         viewer.refresh();
+    }
+
+    /*
+     * Fill Owners list.
+     */
+    private static void fillList(List list, PropertyValues values, Object value) {
+        int[] selectedIndexes = new int[values.size()];
+        int i = 0;
+        int currentIndex = 0;
+        for (String owner : values.toStringArray()) {
+            list.add(owner);
+            if (values.contains(values.getValueIdByIndex(i))) {
+                selectedIndexes[currentIndex] = i;
+                currentIndex++;
+            }
+            i++;
+        }
+
+        list.select(selectedIndexes);
     }
 
 }

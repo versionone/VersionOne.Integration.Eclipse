@@ -44,7 +44,7 @@ public class ListEditor extends EditingSupport {
             //String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
             ValueId value = (ValueId)((Workitem) element).getProperty(propertyName);
             currentValue = value;
-            return dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getPropertyListIndex(value);
+            return dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getStringArrayIndex(value);
             //return getCurrentId(((ValueId)((Workitem) element).getProperty(propertyName)).toString());//;
         } catch (Exception e) {
             Activator.logError(e);

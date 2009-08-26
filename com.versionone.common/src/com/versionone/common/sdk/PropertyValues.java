@@ -94,7 +94,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         return values;
     }
 
-    public int getPropertyListIndex(ValueId value) {
+    public int getStringArrayIndex(ValueId value) {
         return index.get(value.oid);        
     }    
 

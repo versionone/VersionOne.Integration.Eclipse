@@ -113,7 +113,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     		statusCombobox.add(value);
     	}
     	ValueId selectedValue = (ValueId)workitem.getProperty(Workitem.STATUS_PROPERTY);
-    	statusCombobox.select(statuses.getPropertyListIndex(selectedValue));
+    	statusCombobox.select(statuses.getStringArrayIndex(selectedValue));
     }
 
     /**

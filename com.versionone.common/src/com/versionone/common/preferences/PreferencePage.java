@@ -220,6 +220,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
                 rc = false;
             }
             
+        } else if (!enabledEditor.presentsDefaultValue()) {
+            rc = super.performOk();
         }
         return rc;
     }

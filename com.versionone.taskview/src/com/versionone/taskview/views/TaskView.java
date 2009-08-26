@@ -10,7 +10,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.window.Window;
@@ -23,7 +22,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -223,14 +221,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void selectProvider() {
         boolean isEnabled = isEnabled();
 
-        selectProjectAction.setEnabled(isEnabled);
-        refreshAction.setEnabled(isEnabled);
-        saveAction.setEnabled(isEnabled);
-        filåterAction.setEnabled(isEnabled);
-        viewer.getTree().setEnabled(isEnabled);
-        viewer.getTree().setLinesVisible(isEnabled);
-        viewer.getTree().setHeaderVisible(isEnabled);
-        viewer.getTree().setEnabled(isEnabled);
+        enableViewer(isEnabled);
         
         viewer.getTree().clearAll(true);
         
@@ -246,6 +237,21 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             viewer.setSorter(null);
             viewer.setInput(getViewSite());
         }
+    }
+    
+    public void enableViewer(boolean status) {
+        enableAction(status);
+        viewer.getTree().setLinesVisible(status);
+        viewer.getTree().setHeaderVisible(status);
+        viewer.getTree().setEnabled(status);
+    }
+
+    public void enableAction(boolean status) {
+        selectProjectAction.setEnabled(status);
+
+        refreshAction.setEnabled(status);
+        saveAction.setEnabled(status);
+        filåterAction.setEnabled(status);
     }
 
     /**
@@ -382,8 +388,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 //                MessageDialog.openError(viewer.getTree().getShell(), "Task View Error",
 //                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
 //            }
+            ApiDataLayer.getInstance().updateCurrentProjectId();
             reCreateTable();
-        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
+        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {            
             loadTable();
             viewer.refresh();
         }

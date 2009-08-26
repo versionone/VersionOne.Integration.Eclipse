@@ -30,9 +30,13 @@ public class FilterAction extends Action {
     
     @Override
     public void run() {
+        workItemView.enableViewer(false);
+        
         int value = isChecked() ? 1 : 0;
         ApiDataLayer.getInstance().setShowAllTasks(!isChecked());
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, value);
+        
+        workItemView.enableViewer(true);
         //showMessage();
         //setText(getMessage());
     }

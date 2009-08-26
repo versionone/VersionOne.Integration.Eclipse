@@ -27,6 +27,10 @@ class ProjectAction extends Action {
 
     @Override
     public void run() {
+        if (!isEnabled()) {
+            return;
+        }
+        workItemView.enableViewer(false);
         //IProjectTreeNode root = workItemView.getProjectTreeNode();
         List<Workitem> projectList = null;
         try {
@@ -38,7 +42,7 @@ class ProjectAction extends Action {
         }
         
         //IProjectTreeNode selectNode = null;
-        String projectToken = PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN);
+        //String projectToken = PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN);
         /*
         if (!projectToken.equals("")) {
             selectNode = new ProjectTreeNode("", projectToken);
@@ -57,5 +61,6 @@ class ProjectAction extends Action {
         }
         
         workItemView.loadTable();
+        workItemView.enableViewer(true);
     }
 }

@@ -17,7 +17,6 @@ import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
 import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.ConnectionException;
-import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
@@ -242,7 +241,7 @@ public class ApiDataLayer {
             // throw new DataLayerException("Current project is not selected");
             // // TODO implement
             // throw new Exception("Current project is not selected");
-            currentProjectId = "Scope:0";
+            currentProjectId = getDefaultProjectId();
         }
 
         if (assetList == null) {
@@ -619,7 +618,11 @@ public class ApiDataLayer {
     }
 
     public void setCurrentProjectId(String value) {
-        currentProjectId = value;
+        if (isProjectExist(value)) {
+            currentProjectId = value;
+        } else {
+            currentProjectId = getDefaultProjectId();
+        }        
         assetList = null;
     }
 
@@ -634,9 +637,54 @@ public class ApiDataLayer {
 
     public Workitem getCurrentProject() throws Exception {
         if (currentProjectId == null || currentProjectId.equals("")) {
-            currentProjectId = "Scope:0";
+            //currentProjectId = "Scope:0";
+            currentProjectId = getDefaultProjectId();
         }
         return getProjectById(currentProjectId);
+    }
+    
+    private String getDefaultProjectId() {
+        String id = "";
+        
+        Query query = new Query(projectType);
+        
+        QueryResult result = null;
+        try {
+            result = services.retrieve(query);
+        } catch (Exception ex) {
+        }
+        
+        if (result != null && result.getTotalAvaliable() > 0) {
+            id = result.getAssets()[0].getOid().getMomentless().getToken();
+        }
+        
+        return id;
+    }
+    
+    /***
+     * Update current project Id to the root project Id from current server
+     */
+    public void updateCurrentProjectId() {
+        currentProjectId = getDefaultProjectId();
+    }
+    
+    private boolean isProjectExist(String id) {
+        boolean isExist = true;
+
+        try {
+            Query query = new Query(Oid.fromToken(id, metaModel));
+            alreadyUsedDefinition.clear();
+            addSelection(query, Workitem.PROJECT_PREFIX);
+            QueryResult result = null;
+            result = services.retrieve(query);
+            if (result.getTotalAvaliable() == 0) {
+                isExist = false;
+            }
+        } catch (Exception ex) {
+            isExist = false;
+        }        
+        
+        return isExist;
     }
 
     private Workitem getProjectById(String id) throws Exception {
@@ -704,4 +752,5 @@ public class ApiDataLayer {
     public static void resetConnection() {
         instance = null;
     }
+
 }

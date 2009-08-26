@@ -24,6 +24,7 @@ public class SaveAction extends Action {
     }
 
     public void run() {
+        workItemView.enableAction(false);
         if (workItemViewer.isCellEditorActive()) {
             workItemViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         }
@@ -34,6 +35,8 @@ public class SaveAction extends Action {
             Activator.logError(e);
             workItemView.showMessage("Error saving task. Check Error log for more information.");
         }
+        
         workItemView.loadTable();
+        workItemView.enableAction(true);
     }
 }

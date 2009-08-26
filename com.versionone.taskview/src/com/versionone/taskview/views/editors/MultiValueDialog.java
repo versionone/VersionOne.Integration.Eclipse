@@ -14,11 +14,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.PlatformUI;
 
-import com.versionone.taskview.Activator;
-import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.PropertyValues;
-import com.versionone.common.sdk.Workitem;
-
 public class MultiValueDialog extends Dialog {
 
     private static int WINDOW_HEIGHT = 170;

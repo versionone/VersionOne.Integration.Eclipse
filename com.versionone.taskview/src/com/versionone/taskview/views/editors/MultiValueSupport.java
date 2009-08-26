@@ -37,29 +37,18 @@ public class MultiValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
 //        Workitem workitem = ((Workitem) element);
-        return new MultiValueEditor(viewer.getTree(), allValues.toStringArray());
+        return new MultiValueEditor(viewer.getTree(), allValues);
     }
 
     @Override
     protected Object getValue(Object element) {
         try {
             Workitem workitem = ((Workitem) element);
-            currentValue = (PropertyValues) workitem.getProperty(propertyName);
-            return getIndices(currentValue);
+            return currentValue = (PropertyValues) workitem.getProperty(propertyName);
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;
         }
-    }
-
-    private int[] getIndices(PropertyValues property) {
-        // TODO Auto-generated method stub
-        int[] res = new int[property.size()];
-        int i=0;
-        for (ValueId id : property){
-            res[i++] = allValues.getStringArrayIndex(id);
-        }
-        return res;
     }
 
     @Override

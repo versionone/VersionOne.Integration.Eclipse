@@ -7,6 +7,7 @@ Bundle-Activator: com.versionone.taskview.Activator
 Bundle-Vendor: VersionOne
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.views,
  org.eclipse.core.runtime,
  com.versionone.common;bundle-version="2.0.0",
  de.spiritlink.richhtml4eclipse;bundle-version="1.0.0"

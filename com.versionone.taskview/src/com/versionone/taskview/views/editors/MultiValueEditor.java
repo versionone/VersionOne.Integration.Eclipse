@@ -25,7 +25,7 @@ public class MultiValueEditor extends DialogCellEditor {
         dialog.setSelectedIndices(getIndices(value));
         int x = dialog.open();
         if (x == Window.OK){
-            return dialog.getSelectedIndices();
+            return getPropertyValues(dialog.getSelectedIndices());
         }
         return value;
     }
@@ -35,6 +35,14 @@ public class MultiValueEditor extends DialogCellEditor {
         int i=0;
         for (ValueId id : property){
             res[i++] = allValues.getStringArrayIndex(id);
+        }
+        return res;
+    }
+    
+    private PropertyValues getPropertyValues(int[] indexes) {
+        PropertyValues res = new PropertyValues();
+        for (int id : indexes){
+            res.add(allValues.getValueIdByIndex(id));
         }
         return res;
     }

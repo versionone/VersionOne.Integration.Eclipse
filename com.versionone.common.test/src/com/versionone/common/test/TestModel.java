@@ -167,8 +167,9 @@ public class TestModel {
         validateSetToDo(testMe);
         validateDescription(testMe);
         validateSetOwner(testMe);
-    }
-		
+        //validateSetOwner1(allWorkItem[1]);
+    }	
+
     private void validateDescription(Workitem testMe) {
         testMe.setProperty(Workitem.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
         Assert.assertEquals("<br>test <b>new test</b>", testMe.getProperty(Workitem.DESCRIPTION_PROPERTY));
@@ -285,6 +286,21 @@ public class TestModel {
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals("Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
+    
+    /*
+    private void validateSetOwner1(Workitem testMe) {
+        PropertyValues owners = (PropertyValues) testMe.getProperty(Workitem.OWNERS_PROPERTY);
+        final ValueId adminForRemove = owners.getValueIdByIndex(0);
+        owners.remove(adminForRemove);        
+        PropertyValues users = datalayer.getListPropertyValues(testMe.getTypePrefix(), Workitem.OWNERS_PROPERTY);
+        ValueId petja = users.getValueIdByIndex(8);
+        Assert.assertEquals("Petja", petja.toString());
+        owners.add(petja);
+        Assert.assertEquals(3, owners.size());
+        testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("Administrator", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
+    }
+    */
 //
 //	/**
 //	 * Effort is allowed to accept any float value

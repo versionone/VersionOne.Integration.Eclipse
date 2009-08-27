@@ -2,6 +2,7 @@ package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -47,13 +48,9 @@ public class MultiValueDialog extends Dialog {
 
         list = new List(container, SWT.MULTI | SWT.V_SCROLL);
         fillList();
-        list.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO
-            }
-
+        list.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                // TODO
+                selectedIndices = list.getSelectionIndices();
             }
         });
 

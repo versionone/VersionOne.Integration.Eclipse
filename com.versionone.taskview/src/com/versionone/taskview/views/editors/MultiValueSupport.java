@@ -54,7 +54,7 @@ public class MultiValueSupport extends EditingSupport {
     @Override
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
-        int[] newValue = (int[]) value;
+        PropertyValues newValue = (PropertyValues) value;
         
         if (currentValue == null || !currentValue.equals(newValue)) {
             workitem.setProperty(propertyName, newValue);

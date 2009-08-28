@@ -167,7 +167,7 @@ public class TestModel {
         validateSetToDo(testMe);
         validateDescription(testMe);
         validateSetOwner(testMe);
-        //validateSetOwner1(allWorkItem[1]);
+        validateSetOwner1(allWorkItem[1]);
     }	
 
     private void validateDescription(Workitem testMe) {
@@ -287,7 +287,7 @@ public class TestModel {
         Assert.assertEquals("Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
     
-    /*
+
     private void validateSetOwner1(Workitem testMe) {
         PropertyValues owners = (PropertyValues) testMe.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId adminForRemove = owners.getValueIdByIndex(0);
@@ -298,9 +298,9 @@ public class TestModel {
         owners.add(petja);
         Assert.assertEquals(3, owners.size());
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Administrator", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
+        Assert.assertEquals("Petja, Bil, Tom", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
     }
-    */
+
 //
 //	/**
 //	 * Effort is allowed to accept any float value

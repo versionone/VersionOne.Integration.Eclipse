@@ -731,6 +731,7 @@ public class ApiDataLayer {
         return false;
     }
 
+    //** Special test methods
     private static boolean isTestEnable = false;
     public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
         if (!isTestEnable && instance != null) {

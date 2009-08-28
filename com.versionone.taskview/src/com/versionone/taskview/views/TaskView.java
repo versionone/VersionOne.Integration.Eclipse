@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -119,14 +120,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void createContextMenu(TreeViewer viewer) {
     	final Control control = viewer.getControl();
-    	final Menu menu = new Menu(control.getShell(), SWT.POP_UP);
+    	final Shell shell = control.getShell();
+        final Menu menu = new Menu(shell, SWT.POP_UP);
     	final TaskView openingViewer = this;
     	
     	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
     	closeItem.setText(MENU_ITEM_CLOSE_KEY);
     	closeItem.addListener(SWT.Selection, new Listener() {
     		public void handleEvent(Event e) {
-    			CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(control.getShell(), getCurrentWorkitem(), openingViewer);
+    			CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(shell, getCurrentWorkitem(), openingViewer);
     			closeDialog.setBlockOnOpen(true);
     			closeDialog.open();
     		}
@@ -142,7 +144,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     				refreshViewer();
     			} catch(DataLayerException ex) {
     				Activator.logError(ex);
-    				MessageDialog.openError(control.getShell(), "Task View Error",
+    				MessageDialog.openError(shell, "Task View Error",
                           "Error during closing Workitem. Check Error Log for more details.");
     			}
     		}
@@ -160,7 +162,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     				refreshViewer();
     			} catch(DataLayerException ex) {
     				Activator.logError(ex);
-    				MessageDialog.openError(control.getShell(), "Task View Error",
+    				MessageDialog.openError(shell, "Task View Error",
                           "Error during signing up. Check Error Log for more details.");
     			}
     		}
@@ -171,10 +173,9 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     	
     	MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
     	editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
-    	final TreeViewer tmpViewer = viewer;
     	editDescription.addListener(SWT.Selection, new Listener() {
                 public void handleEvent(Event e) {
-                    HTMLEditor htmlEditor = new HTMLEditor(tmpViewer.getControl().getShell(), getCurrentWorkitem());
+                    HTMLEditor htmlEditor = new HTMLEditor(shell, getCurrentWorkitem());
                     htmlEditor.create();
                     int response = htmlEditor.open();
                     if (response == Window.OK) {

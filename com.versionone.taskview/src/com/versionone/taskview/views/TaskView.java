@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -80,8 +79,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
-        
-        PropertyDescriptor pd = new PropertyDescriptor(null, "");
     }
 
     /**
@@ -101,6 +98,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         createContextMenu(viewer);
         hookDoubleClickAction();
         selectProvider();
+        getSite().setSelectionProvider(new ProxySelectionProvider(viewer));
     }
     
     private boolean validRowSelected() {

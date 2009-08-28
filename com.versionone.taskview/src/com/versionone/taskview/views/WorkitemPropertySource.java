@@ -31,9 +31,10 @@ public class WorkitemPropertySource implements IPropertySource {
     public IPropertyDescriptor[] getPropertyDescriptors() {
         ArrayList<PropertyDescriptor> list = new ArrayList<PropertyDescriptor>();
 
+        list.add(new PropertyDescriptor(Workitem.ID_PROPERTY, "ID"));
         list.add(new TextPropertyDescriptor(Workitem.NAME_PROPERTY, "Title"));
-        list.add(new TextPropertyDescriptor(Workitem.ID_PROPERTY, "ID"));
-        list.add(new TextPropertyDescriptor(Workitem.OWNERS_PROPERTY, "Owner"));
+        list.add(new PropertyDescriptor(Workitem.OWNERS_PROPERTY, "Owner"));
+        list.add(new PropertyDescriptor(Workitem.STATUS_PROPERTY, "Status"));
 
         IPropertyDescriptor[] res = new IPropertyDescriptor[list.size()];
         return list.toArray(res);
@@ -44,17 +45,18 @@ public class WorkitemPropertySource implements IPropertySource {
     }
 
     public boolean isPropertySet(Object id) {
-        // TODO Auto-generated method stub
-        return false;
+        return item.isPropertyChanged((String)id);
     }
 
     public void resetPropertyValue(Object id) {
-        // TODO Auto-generated method stub
-
+        item.resetProperty((String)id);
     }
 
     public void setPropertyValue(Object id, Object value) {
-        // TODO Auto-generated method stub
-
+        try {
+            item.setProperty((String)id, value);
+        } catch (Exception e) {
+            // Do nothing
+        }
     }
 }

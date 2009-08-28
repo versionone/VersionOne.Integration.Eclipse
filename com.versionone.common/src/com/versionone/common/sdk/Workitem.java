@@ -54,13 +54,13 @@ public class Workitem {
     Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
-        
+
         children = new ArrayList<Workitem>(asset.getChildren().size());
         for (Asset childAsset : asset.getChildren()) {
-        	if(dataLayer.isAssetSuspended(childAsset)) {
-        		continue;
-        	}
-        	
+            if (dataLayer.isAssetSuspended(childAsset)) {
+                continue;
+            }
+
             if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.showAllTasks
                     || dataLayer.isCurrentUserOwnerAsset(childAsset)) {
                 children.add(new Workitem(childAsset, this));
@@ -141,6 +141,43 @@ public class Workitem {
     }
 
     /**
+     * Checks if property value has changed.
+     * 
+     * @param propertyName
+     *            Name of the property to get, e.g. "Status"
+     * @return true if property has changed; false - otherwise.
+     */
+    public boolean isPropertyChanged(String propertyName) throws IllegalArgumentException {
+        if (propertyName.equals(EFFORT_PROPERTY)) {
+            return dataLayer.getEffort(asset) != null;
+        }
+        final String fullName = getTypePrefix() + '.' + propertyName;
+        Attribute attribute = asset.getAttributes().get(fullName);
+        if (attribute == null) {
+            throw new IllegalArgumentException("There is no property: " + fullName);
+        }
+        return attribute.hasChanged();
+    }
+    
+    /**
+     * Resets property value if it was changed.
+     * 
+     * @param propertyName
+     *            Name of the property to get, e.g. "Status"
+     */
+    public void resetProperty(String propertyName) throws IllegalArgumentException {
+        if (propertyName.equals(EFFORT_PROPERTY)) {
+            dataLayer.setEffort(asset, null);
+        }
+        final String fullName = getTypePrefix() + '.' + propertyName;
+        Attribute attribute = asset.getAttributes().get(fullName);
+        if (attribute == null) {
+            throw new IllegalArgumentException("There is no property: " + fullName);
+        }
+        attribute.rejectChanges();
+    }
+
+    /**
      * Gets property value.
      * 
      * @param propertyName
@@ -162,11 +199,11 @@ public class Workitem {
         }
         final String fullName = getTypePrefix() + '.' + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
-        
-        if(attribute == null) {
-                throw new IllegalArgumentException("There is no property: " + fullName);
+
+        if (attribute == null) {
+            throw new IllegalArgumentException("There is no property: " + fullName);
         }
-        
+
         if (attribute.getDefinition().isMultiValue()) {
             return getPropertyValues(propertyName).subset(attribute.getValues());
         }
@@ -176,11 +213,11 @@ public class Workitem {
             if (val instanceof Oid) {
                 return getPropertyValues(propertyName).find((Oid) val);
             }
-            
-            if (val instanceof Double) {                
+
+            if (val instanceof Double) {
                 return BigDecimal.valueOf((Double) val).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
             }
-            
+
             return val;
         } catch (APIException e) {
             throw new IllegalArgumentException("Cannot get property: " + propertyName, e);
@@ -192,7 +229,7 @@ public class Workitem {
         if (value == null) {
             return "";
         } else if (value instanceof Double) {
-            //return numberFormat.format(value);
+            // return numberFormat.format(value);
             return BigDecimal.valueOf((Double) value).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
         }
         return value.toString();
@@ -207,12 +244,12 @@ public class Workitem {
      *            String, Double, null, ValueId, PropertyValues accepted.
      */
     public void setProperty(String propertyName, Object newValue) {
-        if ((propertyName.equals(Workitem.TODO_PROPERTY) || propertyName.equals(Workitem.DETAIL_ESTIMATE_PROPERTY)) && 
-                Double.parseDouble(newValue.toString()) < 0) {
+        if ((propertyName.equals(Workitem.TODO_PROPERTY) || propertyName.equals(Workitem.DETAIL_ESTIMATE_PROPERTY))
+                && Double.parseDouble(newValue.toString()) < 0) {
             throw new IllegalArgumentException("The field cannot be negative");
         }
-        
-        try {            
+
+        try {
             if (propertyName.equals(EFFORT_PROPERTY)) {
                 final Double effort;
                 if ("".equals(newValue))
@@ -295,13 +332,14 @@ public class Workitem {
             ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
         } catch (NullPointerException e) {
-        	ApiDataLayer.warning("QuickClose not supported.", e);
+            ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
         }
     }
 
     /**
      * Performs 'QuickClose' operation.
+     * 
      * @throws DataLayerException
      */
     public void quickClose() throws DataLayerException {
@@ -321,13 +359,14 @@ public class Workitem {
             ApiDataLayer.warning("QuickSignup not supported.", e);
             return false;
         } catch (NullPointerException e) {
-        	ApiDataLayer.warning("QuickClose not supported.", e);
+            ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
         }
     }
 
     /**
      * Performs 'QuickSignup' operation.
+     * 
      * @throws DataLayerException
      */
     public void signup() throws DataLayerException {
@@ -341,6 +380,7 @@ public class Workitem {
 
     /**
      * Perform 'Inactivate' operation.
+     * 
      * @throws DataLayerException
      */
     public void close() throws DataLayerException {

@@ -1,5 +1,7 @@
 package com.versionone.taskview.views;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -27,31 +29,18 @@ public class WorkitemPropertySource implements IPropertySource {
     }
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        PropertyDescriptor sizeDescriptor = new PropertyDescriptor("v1.size", "Size");
-        // set a custom label provider for a point
-        sizeDescriptor.setLabelProvider(new LabelProvider() {
-            public String getText(Object element) {
-                Point point = (Point) element;
-                StringBuffer buf = new StringBuffer();
-                buf.append("Height:");
-                buf.append(point.y);
-                buf.append("  ");
-                buf.append("Width:");
-                buf.append(point.x);
-                return buf.toString();
-            }
-        });
-        sizeDescriptor.setCategory("Category1");
+        ArrayList<PropertyDescriptor> list = new ArrayList<PropertyDescriptor>();
 
-        PropertyDescriptor textDescriptor = new TextPropertyDescriptor("v1.text", "Text");
-        textDescriptor.setCategory("Category2");
+        list.add(new TextPropertyDescriptor(Workitem.NAME_PROPERTY, "Title"));
+        list.add(new TextPropertyDescriptor(Workitem.ID_PROPERTY, "ID"));
+        list.add(new TextPropertyDescriptor(Workitem.OWNERS_PROPERTY, "Owner"));
 
-        return new PropertyDescriptor[] { sizeDescriptor, textDescriptor };
+        IPropertyDescriptor[] res = new IPropertyDescriptor[list.size()];
+        return list.toArray(res);
     }
 
     public Object getPropertyValue(Object id) {
-        // TODO Auto-generated method stub
-        return null;
+        return item.getProperty((String) id);
     }
 
     public boolean isPropertySet(Object id) {

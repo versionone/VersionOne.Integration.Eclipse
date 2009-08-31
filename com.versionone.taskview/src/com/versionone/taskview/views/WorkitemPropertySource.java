@@ -9,7 +9,10 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
+import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
+import com.versionone.taskview.views.Configuration.ColumnSetting;
 
 public class WorkitemPropertySource implements IPropertySource {
 
@@ -29,15 +32,30 @@ public class WorkitemPropertySource implements IPropertySource {
     }
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        ArrayList<PropertyDescriptor> list = new ArrayList<PropertyDescriptor>();
+        Configuration cfg = Configuration.getInstance();
+        ColumnSetting[] columns = cfg.assetDetailSettings.getColumns(item.getTypePrefix());
+        IPropertyDescriptor[] res = new IPropertyDescriptor[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            res[i] = createPropertyDescriptor(columns[i]);
+        }
+        return res;
+    }
 
-        list.add(new PropertyDescriptor(Workitem.ID_PROPERTY, "ID"));
-        list.add(new TextPropertyDescriptor(Workitem.NAME_PROPERTY, "Title"));
-        list.add(new PropertyDescriptor(Workitem.OWNERS_PROPERTY, "Owner"));
-        list.add(new PropertyDescriptor(Workitem.STATUS_PROPERTY, "Status"));
-
-        IPropertyDescriptor[] res = new IPropertyDescriptor[list.size()];
-        return list.toArray(res);
+    private PropertyDescriptor createPropertyDescriptor(ColumnSetting col) {
+        String localName;
+        try {
+            localName = ApiDataLayer.getInstance().localizerResolve(col.name);
+        } catch (DataLayerException e) {
+            localName = col.name;
+        }
+        final PropertyDescriptor desc;
+        if (col.type.equals("String")) {
+            desc = new PropertyDescriptor(col.attribute, localName);
+        } else {
+            desc = new PropertyDescriptor(col.attribute, localName);
+        }
+        desc.setCategory(col.category);
+        return desc;
     }
 
     public Object getPropertyValue(Object id) {
@@ -45,16 +63,16 @@ public class WorkitemPropertySource implements IPropertySource {
     }
 
     public boolean isPropertySet(Object id) {
-        return item.isPropertyChanged((String)id);
+        return item.isPropertyChanged((String) id);
     }
 
     public void resetPropertyValue(Object id) {
-        item.resetProperty((String)id);
+        item.resetProperty((String) id);
     }
 
     public void setPropertyValue(Object id, Object value) {
         try {
-            item.setProperty((String)id, value);
+            item.setProperty((String) id, value);
         } catch (Exception e) {
             // Do nothing
         }

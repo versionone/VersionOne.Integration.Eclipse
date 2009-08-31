@@ -720,17 +720,6 @@ public class ApiDataLayer {
         }
     }
 
-    public boolean tryLocalizerResolve(String key, String result) {
-        result = null;
-
-        if (localizer != null) {
-            result = localizer.resolve(key);
-            return true;
-        }
-
-        return false;
-    }
-
     //** Special test methods
     private static boolean isTestEnable = false;
     public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {

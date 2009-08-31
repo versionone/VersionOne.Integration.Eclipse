@@ -56,6 +56,7 @@ public class Activator extends AbstractUIPlugin {
         //properties.put(Workitem.ScheduleNameProperty, false);
         properties.put(Workitem.OWNERS_PROPERTY, true);
         properties.put(Workitem.TODO_PROPERTY, false);
+        properties.put("Scope.Name", false);
         for (Entry<String, Boolean> entry : properties.entrySet()) {
             dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
             dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());

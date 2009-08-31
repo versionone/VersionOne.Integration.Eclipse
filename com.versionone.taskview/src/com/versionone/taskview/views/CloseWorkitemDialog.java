@@ -88,7 +88,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         statusLabel.setText("Status");
         statusLabel.setSize(40, 30);
         
-        statusCombobox = new Combo(container, SWT.DROP_DOWN);
+        statusCombobox = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         statusCombobox.setSize(200, 40);
         fillStatusCombobox();
         statusCombobox.addSelectionListener(new SelectionListener() {

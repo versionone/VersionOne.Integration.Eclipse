@@ -22,7 +22,7 @@ class RefreshAction extends Action {
     }
 
     public void run() {
-        workItemView.enableViewer(false);
+        workItemView.enableViewerAndActions(false);
         try {
             Activator.connect();            
         } catch (Exception e) {
@@ -30,7 +30,7 @@ class RefreshAction extends Action {
             MessageDialog.openError(workitemViewer.getTree().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
-        workItemView.enableViewer(true);
+        workItemView.enableViewerAndActions(true);
         workItemView.reCreateTable();
         //workItemView.updateStatusCodes();
     }

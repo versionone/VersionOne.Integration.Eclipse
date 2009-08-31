@@ -98,14 +98,11 @@ public class ApiDataLayer {
     }
 
     private ApiDataLayer() {
-        String[] prefixes = new String[] { Workitem.TASK_PREFIX, Workitem.DEFECT_PREFIX, Workitem.STORY_PREFIX,
-                Workitem.TEST_PREFIX };
-        for (String prefix : prefixes) {
-            attributesToQuery.addLast(new AttributeInfo("CheckQuickClose", prefix, false));
-            attributesToQuery.addLast(new AttributeInfo("CheckQuickSignup", prefix, false));
-        }
     }
 
+    /*
+     * Special constructor for testing
+     */
     private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
         this.metaModel = metaModel;
         this.services = services;
@@ -139,23 +136,37 @@ public class ApiDataLayer {
         this.password = password;
         this.integrated = integrated;
         assetList = null;
-        assetsToIgnore.clear();
-        efforts.clear();
-        types.clear();
+        boolean isUpdateData = true;
+        boolean isTokenChanged = true;
+        
+        String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
+        if (memberOid != null) {
+            // location or user was changed
+            isTokenChanged = !currentOid.equals(memberOid.getToken() + ":" + path);
+        }
+        //TODO test optimization of refresh. need to test
+        isUpdateData = isTokenChanged || metaModel == null || localizer == null || services == null;
+        if (isUpdateData ) {
+            assetsToIgnore.clear();
+            efforts.clear();
+            types.clear();            
+        }
+        
         try {
-            V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
-            metaModel = new MetaModel(metaConnector);
-
-            V1APIConnector localizerConnector = new V1APIConnector(path + LocalizerUrlSuffix, userName, password);
-            localizer = new Localizer(localizerConnector);
-
-            V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
-            services = new Services(metaModel, dataConnector);
-
+            if (isUpdateData) {
+                V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
+                metaModel = new MetaModel(metaConnector);
+    
+                V1APIConnector localizerConnector = new V1APIConnector(path + LocalizerUrlSuffix, userName, password);
+                localizer = new Localizer(localizerConnector);
+    
+                V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
+                services = new Services(metaModel, dataConnector);                  
+    
+                initTypes();                
+            }
             V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
-
-            initTypes();
-
+            
             trackEffort = v1Config.isEffortTracking();
             if (trackEffort) {
                 effortType = metaModel.getAssetType("Actual");
@@ -163,14 +174,15 @@ public class ApiDataLayer {
 
             storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
             defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
-
+            
             memberOid = services.getLoggedIn();
-            listPropertyValues = getListPropertyValues();                       
+            listPropertyValues = getListPropertyValues();
+                       
             isConnected = true;
             
             //TODO review this place possible way when user change location and user has the same token
-            String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
-            if (!currentOid.equals(memberOid.getToken() + ":" + path)) {
+
+            if (isTokenChanged) {
                 PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberOid.getToken() + ":" + path);
             } 
             
@@ -196,10 +208,10 @@ public class ApiDataLayer {
     /**
      * Reconnect with settings, used in last Connect() call.
      * 
-     * @throws Exception
+     * @throws DataLayerException
      */
-    public void reconnect() throws DataLayerException {
-        connect(path, userName, password, integrated);
+    public boolean reconnect() throws DataLayerException {
+        return connect(path, userName, password, integrated);
     }
 
     public List<Workitem> getProjectTree() throws DataLayerException {
@@ -338,7 +350,7 @@ public class ApiDataLayer {
     
 
     private void checkConnection() throws DataLayerException {
-        if (!isConnected) {
+        if (!isConnected && !reconnect()) {
             throw warning("Connection is not set.");
         }
     }
@@ -445,6 +457,7 @@ public class ApiDataLayer {
         Query query = new Query(assetType);
         query.getSelection().add(nameDef);
 
+        //TODO need to cecongnize is it posoble what task can have closed owener
         inactiveDef = assetType.getAttributeDefinition("Inactive");
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);

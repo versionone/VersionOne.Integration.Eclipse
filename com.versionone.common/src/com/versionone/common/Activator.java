@@ -41,6 +41,7 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         setAttributes();
+        connect();
     }
 
     private void setAttributes() throws Exception {
@@ -56,15 +57,17 @@ public class Activator extends AbstractUIPlugin {
         //properties.put(Workitem.ScheduleNameProperty, false);
         properties.put(Workitem.OWNERS_PROPERTY, true);
         properties.put(Workitem.TODO_PROPERTY, false);
+        properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
+        properties.put(Workitem.CHECK_QUICK_SIGNUP_PROPERTY, false);
         properties.put("Scope.Name", false);
+
         for (Entry<String, Boolean> entry : properties.entrySet()) {
             dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
             dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());
             dataLayer.addProperty(entry.getKey(), Workitem.STORY_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());            
         }
         dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
-        connect();
     }
     
     /**
@@ -81,7 +84,7 @@ public class Activator extends AbstractUIPlugin {
             ApiDataLayer.getInstance().connect(path, user, password, auth);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            Activator.logError(e);
         }
         ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
         boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false : true;
@@ -92,10 +95,10 @@ public class Activator extends AbstractUIPlugin {
         try {
             ApiDataLayer.getInstance().connect(path, user, password, auth);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Activator.logError(e);
         }
-        
+        boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false : true;
+        ApiDataLayer.getInstance().setShowAllTasks(showAllTask);        
     }
 
     /*

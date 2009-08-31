@@ -223,7 +223,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void selectProvider() {
         boolean isEnabled = isEnabled();
 
-        enableViewer(isEnabled);
+        enableViewerAndActions(isEnabled);
         
         viewer.getTree().clearAll(true);
         
@@ -241,8 +241,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
     }
     
-    public void enableViewer(boolean status) {
+    public void enableViewerAndActions(boolean status) {
         enableAction(status);
+        enableViewer(status);
+    }
+
+    private void enableViewer(boolean status) {
         viewer.getTree().setLinesVisible(status);
         viewer.getTree().setHeaderVisible(status);
         viewer.getTree().setEnabled(status);
@@ -436,11 +440,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             // "admin", "admin", false);
             viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
         } catch (Exception e) {
-            /*
+            enableViewer(false);
             Activator.logError(e);
             MessageDialog.openError(viewer.getControl().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
-            */
         }
     }
 

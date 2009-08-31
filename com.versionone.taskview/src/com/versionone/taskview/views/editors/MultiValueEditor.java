@@ -6,16 +6,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 
+import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
+import com.versionone.common.sdk.Workitem;
 
 public class MultiValueEditor extends DialogCellEditor {
 
     private final PropertyValues allValues;
 
-    public MultiValueEditor(Tree tree, PropertyValues allValues) {
+    public MultiValueEditor(Tree tree, String propertyName) {
         super(tree, SWT.NONE);
-        this.allValues = allValues;
+        this.allValues = ApiDataLayer.getInstance().getListPropertyValues(Workitem.STORY_PREFIX, propertyName);
     }
 
     @Override

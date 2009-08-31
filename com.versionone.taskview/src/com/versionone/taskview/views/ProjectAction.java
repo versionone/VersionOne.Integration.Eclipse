@@ -30,7 +30,7 @@ class ProjectAction extends Action {
         if (!isEnabled()) {
             return;
         }
-        workItemView.enableViewer(false);
+        workItemView.enableViewerAndActions(false);
         //IProjectTreeNode root = workItemView.getProjectTreeNode();
         List<Workitem> projectList = null;
         try {
@@ -61,6 +61,6 @@ class ProjectAction extends Action {
         }
         
         workItemView.loadTable();
-        workItemView.enableViewer(true);
+        workItemView.enableViewerAndActions(true);
     }
 }

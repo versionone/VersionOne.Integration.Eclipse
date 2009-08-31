@@ -1,15 +1,10 @@
 package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.DialogCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.List;
 
-import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
-import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
@@ -19,14 +14,12 @@ public class MultiValueSupport extends EditingSupport {
     
     private final String propertyName;
     private final TreeViewer viewer;
-    private final PropertyValues allValues;
     private PropertyValues currentValue;
 
     public MultiValueSupport(String propertyName, TreeViewer viewer) {
         super(viewer);
         this.propertyName = propertyName;
         this.viewer = viewer;
-        allValues = ApiDataLayer.getInstance().getListPropertyValues(Workitem.STORY_PREFIX, propertyName);
     }
 
     @Override
@@ -37,7 +30,7 @@ public class MultiValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
 //        Workitem workitem = ((Workitem) element);
-        return new MultiValueEditor(viewer.getTree(), allValues);
+        return new MultiValueEditor(viewer.getTree(), propertyName);
     }
 
     @Override
@@ -65,6 +58,7 @@ public class MultiValueSupport extends EditingSupport {
     /*
      * Fill Owners list.
      */
+    /*
     private static void fillList(List list, PropertyValues values, Object value) {
         int[] selectedIndexes = new int[values.size()];
         int i = 0;
@@ -80,5 +74,5 @@ public class MultiValueSupport extends EditingSupport {
 
         list.select(selectedIndexes);
     }
-
+     */
 }

@@ -30,10 +30,13 @@ public class SaveAction extends Action {
         }
         try {
             data.commitChanges();
-            data.reconnect();
+            Activator.connect();
         } catch (DataLayerException e) {
             Activator.logError(e);
             workItemView.showMessage("Error saving task. Check Error log for more information.");
+        } catch (Exception e) {
+            Activator.logError(e);
+            workItemView.showMessage("Error saving task. Check Error log for more information.");            
         }
         
         workItemView.loadTable();

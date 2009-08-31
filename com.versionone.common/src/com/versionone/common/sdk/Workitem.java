@@ -31,6 +31,8 @@ public class Workitem {
     public static final String OWNERS_PROPERTY = "Owners";
     public static final String TODO_PROPERTY = "ToDo";
     public static final String DESCRIPTION_PROPERTY = "Description";
+    public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
+    public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
 
     /*
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();

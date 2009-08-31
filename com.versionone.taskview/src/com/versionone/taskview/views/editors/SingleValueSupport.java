@@ -11,7 +11,7 @@ import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
-public class ListEditor extends EditingSupport {
+public class SingleValueSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
     private String propertyName;
@@ -19,7 +19,7 @@ public class ListEditor extends EditingSupport {
     private final ApiDataLayer dataLayer;
     private ValueId currentValue;
     
-    public ListEditor(String propertyName, TreeViewer viewer) {
+    public SingleValueSupport(String propertyName, TreeViewer viewer) {
         super(viewer);
         this.propertyName = propertyName;
         this.viewer = viewer;

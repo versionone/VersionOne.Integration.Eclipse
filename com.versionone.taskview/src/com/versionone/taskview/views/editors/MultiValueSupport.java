@@ -29,8 +29,8 @@ public class MultiValueSupport extends EditingSupport {
 
     @Override
     protected CellEditor getCellEditor(Object element) {
-//        Workitem workitem = ((Workitem) element);
-        return new MultiValueEditor(viewer.getTree(), propertyName);
+        Workitem workitem = ((Workitem) element);
+        return new MultiValueEditor(viewer.getTree(), workitem.getTypePrefix(), propertyName);
     }
 
     @Override

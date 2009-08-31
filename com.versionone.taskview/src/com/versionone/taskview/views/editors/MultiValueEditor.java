@@ -15,9 +15,9 @@ public class MultiValueEditor extends DialogCellEditor {
 
     private final PropertyValues allValues;
 
-    public MultiValueEditor(Composite parent, String propertyName) {
+    public MultiValueEditor(Composite parent, String typePrefix, String propertyName) {
         super(parent, SWT.NONE);
-        this.allValues = ApiDataLayer.getInstance().getListPropertyValues(Workitem.STORY_PREFIX, propertyName);
+        this.allValues = ApiDataLayer.getInstance().getListPropertyValues(typePrefix, propertyName);
     }
 
     @Override

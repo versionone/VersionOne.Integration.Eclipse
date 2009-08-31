@@ -51,12 +51,12 @@ public class ApiDataLayer {
             "ToDo", "Done", "Effort", "Actuals");
 
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
-    private final Map<Asset, Double> efforts  = new HashMap<Asset, Double>();
+    private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
 
     public static final String OP_QUICK_CLOSE = "QuickClose";
     public static final String OP_CLOSE = "Inactivate";
     public static final String OP_SIGNUP = "QuickSignup";
-    
+
     private IAssetType projectType;
     private IAssetType taskType;
     private IAssetType testType;
@@ -90,7 +90,7 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
-    
+
     private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
 
     public void setShowAllTasks(boolean showAllTasks) {
@@ -103,11 +103,12 @@ public class ApiDataLayer {
     /*
      * Special constructor for testing
      */
-    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
+    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector)
+            throws Exception {
         this.metaModel = metaModel;
         this.services = services;
         this.localizer = localizer;
-        
+
         if (configConnector != null) {
             trackEffort = configConnector.isEffortTracking();
             if (trackEffort) {
@@ -116,7 +117,7 @@ public class ApiDataLayer {
             storyTrackingLevel = EffortTrackingLevel.translate(configConnector.getStoryTrackingLevel());
             defectTrackingLevel = EffortTrackingLevel.translate(configConnector.getDefectTrackingLevel());
         }
-        
+
         initTypes();
         isConnected = true;
         memberOid = this.services.getLoggedIn();
@@ -138,35 +139,35 @@ public class ApiDataLayer {
         assetList = null;
         boolean isUpdateData = true;
         boolean isTokenChanged = true;
-        
+
         String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
         if (memberOid != null) {
             // location or user was changed
             isTokenChanged = !currentOid.equals(memberOid.getToken() + ":" + path);
         }
-        //TODO test optimization of refresh. need to test
+        // TODO test optimization of refresh. need to test
         isUpdateData = isTokenChanged || metaModel == null || localizer == null || services == null;
-        if (isUpdateData ) {
+        if (isUpdateData) {
             assetsToIgnore.clear();
             efforts.clear();
-            types.clear();            
+            types.clear();
         }
-        
+
         try {
             if (isUpdateData) {
                 V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
                 metaModel = new MetaModel(metaConnector);
-    
+
                 V1APIConnector localizerConnector = new V1APIConnector(path + LocalizerUrlSuffix, userName, password);
                 localizer = new Localizer(localizerConnector);
-    
+
                 V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
-                services = new Services(metaModel, dataConnector);                  
-    
-                initTypes();                
+                services = new Services(metaModel, dataConnector);
+
+                initTypes();
             }
             V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
-            
+
             trackEffort = v1Config.isEffortTracking();
             if (trackEffort) {
                 effortType = metaModel.getAssetType("Actual");
@@ -174,18 +175,20 @@ public class ApiDataLayer {
 
             storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
             defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
-            
+
             memberOid = services.getLoggedIn();
             listPropertyValues = getListPropertyValues();
-                       
+
             isConnected = true;
-            
-            //TODO review this place possible way when user change location and user has the same token
+
+            // TODO review this place possible way when user change location and
+            // user has the same token
 
             if (isTokenChanged) {
-                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberOid.getToken() + ":" + path);
-            } 
-            
+                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN,
+                        memberOid.getToken() + ":" + path);
+            }
+
             this.path = path; //
             return true;
         } catch (MetaException e) {
@@ -291,18 +294,18 @@ public class ApiDataLayer {
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
-        	if(isAssetSuspended(asset)) {
-        		continue;
-        	}
-        	
+            if (isAssetSuspended(asset)) {
+                continue;
+            }
+
             if (showAllTasks || isCurrentUserOwnerAsset(asset, definition)) {
                 res.add(new Workitem(asset, null));
             }
         }
         return res.toArray(new Workitem[res.size()]);
     }
-    
-    private boolean isCurrentUserOwnerAsset(Asset assets, IAttributeDefinition definition){
+
+    private boolean isCurrentUserOwnerAsset(Asset assets, IAttributeDefinition definition) {
         Attribute attribute = assets.getAttribute(definition);
 
         Object[] owners = attribute.getValues();
@@ -320,11 +323,11 @@ public class ApiDataLayer {
         }
 
         return false;
-}
-    
+    }
+
     public boolean checkConnection(String url, String user, String pass, boolean auth) {
         boolean result = true;
-        
+
         V1APIConnector metaConnector = new V1APIConnector(url.toString() + MetaUrlSuffix);
         MetaModel model = new MetaModel(metaConnector);
 
@@ -344,10 +347,9 @@ public class ApiDataLayer {
         } catch (MetaException e) {
             result = false;
         }
-        
+
         return result;
     }
-    
 
     private void checkConnection() throws DataLayerException {
         if (!isConnected && !reconnect()) {
@@ -389,12 +391,12 @@ public class ApiDataLayer {
             }
         }
     }
-    
+
     private void addSelection(Query query, String typePrefix, boolean clearDefinitions) throws DataLayerException {
-    	if(clearDefinitions) {
-    		alreadyUsedDefinition.clear();
-    	}
-    	addSelection(query, typePrefix);
+        if (clearDefinitions) {
+            alreadyUsedDefinition.clear();
+        }
+        addSelection(query, typePrefix);
     }
 
     public void addProperty(String attr, String prefix, boolean isList) {
@@ -402,10 +404,10 @@ public class ApiDataLayer {
     }
 
     private Map<String, PropertyValues> getListPropertyValues() throws Exception { // ConnectionException,
-                                                                                   // APIException,
-                                                                                   // OidException,
-                                                                                   // MetaException
-                                                                                   // {
+        // APIException,
+        // OidException,
+        // MetaException
+        // {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {
@@ -457,7 +459,8 @@ public class ApiDataLayer {
         Query query = new Query(assetType);
         query.getSelection().add(nameDef);
 
-        //TODO need to cecongnize is it posoble what task can have closed owener
+        // TODO need to recongnize is it possible what task can have closed
+        // owner
         inactiveDef = assetType.getAttributeDefinition("Inactive");
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
@@ -489,7 +492,7 @@ public class ApiDataLayer {
         // TODO Auto-generated method stub
         return new DataLayerException(string);
     }
-    
+
     public boolean isTrackEffortEnabled() {
         return trackEffort;
     }
@@ -499,7 +502,7 @@ public class ApiDataLayer {
     }
 
     void setEffort(Asset asset, Double value) {
-        if (value == null || value == 0){
+        if (value == null || value == 0) {
             efforts.remove(asset);
         } else {
             efforts.put(asset, value);
@@ -540,12 +543,12 @@ public class ApiDataLayer {
     }
 
     private void commitAssetsRecursively(List<Asset> assets) throws V1Exception {
-        for (Asset asset : assets){
-        	// do not commit assets that were closed and their children
-        	if(assetsToIgnore.contains(asset)) {
-        		continue;
-        	}
-        	
+        for (Asset asset : assets) {
+            // do not commit assets that were closed and their children
+            if (assetsToIgnore.contains(asset)) {
+                continue;
+            }
+
             commitAsset(asset);
             commitAssetsRecursively(asset.getChildren());
         }
@@ -554,34 +557,34 @@ public class ApiDataLayer {
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
         services.executeOperation(operation, asset.getOid());
     }
-    
+
     public boolean isAssetClosed(Asset asset) {
-    	try {
-    	    IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
-    	    AssetState state = AssetState.valueOf((Integer)asset.getAttribute(stateDef).getValue());
-    	    return state == AssetState.Closed || assetsToIgnore.contains(asset.getOid().getMomentless());
-    	} catch(APIException e) {
-    		Activator.logError("Unable to resolve asset state.", e);
-    		return false;
-    	} catch(MetaException e) {
-    		Activator.logError("Unable to resolve asset state.", e);
-    		return false;
-    	}
+        try {
+            IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
+            AssetState state = AssetState.valueOf((Integer) asset.getAttribute(stateDef).getValue());
+            return state == AssetState.Closed || assetsToIgnore.contains(asset.getOid().getMomentless());
+        } catch (APIException e) {
+            Activator.logError("Unable to resolve asset state.", e);
+            return false;
+        } catch (MetaException e) {
+            Activator.logError("Unable to resolve asset state.", e);
+            return false;
+        }
     }
-    
+
     public boolean isAssetSuspended(Asset asset) {
-    	return assetsToIgnore.contains(asset);
+        return assetsToIgnore.contains(asset);
     }
 
     public void addIgnoreRecursively(Workitem item) {
-    	assetsToIgnore.add(item.asset);
-    	for(Workitem child : item.children) {
-    		addIgnoreRecursively(child);
-    	}
+        assetsToIgnore.add(item.asset);
+        for (Workitem child : item.children) {
+            addIgnoreRecursively(child);
+        }
     }
-    
+
     void refreshAsset(Workitem workitem) throws DataLayerException {
-    	try {
+        try {
             IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
             Query query = new Query(workitem.asset.getOid().getMomentless(), false);
             addSelection(query, workitem.getTypePrefix(), true);
@@ -596,34 +599,33 @@ public class ApiDataLayer {
                 parentList = workitem.parent.asset.getChildren();
             }
 
-            if (newAssets.getTotalAvaliable() != 1 ) {
-            	assetsToIgnore.add(workitem.asset);
+            if (newAssets.getTotalAvaliable() != 1) {
+                assetsToIgnore.add(workitem.asset);
                 return;
             }
 
             Asset newAsset = newAssets.getAssets()[0];
             if (isAssetClosed(newAsset)) {
-            	assetsToIgnore.add(workitem.asset);
+                assetsToIgnore.add(workitem.asset);
                 return;
             }
 
-            //Adding new Asset to parent
-            for(int i = 0; i < parentArray.length; i++) {
-            	if(parentArray[i].equals(workitem.asset)) {
-            		parentArray[i] = newAsset;
-            		break;
-            	}
+            // Adding new Asset to parent
+            for (int i = 0; i < parentArray.length; i++) {
+                if (parentArray[i].equals(workitem.asset)) {
+                    parentArray[i] = newAsset;
+                    break;
+                }
             }
-            
-            if(parentList != null) {
-            	int index = parentList.indexOf(workitem.asset);
-            	if(index != -1) {
-            		parentList.set(index, newAsset);
-            	}
+
+            if (parentList != null) {
+                int index = parentList.indexOf(workitem.asset);
+                if (index != -1) {
+                    parentList.set(index, newAsset);
+                }
             }
             newAsset.getChildren().addAll(workitem.asset.getChildren());
-        }
-        catch (MetaException ex) {
+        } catch (MetaException ex) {
             throw warning("Unable to get workitems.", ex);
         } catch (Exception ex) {
             throw warning("Unable to get workitems.", ex);
@@ -635,7 +637,7 @@ public class ApiDataLayer {
             currentProjectId = value;
         } else {
             currentProjectId = getDefaultProjectId();
-        }        
+        }
         assetList = null;
     }
 
@@ -650,37 +652,37 @@ public class ApiDataLayer {
 
     public Workitem getCurrentProject() throws Exception {
         if (currentProjectId == null || currentProjectId.equals("")) {
-            //currentProjectId = "Scope:0";
+            // currentProjectId = "Scope:0";
             currentProjectId = getDefaultProjectId();
         }
         return getProjectById(currentProjectId);
     }
-    
+
     private String getDefaultProjectId() {
         String id = "";
-        
+
         Query query = new Query(projectType);
-        
+
         QueryResult result = null;
         try {
             result = services.retrieve(query);
         } catch (Exception ex) {
         }
-        
+
         if (result != null && result.getTotalAvaliable() > 0) {
             id = result.getAssets()[0].getOid().getMomentless().getToken();
         }
-        
+
         return id;
     }
-    
+
     /***
      * Update current project Id to the root project Id from current server
      */
     public void updateCurrentProjectId() {
         currentProjectId = getDefaultProjectId();
     }
-    
+
     private boolean isProjectExist(String id) {
         boolean isExist = true;
 
@@ -695,8 +697,8 @@ public class ApiDataLayer {
             }
         } catch (Exception ex) {
             isExist = false;
-        }        
-        
+        }
+
         return isExist;
     }
 
@@ -704,7 +706,7 @@ public class ApiDataLayer {
         if (!isConnected || id == null || id.equals("")) {
             return null;
         }
-        
+
         Query query = new Query(Oid.fromToken(id, metaModel));
         // clear all definitions used in previous queries
         alreadyUsedDefinition.clear();
@@ -724,7 +726,7 @@ public class ApiDataLayer {
         }
         return null;
     }
-    
+
     public String localizerResolve(String key) throws DataLayerException {
         try {
             return localizer.resolve(key);
@@ -733,25 +735,28 @@ public class ApiDataLayer {
         }
     }
 
-    //** Special test methods
+    // ** Special test methods
     private static boolean isTestEnable = false;
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector) throws Exception {
+
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer,
+            V1Configuration configConnector) throws Exception {
         if (!isTestEnable && instance != null) {
             resetConnection();
             isTestEnable = true;
         }
-        
+
         if (null == instance) {
             instance = new ApiDataLayer(services, metaModel, localizer, configConnector);
         }
-        
+
         return instance;
     }
-    
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer) throws Exception {
+
+    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer)
+            throws Exception {
         return getInitializedInstance(services, metaModel, localizer, null);
     }
-    
+
     public static void resetConnection() {
         instance = null;
     }

@@ -34,16 +34,6 @@ public class Workitem {
     public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
     public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
 
-    /*
-    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
-
-
-    static {
-        numberFormat.setMinimumFractionDigits(2);
-        numberFormat.setMaximumFractionDigits(6);
-    }
-    */
-
     protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();
     protected Asset asset;
     public Workitem parent;
@@ -53,7 +43,7 @@ public class Workitem {
      */
     public final ArrayList<Workitem> children;
 
-    Workitem(Asset asset, Workitem parent) {
+    public Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
 

@@ -1,13 +1,8 @@
 package com.versionone.taskview.views;
 
-import java.util.ArrayList;
-
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
-import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;

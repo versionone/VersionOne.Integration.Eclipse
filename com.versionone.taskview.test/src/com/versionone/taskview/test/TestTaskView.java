@@ -47,12 +47,12 @@ public class TestTaskView {
 	static final int OWNER_COLUMN_INDEX = 2;
 	static final int STATUS_COLUMN_INDEX = 3;
         static final int DETAIL_ESTIMATE_COLUMN_INDEX = 4;
-        static final int TODO_COLUMN_INDEX = 5;
+        static final int DONE_COLUMN_INDEX = 5;
 	// index changes when effort tracking is enabled	
-        static final int DONE_COLUMN_INDEX = 4;
-        static final int EFFORT_COLUMN_INDEX = 5;
+        static final int TODO_COLUMN_INDEX = 5;
+        static final int EFFORT_COLUMN_INDEX = 6;
 	static final int TRACKED_TODO_COLUMN_INDEX = 7;
-	static final int TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX = 6;
+	//static final int TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX = 6;
 	
 	// test target
 	private static TaskView testView = null;
@@ -106,10 +106,10 @@ public class TestTaskView {
 		Assert.assertNotNull(table);
 		Assert.assertEquals(8, table.getColumnCount());
 		TreeColumn[] columns = table.getColumns();
-		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
+		Assert.assertEquals("Task Name", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Owner", columns[OWNER_COLUMN_INDEX].getText());
-		Assert.assertEquals("Detail Estimate", columns[TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX].getText());
+		Assert.assertEquals("Detail Estimate", columns[DETAIL_ESTIMATE_COLUMN_INDEX].getText());
 		Assert.assertEquals("Done", columns[DONE_COLUMN_INDEX].getText());
 		Assert.assertEquals("Effort", columns[EFFORT_COLUMN_INDEX].getText());
 		Assert.assertEquals("To Do", columns[TRACKED_TODO_COLUMN_INDEX].getText());
@@ -145,7 +145,6 @@ public class TestTaskView {
             }
             testView = (TaskView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(VIEW_ID);
             waitForJobs();
-            delay(1000);
             
             isEffortEnabled = true;
         }
@@ -181,7 +180,6 @@ public class TestTaskView {
             }
             testView = (TaskView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(VIEW_ID);
             waitForJobs();
-            delay(1000);
             
             isEffortEnabled = false;
 	}
@@ -198,7 +196,7 @@ public class TestTaskView {
 		Assert.assertNotNull(table);
 		Assert.assertEquals(6, table.getColumnCount());
 		TreeColumn[] columns = table.getColumns();
-		Assert.assertEquals("Task", columns[NAME_COLUMN_INDEX].getText());
+		Assert.assertEquals("Task Name", columns[NAME_COLUMN_INDEX].getText());
 		Assert.assertEquals("ID", columns[ID_COLUMN_INDEX].getText());
 		Assert.assertEquals("Owner", columns[OWNER_COLUMN_INDEX].getText());
 		Assert.assertEquals("Detail Estimate", columns[DETAIL_ESTIMATE_COLUMN_INDEX].getText());
@@ -240,7 +238,7 @@ public class TestTaskView {
 		checkEditor(selectedElement, ID_COLUMN_INDEX, true);
 		checkEditor(selectedElement, OWNER_COLUMN_INDEX, true);
 		checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
-		checkEditor(selectedElement, TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX, false);
+		checkEditor(selectedElement, DETAIL_ESTIMATE_COLUMN_INDEX, false);
 		checkEditor(selectedElement, DONE_COLUMN_INDEX, false);
 		checkEditor(selectedElement, EFFORT_COLUMN_INDEX, false);
 		checkEditor(selectedElement, TRACKED_TODO_COLUMN_INDEX , false);
@@ -251,7 +249,7 @@ public class TestTaskView {
                 checkEditor(selectedElement, ID_COLUMN_INDEX, true);
                 checkEditor(selectedElement, OWNER_COLUMN_INDEX, true);
                 checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
-                checkEditor(selectedElement, TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX, true);
+                checkEditor(selectedElement, DETAIL_ESTIMATE_COLUMN_INDEX, true);
                 checkEditor(selectedElement, DONE_COLUMN_INDEX, false);
                 checkEditor(selectedElement, EFFORT_COLUMN_INDEX, true);
                 checkEditor(selectedElement, TRACKED_TODO_COLUMN_INDEX , true);
@@ -262,7 +260,7 @@ public class TestTaskView {
                 checkEditor(selectedElement, ID_COLUMN_INDEX, true);
                 checkEditor(selectedElement, OWNER_COLUMN_INDEX, true);
                 checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
-                checkEditor(selectedElement, TRACKED_DETAIL_ESTIMATE_COLUMN_INDEX, true);
+                checkEditor(selectedElement, DETAIL_ESTIMATE_COLUMN_INDEX, true);
                 checkEditor(selectedElement, DONE_COLUMN_INDEX, false);
                 checkEditor(selectedElement, EFFORT_COLUMN_INDEX, true);
                 checkEditor(selectedElement, TRACKED_TODO_COLUMN_INDEX , true);

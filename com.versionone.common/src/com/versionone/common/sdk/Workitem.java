@@ -150,7 +150,7 @@ public class Workitem {
         }
         return attribute.hasChanged();
     }
-    
+
     /**
      * Resets property value if it was changed.
      * 
@@ -236,49 +236,68 @@ public class Workitem {
      *            String, Double, null, ValueId, PropertyValues accepted.
      */
     public void setProperty(String propertyName, Object newValue) {
-        if ((propertyName.equals(Workitem.TODO_PROPERTY) || propertyName.equals(Workitem.DETAIL_ESTIMATE_PROPERTY))
-                && Double.parseDouble(newValue.toString()) < 0) {
-            throw new IllegalArgumentException("The field cannot be negative");
-        }
-
+        final boolean isEffort = propertyName.equals(EFFORT_PROPERTY);
         try {
-            if (propertyName.equals(EFFORT_PROPERTY)) {
-                final Double effort;
-                if ("".equals(newValue))
-                    effort = null;
-                else
-                    //effort = numberFormat.parse((String) newValue).doubleValue();
-                    effort = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String)newValue)).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-                dataLayer.setEffort(asset, effort);
-                return;
-            }
-            IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
-            if (newValue == null || newValue.equals("")) {
-                asset.setAttributeValue(attrDef, null);
-                return;
-            }
-            Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
-            if (attrDef.isMultiValue()) {
-                updateValues(propertyName, attribute.getValues(), (PropertyValues) newValue);
-                return;
-            }
-            if (newValue instanceof ValueId) {
-                newValue = ((ValueId) newValue).oid;
-            } else if (attrDef.getAttributeType() == AttributeType.Numeric) {
-                //newValue = numberFormat.parse((String) newValue);
-                newValue = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String)newValue)).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+            if ("".equals(newValue)) {
+                newValue = null;
             }
 
-            if (!newValue.equals(attribute.getValue())) {
-                asset.setAttributeValue(attrDef, newValue);
+            if ((isEffort || isNumeric(propertyName))) {
+                setNumericProperty(propertyName, newValue);
+            } else if (isMultiValue(propertyName)) {
+                setMultiValueProperty(propertyName, (PropertyValues) newValue);
+            } else {// List & String types
+                if (newValue instanceof ValueId) {
+                    newValue = ((ValueId) newValue).oid;
+                }
+                setPropertyInternal(propertyName, newValue);
             }
+
         } catch (Exception ex) {
             ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
         }
     }
 
-    private void updateValues(String propertyName, Object[] oldValues, PropertyValues newValues) throws APIException {
-        IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+    private boolean isMultiValue(String propertyName) {
+        final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+        return attrDef.isMultiValue();
+    }
+
+    private boolean isNumeric(String propertyName) {
+        final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+        return attrDef.getAttributeType() == AttributeType.Numeric;
+    }
+
+    private void setNumericProperty(String propertyName, Object newValue) throws APIException {
+        Double doubleValue = null;
+        if (newValue != null) {
+            // newValue = numberFormat.parse((String) newValue);
+            doubleValue = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String) newValue)).setScale(2,
+                    BigDecimal.ROUND_HALF_UP).toPlainString());
+        }
+
+        if (propertyName.equals(EFFORT_PROPERTY)) {
+            dataLayer.setEffort(asset, doubleValue);
+        } else {
+            if (doubleValue < 0) {
+                throw new IllegalArgumentException("The field cannot be negative");
+            }
+            setPropertyInternal(propertyName, doubleValue);
+        }
+    }
+
+    private void setPropertyInternal(String propertyName, Object newValue) throws APIException {
+        final Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        final Object oldValue = attribute.getValue();
+        if ((oldValue == null && newValue != null) || !oldValue.equals(newValue)) {
+            asset.setAttributeValue(asset.getAssetType().getAttributeDefinition(propertyName), newValue);
+        }
+    }
+
+    private void setMultiValueProperty(String propertyName, PropertyValues newValues) throws APIException {
+        final Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        final Object[] oldValues = attribute.getValues();
+        final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
         for (Object oldOid : oldValues) {
             if (!newValues.containsOid((Oid) oldOid)) {
                 asset.removeAttributeValue(attrDef, oldOid);

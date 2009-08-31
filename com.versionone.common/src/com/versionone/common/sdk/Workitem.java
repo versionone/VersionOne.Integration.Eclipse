@@ -279,7 +279,7 @@ public class Workitem {
         if (propertyName.equals(EFFORT_PROPERTY)) {
             dataLayer.setEffort(asset, doubleValue);
         } else {
-            if (doubleValue < 0) {
+            if (doubleValue != null && doubleValue < 0) {
                 throw new IllegalArgumentException("The field cannot be negative");
             }
             setPropertyInternal(propertyName, doubleValue);

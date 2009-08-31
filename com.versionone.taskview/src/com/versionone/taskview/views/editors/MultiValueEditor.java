@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.DialogCellEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Composite;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
@@ -15,8 +15,8 @@ public class MultiValueEditor extends DialogCellEditor {
 
     private final PropertyValues allValues;
 
-    public MultiValueEditor(Tree tree, String propertyName) {
-        super(tree, SWT.NONE);
+    public MultiValueEditor(Composite parent, String propertyName) {
+        super(parent, SWT.NONE);
         this.allValues = ApiDataLayer.getInstance().getListPropertyValues(Workitem.STORY_PREFIX, propertyName);
     }
 

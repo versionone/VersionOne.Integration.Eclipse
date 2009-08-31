@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.ValueId;
@@ -34,7 +35,7 @@ public class ListEditor extends EditingSupport {
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
         String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
-        return new ComboBoxCellEditor(viewer.getTree(), valueList);
+        return new ComboBoxCellEditor(viewer.getTree(), valueList, SWT.READ_ONLY);
     }
 
     @Override

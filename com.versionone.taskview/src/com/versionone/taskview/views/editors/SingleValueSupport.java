@@ -1,10 +1,8 @@
 package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.ValueId;
@@ -34,17 +32,15 @@ public class SingleValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
-        String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
-        return new ComboBoxCellEditor(viewer.getTree(), valueList, SWT.READ_ONLY);
+        return new SingleValueEditor(viewer.getTree(), workitem.getTypePrefix(), propertyName);
     }
 
     @Override
     protected Object getValue(Object element) {
         try {            
-            Workitem workitem = ((Workitem) element);
             ValueId value = (ValueId)((Workitem) element).getProperty(propertyName);
             currentValue = value;
-            return dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getStringArrayIndex(value);
+            return currentValue;
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;
@@ -54,7 +50,7 @@ public class SingleValueSupport extends EditingSupport {
     @Override
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
-        ValueId newValue = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getValueIdByIndex((Integer)value);
+        ValueId newValue = (ValueId) value;
         if (dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).contains(newValue) &&
                 !currentValue.equals(newValue) && newValue != null) {
             workitem.setProperty(propertyName, newValue);

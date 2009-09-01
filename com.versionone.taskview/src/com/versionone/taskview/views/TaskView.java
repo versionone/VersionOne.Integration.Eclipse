@@ -61,12 +61,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_DONE = "ColumnTitle'Done";
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
     private static final String V1_COLUMN_TITLE_OWNER = "ColumnTitle'Owner";
-    
+
     private static final String MENU_ITEM_CLOSE_KEY = "Close";
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
     private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
     private static final String MENU_ITEM_EDIT_DESCRIPTION_KEY = "Edit description";
-    
+
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
     private boolean isEffortColumsShow;
@@ -75,7 +75,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private Action refreshAction = null;
     private Action saveAction = null;
     private Action filåterAction = null;
-    
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -85,7 +84,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * This is a callback that will allow us to create the viewer and initialize
      * it.
      */
-    public void createPartControl(Composite parent) {        
+    public void createPartControl(Composite parent) {
 
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
@@ -96,127 +95,129 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         makeActions();
         contributeToActionBars();
         createContextMenu(viewer);
-        hookDoubleClickAction();
         selectProvider();
         getSite().setSelectionProvider(new ProxySelectionProvider(viewer));
     }
-    
+
     private boolean validRowSelected() {
-    	return !viewer.getSelection().isEmpty();
+        return !viewer.getSelection().isEmpty();
     }
-    
+
     private Workitem getCurrentWorkitem() {
-    	ISelection selection = viewer.getSelection();
-    	if(selection != null && selection instanceof IStructuredSelection) {
-    		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-    		Object element = structuredSelection.getFirstElement();
-    		return element == null ? null : (Workitem)element; 
-    	}
-    	
-    	return null;
+        ISelection selection = viewer.getSelection();
+        if (selection != null && selection instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            Object element = structuredSelection.getFirstElement();
+            return element == null ? null : (Workitem) element;
+        }
+
+        return null;
     }
-    
+
     /**
-     * Create context menu, assign actions, store items in a collection to manage visibility.
+     * Create context menu, assign actions, store items in a collection to
+     * manage visibility.
      */
     private void createContextMenu(TreeViewer viewer) {
-    	final Control control = viewer.getControl();
-    	final Shell shell = control.getShell();
+        final Control control = viewer.getControl();
+        final Shell shell = control.getShell();
         final Menu menu = new Menu(shell, SWT.POP_UP);
-    	final TaskView openingViewer = this;
-    	
-    	final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
-    	closeItem.setText(MENU_ITEM_CLOSE_KEY);
-    	closeItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(shell, getCurrentWorkitem(), openingViewer);
-    			closeDialog.setBlockOnOpen(true);
-    			closeDialog.open();
-    		}
-    	});
-    	menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
-    	
-    	final MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
-    	quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
-    	quickCloseItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			try {
-    				getCurrentWorkitem().quickClose();
-    				refreshViewer();
-    			} catch(DataLayerException ex) {
-    				Activator.logError(ex);
-    				MessageDialog.openError(shell, "Task View Error",
-                          "Error during closing Workitem. Check Error Log for more details.");
-    			}
-    		}
-    	});
-    	menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
-    	
-    	new MenuItem(menu, SWT.SEPARATOR);
-    	
-    	final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
-    	signupItem.setText(MENU_ITEM_SIGNUP_KEY);
-    	signupItem.addListener(SWT.Selection, new Listener() {
-    		public void handleEvent(Event e) {
-    			try {
-    				getCurrentWorkitem().signup();
-    				refreshViewer();
-    			} catch(DataLayerException ex) {
-    				Activator.logError(ex);
-    				MessageDialog.openError(shell, "Task View Error",
-                          "Error during signing up. Check Error Log for more details.");
-    			}
-    		}
-    	});
-    	menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
-    	
-    	new MenuItem(menu, SWT.SEPARATOR);
-    	
-    	MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
-    	editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
-    	editDescription.addListener(SWT.Selection, new Listener() {
-                public void handleEvent(Event e) {
-                    HTMLEditor htmlEditor = new HTMLEditor(shell, getCurrentWorkitem());
-                    htmlEditor.create();
-                    int response = htmlEditor.open();
-                    if (response == Window.OK) {
-                        updateDescription(getCurrentWorkitem(), htmlEditor.getValue()); 
-                    }
+        final TaskView openingViewer = this;
+
+        final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
+        closeItem.setText(MENU_ITEM_CLOSE_KEY);
+        closeItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(shell, getCurrentWorkitem(), openingViewer);
+                closeDialog.setBlockOnOpen(true);
+                closeDialog.open();
+            }
+        });
+        menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
+
+        final MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
+        quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
+        quickCloseItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                try {
+                    getCurrentWorkitem().quickClose();
+                    refreshViewer();
+                } catch (DataLayerException ex) {
+                    Activator.logError(ex);
+                    MessageDialog.openError(shell, "Task View Error",
+                            "Error during closing Workitem. Check Error Log for more details.");
                 }
+            }
+        });
+        menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
+        signupItem.setText(MENU_ITEM_SIGNUP_KEY);
+        signupItem.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                try {
+                    getCurrentWorkitem().signup();
+                    refreshViewer();
+                } catch (DataLayerException ex) {
+                    Activator.logError(ex);
+                    MessageDialog.openError(shell, "Task View Error",
+                            "Error during signing up. Check Error Log for more details.");
+                }
+            }
+        });
+        menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
+        editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
+        editDescription.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event e) {
+                HTMLEditor htmlEditor = new HTMLEditor(shell, getCurrentWorkitem());
+                htmlEditor.create();
+                int response = htmlEditor.open();
+                if (response == Window.OK) {
+                    updateDescription(getCurrentWorkitem(), htmlEditor.getValue());
+                }
+            }
         });
         menuItemsMap.put(MENU_ITEM_EDIT_DESCRIPTION_KEY, editDescription);
-    	
-    	menu.addMenuListener(new MenuListener() {
 
-			public void menuHidden(MenuEvent e) { }
+        menu.addMenuListener(new MenuListener() {
 
-			public void menuShown(MenuEvent e) {
-				Workitem item = getCurrentWorkitem();
-				if(menu.getVisible() && (item == null || !validRowSelected())) {
-					menu.setVisible(false);
-				}
-				
-				quickCloseItem.setEnabled(item.canQuickClose());
-				signupItem.setEnabled(item.canSignup() && !item.isMine());
-			}
-    	});
-    	control.setMenu(menu);
+            public void menuHidden(MenuEvent e) {
+            }
+
+            public void menuShown(MenuEvent e) {
+                Workitem item = getCurrentWorkitem();
+                if (menu.getVisible() && (item == null || !validRowSelected())) {
+                    menu.setVisible(false);
+                }
+
+                quickCloseItem.setEnabled(item.canQuickClose());
+                signupItem.setEnabled(item.canSignup() && !item.isMine());
+            }
+        });
+        control.setMenu(menu);
     }
 
     protected void updateDescription(Workitem currentWorkitem, String value) {
         currentWorkitem.setProperty(Workitem.DESCRIPTION_PROPERTY, value);
-        
+
     }
 
     /**
-     * Refresh viewer, causing it to re-read data from model and remove possibly non-relevant items.
+     * Refresh viewer, causing it to re-read data from model and remove possibly
+     * non-relevant items.
      */
     public void refreshViewer() {
-    	viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
-    	loadTable();
-    	viewer.refresh();
+        viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
+        loadTable();
+        viewer.refresh();
     }
-    
+
     /**
      * Select the content and label providers
      */
@@ -224,23 +225,23 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         boolean isEnabled = isEnabled();
 
         enableViewerAndActions(isEnabled);
-        
+
         viewer.getTree().clearAll(true);
-        
+
         if (viewer.getContentProvider() == null) {
             viewer.setContentProvider(new ViewContentProvider());
         }
-        
+
         if (isEnabled) {
             loadTable();
-            
+
         } else {
             viewer.getTree().clearAll(true);
             viewer.setSorter(null);
             viewer.setInput(getViewSite());
         }
     }
-    
+
     public void enableViewerAndActions(boolean status) {
         enableAction(status);
         enableViewer(status);
@@ -271,7 +272,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer));
-        
+
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
         column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer));
@@ -304,7 +305,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer));
 
-        //viewer.refresh();
+        // viewer.refresh();
         isEffortColumsShow = true;
     }
 
@@ -314,7 +315,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void removeEffortColumns() {
         viewer.getTree().getColumn(6).dispose();
         viewer.getTree().getColumn(5).dispose();
-        //viewer.refresh();
+        // viewer.refresh();
         isEffortColumsShow = false;
     }
 
@@ -339,7 +340,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         manager.add(filåterAction);
         manager.add(selectProjectAction);
         manager.add(refreshAction);
-        manager.add(saveAction);        
+        manager.add(saveAction);
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
@@ -381,63 +382,26 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getProperty();
         if (property.equals(PreferenceConstants.P_ENABLED)) {
-            
+
             if (0 == viewer.getTree().getColumnCount()) {
                 configureTable();
             }
             selectProvider();
         } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
-//            try {
-//                Activator.connect();            
-//            } catch (Exception e) {
-//                Activator.logError(e);
-//                MessageDialog.openError(viewer.getTree().getShell(), "Task View Error",
-//                        "Error Occurred Retrieving Task. Check ErrorLog for more Details");
-//            }
             ApiDataLayer.getInstance().updateCurrentProjectId();
             reCreateTable();
-        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {            
+        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
             loadTable();
             viewer.refresh();
         }
-        
-        /*
-        else if (property.equals(PreferenceConstants.P_TRACK_EFFORT)) {
-            if (isTrackEffort()) {
-                this.addEffortColumns();
-            } else {
-                this.removeEffortColumns();
-            }
-        }
-         */
-    }
 
-    /**
-     * Get the projects from VersionOne
-     * 
-     * @return
-     */
-    /*
-    protected IProjectTreeNode getProjectTreeNode() {
-        try {
-            return V1Server.getInstance().getProjects();
-        } catch (Exception e) {
-            Activator.logError(e);
-            MessageDialog.openError(viewer.getControl().getShell(), "Project View Error",
-                    "Error Occurred Retrieving Projects. Check ErrorLog for more Details");
-            return new ProjectTreeNode("root", "0");
-        }
     }
-    */
 
     /**
      * Load the Viewer with Task data
      */
     protected void loadTable() {
         try {
-            // viewer.setInput(V1Server.getInstance().getTasks());
-            // ApiDataLayer.getInstance().connect("http://jsdksrv01:8080/VersionOne/",
-            // "admin", "admin", false);
             viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
         } catch (Exception e) {
             enableViewer(false);
@@ -447,45 +411,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
     }
 
-    
-    /**
-     * Retrieve the StatusCodes from the server
-     * 
-     * @return StatusCodes from the server or an empty collection
-     */
-    /*
-    private IStatusCodes getStatusValues() {
-        try {
-            return V1Server.getInstance().getTaskStatusValues();
-        } catch (Exception e) {
-            Activator.logError(e);
-            showMessage("Error retrieving Task Status from server. Additional informaiton available in Error log.");
-            return new IStatusCodes() {
-                String[] _data = new String[] {};
-
-                public String getDisplayValue(int index) {
-                    return "";
-                }
-
-                public String[] getDisplayValues() {
-                    return _data;
-                }
-
-                public int getOidIndex(String oid) {
-                    return 0;
-                }
-
-                public String getID(int value) {
-                    return "";
-                }
-
-                public String getDisplayFromOid(String oid) {
-                    return "";
-                }
-            };
-        }
-    }
-    */
 
     /**
      * Create a TableViewerColumn with specified properties and append it to the
@@ -537,37 +462,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         return rc;
     }
 
-    private void hookDoubleClickAction() {
-        //
-        // Code to launch a browser when the user double clicks on a task. The
-        // browser is instructed to navigate
-        // to the asset detail page for that task.
-        // This code is currently commented out because
-        // a) with integrated authentication the server responds with a
-        // "forbidden" message.
-        // b) with v1 authentication, the user is always prompted for
-        // credentials.
-        // 
-        // viewer.addDoubleClickListener(new IDoubleClickListener() {
-        // public void doubleClick(DoubleClickEvent event) {
-        // IStructuredSelection selection = (IStructuredSelection)
-        // event.getSelection();
-        // String oid = null;
-        // try {
-        // oid = ((Task)selection.getFirstElement()).getToken();
-        // StringBuffer v1Url = new
-        // StringBuffer(PreferencePage.getPreferences().getString(PreferenceConstants.P_URL));
-        // v1Url.append("assetdetail.v1?Oid=");
-        // v1Url.append(oid);
-        // URL url = new URL(v1Url.toString());
-        // PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(url);
-        // } catch (Exception e) {
-        // Activator.logError(e);
-        // }
-        // }
-        // });
-    }
-
     protected void showMessage(String message) {
         MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
     }
@@ -579,19 +473,17 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     /*
-    protected void updateStatusCodes() {
-        statusEditor.setStatusCodes(getStatusValues());
-    }
-    */
-    protected void reCreateTable() {       
-        
+     * protected void updateStatusCodes() {
+     * statusEditor.setStatusCodes(getStatusValues()); }
+     */
+    protected void reCreateTable() {
+
         if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             removeEffortColumns();
         } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
         }
         selectProvider();
-        //loadTable();
     }
 
 }

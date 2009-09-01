@@ -2,9 +2,6 @@ package com.versionone.taskview.views;
 
 import com.versionone.common.sdk.Workitem;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 public class Configuration {
 
     private static final String CONFIGURATION_FILE = "configuration.xml";
@@ -24,11 +21,7 @@ public class Configuration {
             // TODO load from XML
             configuration = new Configuration();
 
-            try {
-                JAXBContext jc = JAXBContext.newInstance(Configuration.class);
-            } catch (JAXBException e) {
-                throw new RuntimeException("Cannot read " + CONFIGURATION_FILE, e);
-            }
+//          JAXBContext jc = JAXBContext.newInstance(Configuration.class);
         }
         return configuration;
     }

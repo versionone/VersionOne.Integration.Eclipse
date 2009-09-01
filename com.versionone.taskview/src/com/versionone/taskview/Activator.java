@@ -1,5 +1,10 @@
 package com.versionone.taskview;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.eclipse.core.commands.Category;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -7,6 +12,10 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.Workitem;
+import com.versionone.taskview.views.Configuration;
+import com.versionone.taskview.views.Configuration.ColumnSetting;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -45,7 +54,64 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
+        setAttributes();
+        setDetailsAttributes();
+        connect();
     }
+
+    private void setDetailsAttributes() throws Exception {
+        Configuration cfg = Configuration.getInstance();
+        String[] prefixes = new String[] {
+                Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, 
+                Workitem.TEST_PREFIX, Workitem.TASK_PREFIX};
+        setAttributes(cfg.assetDetailSettings.defectColumns, prefixes);
+        setAttributes(cfg.assetDetailSettings.storyColumns, prefixes);
+        setAttributes(cfg.assetDetailSettings.testColumns, prefixes);
+        setAttributes(cfg.assetDetailSettings.taskColumns, prefixes);
+        setAttributes(cfg.assetDetailSettings.projectColumns, Workitem.PROJECT_PREFIX);
+    }
+
+    private static void setAttributes(ColumnSetting[] columns, String... typePrefixes) {
+        ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+        for (ColumnSetting entry : columns) {
+            for (String prefix : typePrefixes) {
+                dataLayer.addProperty(entry.attribute, prefix, isListType(entry.type));
+            }
+        }
+    }
+    
+    private static boolean isListType(String type) {
+        return type.equals(Configuration.AssetDetailSettings.LIST_TYPE)
+                || type.equals(Configuration.AssetDetailSettings.MULTI_VALUE_TYPE);
+    }
+
+    
+    private void setAttributes() throws Exception {
+        ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+        Map<String, Boolean> properties = new HashMap<String, Boolean>();
+        properties.put(Workitem.ID_PROPERTY, false);
+        properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
+        properties.put(Workitem.NAME_PROPERTY, false);
+        properties.put(Workitem.STATUS_PROPERTY, true);
+        properties.put(Workitem.EFFORT_PROPERTY, false);
+        properties.put(Workitem.DONE_PROPERTY, false);
+        properties.put(Workitem.DESCRIPTION_PROPERTY, false);
+        // properties.put(Workitem.ScheduleNameProperty, false);
+        properties.put(Workitem.OWNERS_PROPERTY, true);
+        properties.put(Workitem.TODO_PROPERTY, false);
+        properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
+        properties.put(Workitem.CHECK_QUICK_SIGNUP_PROPERTY, false);
+        properties.put("Scope.Name", false);
+
+        for (Entry<String, Boolean> entry : properties.entrySet()) {
+            dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.STORY_PREFIX, entry.getValue());
+            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());
+        }
+        dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
+    }
+    
 
     /*
      * (non-Javadoc)
@@ -67,12 +133,11 @@ public class Activator extends AbstractUIPlugin {
     public static Activator getDefault() {
         return plugin;
     }
-    
-    //public static void connect(String path, String user, String pass, boolean auth) throws Exception {
+
     public static void connect() throws Exception {
         com.versionone.common.Activator.connect();
     }
-    
+
     /**
      * Returns an image descriptor for the image file at the given plug-in
      * relative path
@@ -116,7 +181,5 @@ public class Activator extends AbstractUIPlugin {
         registry.put(REFRESH_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/refresh.gif"));
         registry.put(SAVE_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/save.gif"));
         registry.put(FILTER_WORKITEM_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/member.gif"));
-        
     }
-
 }

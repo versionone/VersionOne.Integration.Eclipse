@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -40,34 +41,6 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        setAttributes();
-        connect();
-    }
-
-    private void setAttributes() throws Exception {
-        ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-        Map<String, Boolean> properties = new HashMap<String, Boolean>();
-        properties.put(Workitem.ID_PROPERTY, false);
-        properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
-        properties.put(Workitem.NAME_PROPERTY, false);
-        properties.put(Workitem.STATUS_PROPERTY, true);
-        properties.put(Workitem.EFFORT_PROPERTY, false);
-        properties.put(Workitem.DONE_PROPERTY, false);
-        properties.put(Workitem.DESCRIPTION_PROPERTY, false);
-        //properties.put(Workitem.ScheduleNameProperty, false);
-        properties.put(Workitem.OWNERS_PROPERTY, true);
-        properties.put(Workitem.TODO_PROPERTY, false);
-        properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
-        properties.put(Workitem.CHECK_QUICK_SIGNUP_PROPERTY, false);
-        properties.put("Scope.Name", false);
-
-        for (Entry<String, Boolean> entry : properties.entrySet()) {
-            dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.STORY_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());            
-        }
-        dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
     }
     
     /**
@@ -75,20 +48,14 @@ public class Activator extends AbstractUIPlugin {
      * @throws Exception
      */
     public static void connect() {
-        String path = PreferencePage.getPreferences().getString(PreferenceConstants.P_URL);
-        String user = PreferencePage.getPreferences().getString(PreferenceConstants.P_USER);
-        String password = PreferencePage.getPreferences().getString(PreferenceConstants.P_PASSWORD);
-        boolean auth = Boolean.valueOf(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_INTEGRATED_AUTH));
+        final IPreferenceStore pref = PreferencePage.getPreferences();
+        String path = pref.getString(PreferenceConstants.P_URL);
+        String user = pref.getString(PreferenceConstants.P_USER);
+        String password = pref.getString(PreferenceConstants.P_PASSWORD);
+        boolean auth = pref.getBoolean(PreferenceConstants.P_INTEGRATED_AUTH);
         
-        try {
-            ApiDataLayer.getInstance().connect(path, user, password, auth);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            Activator.logError(e);
-        }
-        ApiDataLayer.getInstance().setCurrentProjectId(PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN));
-        boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false : true;
-        ApiDataLayer.getInstance().setShowAllTasks(showAllTask);
+        connect(user, password, path, auth);
+        ApiDataLayer.getInstance().setCurrentProjectId(pref.getString(PreferenceConstants.P_PROJECT_TOKEN));
     }
     
     public static void connect(String user, String password, String path, boolean auth) {

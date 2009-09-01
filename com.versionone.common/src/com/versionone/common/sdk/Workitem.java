@@ -181,7 +181,7 @@ public class Workitem {
      * 
      * @param propertyName
      *            Name of the property to get, e.g. "Status"
-     * @return String, Double, ValueId or PropertyValues.
+     * @return String, ValueId or PropertyValues.
      * @throws IllegalArgumentException
      *             If property cannot be got or there is no such one.
      * @see #NAME_PROPERTY
@@ -194,7 +194,8 @@ public class Workitem {
      */
     public Object getProperty(String propertyName) throws IllegalArgumentException {
         if (propertyName.equals(EFFORT_PROPERTY)) {
-            return dataLayer.getEffort(asset);
+            final Double effort = dataLayer.getEffort(asset);
+            return effort == null ? "" : numberFormat.format(effort.doubleValue());
         }
         final String fullName = getTypePrefix() + '.' + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);

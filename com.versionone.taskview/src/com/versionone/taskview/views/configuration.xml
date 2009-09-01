@@ -430,9 +430,7 @@
 				<EffortTracking>true</EffortTracking>
 			</ColumnSetting>
 		</DefectColumns>
-  </AssetDetail>
-  <ProjectTree>
-		<Columns>
+		<ProjectColumns>
 			<ColumnSetting>
 				<Name>Schedule</Name>
 				<Category>Main</Category>
@@ -453,6 +451,6 @@
 				<Attribute>BuildProjects</Attribute>
 				<ReadOnly>1</ReadOnly>
 			</ColumnSetting>
-		</Columns>
-	</ProjectTree>
+		</ProjectColumns>
+  </AssetDetail>
 </Configuration>

@@ -50,6 +50,10 @@ public class WorkitemPropertySource implements IPropertySource {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly);
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
+        } else if(col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
+            desc = new MultiValueListPropertyDescriptor(col.attribute, item.getTypePrefix(), localName);
+        } else if(col.type.equals(AssetDetailSettings.RICH_TEXT_TYPE)) {
+            desc = new RichTextPropertyDescriptor(col.attribute, localName);
         } else {
             desc = new PropertyDescriptor(col.attribute, localName);
         }

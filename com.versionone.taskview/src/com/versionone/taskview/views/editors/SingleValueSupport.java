@@ -42,11 +42,9 @@ public class SingleValueSupport extends EditingSupport {
     protected Object getValue(Object element) {
         try {            
             Workitem workitem = ((Workitem) element);
-            //String[] valueList = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).toStringArray();
             ValueId value = (ValueId)((Workitem) element).getProperty(propertyName);
             currentValue = value;
             return dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getStringArrayIndex(value);
-            //return getCurrentId(((ValueId)((Workitem) element).getProperty(propertyName)).toString());//;
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;
@@ -56,8 +54,6 @@ public class SingleValueSupport extends EditingSupport {
     @Override
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
-        //ValueId currentValue = (ValueId)workitem.getProperty(propertyName);
-        //ValueId newValue = valueList[value];
         ValueId newValue = dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).getValueIdByIndex((Integer)value);
         if (dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).contains(newValue) &&
                 !currentValue.equals(newValue) && newValue != null) {

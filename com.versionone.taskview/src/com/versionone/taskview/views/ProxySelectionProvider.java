@@ -62,8 +62,7 @@ public class ProxySelectionProvider implements ISelectionProvider {
         }
 
         public void selectionChanged(SelectionChangedEvent event) {
-            listener
-                    .selectionChanged(new SelectionChangedEvent(ProxySelectionProvider.this, wrap(event.getSelection())));
+            listener.selectionChanged(new SelectionChangedEvent(ProxySelectionProvider.this, wrap(event.getSelection())));
         }
     }
 }

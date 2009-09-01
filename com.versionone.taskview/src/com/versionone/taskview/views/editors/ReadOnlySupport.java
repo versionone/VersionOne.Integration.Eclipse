@@ -40,7 +40,7 @@ public class ReadOnlySupport extends TextSupport {
      * 
      * @author jerry
      */
-    static class ReadOnlyCellEditor extends CellEditor {
+    public static class ReadOnlyCellEditor extends CellEditor {
 
         protected Text text;
 

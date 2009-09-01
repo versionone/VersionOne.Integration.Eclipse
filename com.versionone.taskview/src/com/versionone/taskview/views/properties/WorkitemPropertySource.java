@@ -8,6 +8,7 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.Configuration;
+import com.versionone.taskview.views.Configuration.AssetDetailSettings;
 import com.versionone.taskview.views.Configuration.ColumnSetting;
 
 public class WorkitemPropertySource implements IPropertySource {
@@ -45,10 +46,10 @@ public class WorkitemPropertySource implements IPropertySource {
             localName = col.name;
         }
         final PropertyDescriptor desc;
-        if (col.type.equals("String")) {
+        if (col.type.equals(AssetDetailSettings.STRING_TYPE)) {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly);
-        } else if(col.type.equals("List")) {
-        	desc = new ListPropertyDescriptor(col.attribute, localName, item);
+        } else if (col.type.equals("List")) {
+            desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else {
             desc = new PropertyDescriptor(col.attribute, localName);
         }

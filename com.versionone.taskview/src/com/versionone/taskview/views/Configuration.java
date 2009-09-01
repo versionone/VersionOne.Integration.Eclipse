@@ -44,7 +44,7 @@ public class Configuration {
 
         public AssetDetailSettings() {
             // TODO temporary
-            taskColumns = new ColumnSetting[6];
+            taskColumns = new ColumnSetting[7];
             testColumns = new ColumnSetting[1];
             storyColumns = new ColumnSetting[1];
             defectColumns = new ColumnSetting[1];
@@ -61,12 +61,15 @@ public class Configuration {
                     false, false);
             taskColumns[5] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
                     false);
+            taskColumns[6] = new ColumnSetting("ColumnTitle'ID", STRING_TYPE, "Number", MAIN_CATEGORY, true,
+                    false);
             
             storyColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false, false);
             
             testColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false, false);
             
             defectColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false, false);
+
         }
 
         public ColumnSetting[] getColumns(String type) {

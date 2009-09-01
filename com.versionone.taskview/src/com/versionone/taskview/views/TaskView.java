@@ -35,8 +35,8 @@ import com.versionone.taskview.Activator;
 
 import com.versionone.taskview.views.editors.SingleValueSupport;
 import com.versionone.taskview.views.editors.MultiValueSupport;
-import com.versionone.taskview.views.editors.ReadOnlyEditor;
-import com.versionone.taskview.views.editors.TextEditor;
+import com.versionone.taskview.views.editors.ReadOnlySupport;
+import com.versionone.taskview.views.editors.TextSupport;
 import com.versionone.taskview.views.htmleditor.HTMLEditor;
 import com.versionone.taskview.views.providers.SimpleProvider;
 
@@ -266,11 +266,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void configureTable() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.ID_PROPERTY, true));
-        column.setEditingSupport(new ReadOnlyEditor(Workitem.ID_PROPERTY, viewer));
+        column.setEditingSupport(new ReadOnlySupport(Workitem.ID_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
-        column.setEditingSupport(new TextEditor(Workitem.NAME_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer));
         
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
@@ -282,11 +282,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));
-        column.setEditingSupport(new TextEditor(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.TODO_PROPERTY, false));
-        column.setEditingSupport(new TextEditor(Workitem.TODO_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.TODO_PROPERTY, viewer));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
@@ -302,7 +302,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 6);
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
-        column.setEditingSupport(new TextEditor(Workitem.EFFORT_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer));
 
         //viewer.refresh();
         isEffortColumsShow = true;

@@ -1,4 +1,4 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.properties;
 
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -7,13 +7,14 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
+import com.versionone.taskview.views.Configuration;
 import com.versionone.taskview.views.Configuration.ColumnSetting;
 
 public class WorkitemPropertySource implements IPropertySource {
 
     private final Workitem item;
 
-    WorkitemPropertySource(Workitem item) {
+    public WorkitemPropertySource(Workitem item) {
         this.item = item;
     }
 

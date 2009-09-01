@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.Workitem;
+import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
 public class ProxySelectionProvider implements ISelectionProvider {
 

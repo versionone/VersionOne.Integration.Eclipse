@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ReadOnlyEditor extends TextEditor {
+public class ReadOnlySupport extends TextSupport {
 
-    public ReadOnlyEditor(String propertyName, TreeViewer viewer) {
+    public ReadOnlySupport(String propertyName, TreeViewer viewer) {
         super(propertyName, viewer);
     }
 

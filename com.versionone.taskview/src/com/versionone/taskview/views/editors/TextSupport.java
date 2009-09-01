@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
-public class TextEditor extends EditingSupport {
+public class TextSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
 
@@ -17,7 +17,7 @@ public class TextEditor extends EditingSupport {
     private final String property;
     private String oldValue;
 
-    public TextEditor(String propertyName, TreeViewer viewer) {
+    public TextSupport(String propertyName, TreeViewer viewer) {
         super(viewer);
         property = propertyName;
         editor = createEditor(viewer);

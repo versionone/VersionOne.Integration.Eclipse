@@ -10,10 +10,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.versionone.apiclient.MetaModel;
-import com.versionone.apiclient.Services;
-import com.versionone.apiclient.V1APIConnector;
-import com.versionone.apiclient.V1Exception;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.ButtonFieldEditor.Validator;
 import com.versionone.common.sdk.ApiDataLayer;
@@ -23,7 +19,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     private StringFieldEditor urlEditor;
     private StringFieldEditor userEditor;
     private StringFieldEditor pwdField;
-    //private BooleanFieldEditor effortEditor;
     private BooleanFieldEditor enabledEditor;
     private ButtonFieldEditor requiresValidation;
     private BooleanFieldEditor integratedAuthEditor;
@@ -72,13 +67,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         pwdField = new StringFieldEditor(PreferenceConstants.P_PASSWORD, "Password:", this.getFieldEditorParent());
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
-
-/*
-        effortEditor = new BooleanFieldEditor(PreferenceConstants.P_TRACK_EFFORT, "Effort Tracking", this
-                .getFieldEditorParent());
-        addField(effortEditor);
-*/
-
+        
         requiresValidation = new ButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
                 new ConnectionValidator(), this.getFieldEditorParent());
         addField(requiresValidation);
@@ -103,7 +92,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             userEditor.setEnabled(value, this.getFieldEditorParent());
             pwdField.setEnabled(value, this.getFieldEditorParent());
         }
-        //effortEditor.setEnabled(value, this.getFieldEditorParent());
+
         requiresValidation.setEnabled(value, this.getFieldEditorParent());
         integratedAuthEditor.setEnabled(value, this.getFieldEditorParent());
     }

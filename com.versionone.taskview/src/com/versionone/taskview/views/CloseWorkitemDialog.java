@@ -22,8 +22,6 @@ import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
-import com.versionone.common.preferences.PreferenceConstants;
-import com.versionone.common.preferences.PreferencePage;
 
 public class CloseWorkitemDialog extends Dialog implements SelectionListener {
 

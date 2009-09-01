@@ -37,8 +37,6 @@ public class HTMLEditor extends Dialog {
 
         this.workitem = workitem;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
-        //getButton(IDialogConstants.OK_ID).
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -49,18 +47,9 @@ public class HTMLEditor extends Dialog {
         final Composite container = (Composite) super.createDialogArea(parent);        
         container.setLayout(new GridLayout(1, true));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));//SWT.FILL, SWT.FILL
-
-        //CoolBar coolbar = new CoolBar(container, SWT.NONE);
-        //GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);//SWT.FILL, SWT.BEGINNING
-        //gd.widthHint = 100;
-        //coolbar.setLayoutData(gd);
-       
         
         ToolBar menu = new ToolBar(container, SWT.HORIZONTAL | SWT.FLAT);//
         ToolBarManager manager = new ToolBarManager(menu);
-
-        //CoolItem item = new CoolItem(coolbar, SWT.VERTICAL);//SWT.VERTICAL
-        //item.setControl(menu);
 
         composer = new HtmlComposer(container, SWT.BORDER | SWT.SCROLL_LINE);
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

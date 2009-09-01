@@ -181,9 +181,6 @@ public class ApiDataLayer {
 
             isConnected = true;
 
-            // TODO review this place possible way when user change location and
-            // user has the same token
-
             if (isTokenChanged) {
                 PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN,
                         memberOid.getToken() + ":" + path);
@@ -232,10 +229,7 @@ public class ApiDataLayer {
                 roots.add(new Workitem(oneAsset, null));
             }
             return roots;
-        }/*
-          * catch (WebException ex) { isConnected = false; throw
-          * Warning("Can't get projects list.", ex); }
-          */catch (Exception ex) {
+        } catch (Exception ex) {
             throw warning("Can't get projects list.", ex);
         }
     }
@@ -253,9 +247,6 @@ public class ApiDataLayer {
     public Workitem[] getWorkitemTree() throws Exception {
         checkConnection();
         if (currentProjectId == null) {
-            // throw new DataLayerException("Current project is not selected");
-            // // TODO implement
-            // throw new Exception("Current project is not selected");
             currentProjectId = getDefaultProjectId();
         }
 
@@ -264,7 +255,7 @@ public class ApiDataLayer {
                 IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
 
                 Query query = new Query(workitemType, parentDef);
-                // Query query = new Query(taskType, parentDef);
+                
                 // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
                 addSelection(query, Workitem.TASK_PREFIX);
@@ -280,12 +271,7 @@ public class ApiDataLayer {
                 assetList = services.retrieve(query);
             } catch (MetaException ex) {
                 throw warning("Unable to get workitems.", ex);
-            }
-            /*
-             * catch (WebException ex) { isConnected = false; throw
-             * Warning("Unable to get workitems.", ex); }
-             */
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 throw warning("Unable to get workitems.", ex);
             }
         }
@@ -403,11 +389,7 @@ public class ApiDataLayer {
         attributesToQuery.addLast(new AttributeInfo(attr, prefix, isList));
     }
 
-    private Map<String, PropertyValues> getListPropertyValues() throws Exception { // ConnectionException,
-        // APIException,
-        // OidException,
-        // MetaException
-        // {
+    private Map<String, PropertyValues> getListPropertyValues() throws Exception { 
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {
@@ -652,7 +634,6 @@ public class ApiDataLayer {
 
     public Workitem getCurrentProject() throws Exception {
         if (currentProjectId == null || currentProjectId.equals("")) {
-            // currentProjectId = "Scope:0";
             currentProjectId = getDefaultProjectId();
         }
         return getProjectById(currentProjectId);

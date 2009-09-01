@@ -2,8 +2,6 @@ package com.versionone.taskview.test;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TreeNode;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -208,20 +206,19 @@ public class TestTaskView {
 
 	/**
 	 * Test row when all projects are selected
+	 * @throws Exception 
 	 */
-	/*
 	@Test	
-	public void testViewDataNoEffort() {
-		//disableEffortTracking();
+	public void testViewDataNoEffort() throws Exception {
+		disableEffortTracking();
 		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		TreeItem[] rows = table.getItems();
-		Assert.assertEquals(2, rows.length);
-
-		validateRow(rows[0], "Add Shipping Notes", "Service Changes", "TK-01061", "24.0", "10.0", "In Progress");
-		validateRow(rows[1], "View Daily Call Count", "Service Changes", "TK-01068", "24.0", "24.0", "In Progress");
+		Assert.assertEquals(11, rows.length);
+		
+		validateRow(rows[0], "Cat", "New Defect1", "D-01094", "19.00", "19.00", "Accepted");
+		validateRow(rows[1], "Bil, Tom, Administrator", "FAST LAND 1", "B-01190", "", "", "Done");
 	}
-	*/
 
 	/**
 	 * Check each column and verify if edits are allowed
@@ -234,7 +231,8 @@ public class TestTaskView {
 		testView.getViewer().expandAll();
 		
 		//story
-		Object selectedElement = testView.getViewer().getTree().getItem(1).getData();		
+		Object selectedElement = testView.getViewer().getTree().getItem(1).getData();
+		delay(1000);
 		checkEditor(selectedElement, ID_COLUMN_INDEX, true);
 		checkEditor(selectedElement, OWNER_COLUMN_INDEX, true);
 		checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
@@ -288,49 +286,44 @@ public class TestTaskView {
 	/**
 	 * Validate one row in the table
 	 */
-	/*
-	private void validateRow(TreeItem row, String story, String name, String number, String estimate, String todo, String status) {
-		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
+	private void validateRow(TreeItem row, String owners, String name, String number, String estimate, String todo, String status) {
+		Assert.assertEquals(owners, row.getText(OWNER_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));
-		Assert.assertEquals(estimate, row.getText(ESTIMATE_COLUMN_INDEX));
+		Assert.assertEquals(estimate, row.getText(DETAIL_ESTIMATE_COLUMN_INDEX));
 		Assert.assertEquals(todo, row.getText(TODO_COLUMN_INDEX));
 		Assert.assertEquals(status, row.getText(STATUS_COLUMN_INDEX));
 	}
-	*/
 	
 	/**
 	 * Test row when all projects are selected
+	 * @throws Exception 
 	 */
-	/*
 	@Test
-	public void testViewDataEffort() {
+	public void testViewDataEffort() throws Exception {
 		enableEffortTracking();
 		Tree table = testView.getViewer().getTree();
 		Assert.assertNotNull(table);
 		TreeItem[] rows = table.getItems();
-		Assert.assertEquals(2, rows.length);
+		Assert.assertEquals(11, rows.length);
 
-		validateRow(rows[0], "Add Shipping Notes", "Service Changes", "TK-01061", "24.0", "30.0", "", "10.0", "In Progress");
-		validateRow(rows[1], "View Daily Call Count", "Service Changes", "TK-01068", "24.0", "", "", "24.0", "In Progress");
+                validateRow(rows[0], "Cat", "New Defect1", "D-01094", "19.00", "", "", "19.00",  "Accepted");
+                validateRow(rows[1], "Bil, Tom, Administrator", "FAST LAND 1", "B-01190", "", "", "", "", "Done");
 	}
-	*/
 
 	/**
 	 * Validate one row in the table
 	 */	
-	/*
-	private void validateRow(TreeItem row, String story, String name, String number, String estimate, String done, String effort, String todo, String status) {
-		Assert.assertEquals(story, row.getText(STORY_COLUMN_INDEX));
+	private void validateRow(TreeItem row, String owner, String name, String number, String estimate, String done, String effort, String todo, String status) {
+		Assert.assertEquals(owner, row.getText(OWNER_COLUMN_INDEX));
 		Assert.assertEquals(name, row.getText(NAME_COLUMN_INDEX));
 		Assert.assertEquals(number, row.getText(ID_COLUMN_INDEX));
-		Assert.assertEquals(estimate, row.getText(ESTIMATE_COLUMN_INDEX));		
+		Assert.assertEquals(estimate, row.getText(DETAIL_ESTIMATE_COLUMN_INDEX));		
 		Assert.assertEquals(effort, row.getText(EFFORT_COLUMN_INDEX));
 		Assert.assertEquals(done, row.getText(DONE_COLUMN_INDEX));
 		Assert.assertEquals(todo, row.getText(TRACKED_TODO_COLUMN_INDEX));
-		Assert.assertEquals(status, row.getText(TRACKED_STATUS_COLUMN_INDEX));
+		Assert.assertEquals(status, row.getText(STATUS_COLUMN_INDEX));
 	}
-	*/
 	
 	/**
 	 * Process UI input but do not return for the specified time interval

@@ -1,9 +1,7 @@
 package com.versionone.taskview.views;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TreeNode;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.TreeItem;
 
 import com.versionone.common.sdk.Workitem;
 
@@ -13,8 +11,6 @@ import com.versionone.common.sdk.Workitem;
  * @author jerry
  */
 class ViewContentProvider implements ITreeContentProvider {
-
-    Object justForTest;
 
     public Object[] getChildren(Object parentElement) {
 
@@ -26,14 +22,11 @@ class ViewContentProvider implements ITreeContentProvider {
     }
 
     public boolean hasChildren(Object element) {
-        // TODO Auto-generated method stub
         Workitem workitem = ((Workitem) element);
         return workitem.children != null && workitem.children.size() > 0;
     }
 
     public Object[] getElements(Object inputElement) {
-        // justForTest = inputElement;
-        // return inputElement;
         if (inputElement instanceof Workitem[]) {
             return (Object[]) inputElement;
         } else {
@@ -42,17 +35,7 @@ class ViewContentProvider implements ITreeContentProvider {
 
     }
 
-    public void dispose() {
-        // TODO Auto-generated method stub
-
-    }
+    public void dispose() {}
 
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-
-    /*
-     * public void inputChanged(Viewer v, Object oldInput, Object newInput)
-     * {} public void dispose() {} public Object[] getElements(Object
-     * parent) { if(parent instanceof Task[]) { return (Object[]) parent; }
-     * else { return new Object[]{}; } }
-     */
 }

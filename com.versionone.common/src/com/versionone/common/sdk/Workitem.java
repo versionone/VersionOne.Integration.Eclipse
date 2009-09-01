@@ -1,6 +1,5 @@
 package com.versionone.common.sdk;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
-import com.versionone.common.Activator;
 
 public class Workitem {
 

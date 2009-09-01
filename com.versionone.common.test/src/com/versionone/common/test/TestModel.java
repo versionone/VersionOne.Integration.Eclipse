@@ -7,15 +7,11 @@ import junit.framework.JUnit4TestAdapter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.versionone.apiclient.APIException;
-import com.versionone.apiclient.ConnectionException;
 import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaModel;
-import com.versionone.apiclient.OidException;
 import com.versionone.apiclient.Services;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -41,7 +37,6 @@ public class TestModel {
     static final String SCOPE_ID = "Scope:1012";
     static final boolean VALIDATION_REQUIRED = false;
     static final boolean TRACKING = false;
-    private static final double EPSILON = 0.005;
     private static ApiDataLayer datalayer = null;
 
     private static void loadTestData() throws Exception {
@@ -87,7 +82,6 @@ public class TestModel {
         Workitem companyNode = projectNode.get(0);
         Assert.assertEquals("Company", companyNode.getProperty(Workitem.NAME_PROPERTY));
         
-        // Assert.assertEquals("Scope:1011", companyNode.getToken());
         Assert.assertEquals(3, companyNode.children.size());
         companyNode = children.get(0);
         Assert.assertEquals("Call Center", companyNode.getProperty(Workitem.NAME_PROPERTY));
@@ -111,13 +105,6 @@ public class TestModel {
                 "", Workitem.TEST_PREFIX);
         validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
                 "In Progress", Workitem.TASK_PREFIX);
-        // test [1][0]
-        //
-        // task [0][0]
-        // 1, , Administrator, , , 4, 5, 0, 0
-
-        // validateTask(allTask[1], "TK-01068", "View Daily Call Count",
-        // "Service Changes", "24", "", "0", "24", "TaskStatus:123");
     }
     
     @Test
@@ -138,10 +125,6 @@ public class TestModel {
 
         validateTask(allWorkItem[5].children.get(1), "AT-01008", "Test:2244", "test1", "0.00", "35.00", null, "0.00",
                 "Passed", Workitem.TEST_PREFIX);
-        /*
-        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
-                "In Progress", Workitem.TaskPrefix);
-        */
     }
 	
 //	@Test
@@ -194,7 +177,6 @@ public class TestModel {
         testMe.setProperty(Workitem.TODO_PROPERTY, "10.01");
         Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));
 
-        //TODO need to fix this bug
         try {
             testMe.setProperty(Workitem.TODO_PROPERTY, "-1");
             Assert.fail("ToDo cannot be negative");

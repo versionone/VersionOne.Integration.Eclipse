@@ -6,8 +6,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.versionone.common.preferences.PreferenceConstants;
-import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
@@ -31,7 +29,6 @@ class ProjectAction extends Action {
             return;
         }
         workItemView.enableViewerAndActions(false);
-        //IProjectTreeNode root = workItemView.getProjectTreeNode();
         List<Workitem> projectList = null;
         try {
             projectList = ApiDataLayer.getInstance().getProjectTree();
@@ -40,14 +37,7 @@ class ProjectAction extends Action {
             MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
             "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
-        
-        //IProjectTreeNode selectNode = null;
-        //String projectToken = PreferencePage.getPreferences().getString(PreferenceConstants.P_PROJECT_TOKEN);
-        /*
-        if (!projectToken.equals("")) {
-            selectNode = new ProjectTreeNode("", projectToken);
-        }
-        */
+
         
         try {
             ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(workItemViewer.getControl().getShell(), projectList,

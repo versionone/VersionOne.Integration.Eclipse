@@ -4,7 +4,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.taskview.Activator;
 
 class RefreshAction extends Action {
@@ -32,6 +31,5 @@ class RefreshAction extends Action {
         }
         workItemView.enableViewerAndActions(true);
         workItemView.reCreateTable();
-        //workItemView.updateStatusCodes();
     }
 }

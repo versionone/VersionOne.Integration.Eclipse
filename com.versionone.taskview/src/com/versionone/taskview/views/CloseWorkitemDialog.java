@@ -79,10 +79,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         toDoText = new Text(container, SWT.BORDER);
         toDoText.setSize(40, 30);
         toDoText.setEditable(false);
-        Object toDo = workitem.getProperty("ToDo");
-        if(toDo != null) {
-        	toDoText.setText(toDo.toString());
-        }
+        toDoText.setText(workitem.getPropertyAsString(Workitem.TODO_PROPERTY));
         
         statusLabel = new Label(container, SWT.NONE);
         statusLabel.setText("Status");

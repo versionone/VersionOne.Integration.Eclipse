@@ -2,6 +2,7 @@ package com.versionone.common.sdk;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import com.versionone.Oid;
@@ -38,12 +39,18 @@ public class Workitem {
     protected Asset asset;
     public Workitem parent;
 
+    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    static {
+        numberFormat.setMinimumFractionDigits(2);
+        numberFormat.setMaximumFractionDigits(6);
+    }
+
     /**
      * List of child Workitems.
      */
     public final ArrayList<Workitem> children;
 
-    public Workitem(Asset asset, Workitem parent) {
+    Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
 
@@ -204,12 +211,9 @@ public class Workitem {
             Object val = attribute.getValue();
             if (val instanceof Oid) {
                 return getPropertyValues(propertyName).find((Oid) val);
+            } else if (val instanceof Double) {
+                return numberFormat.format(((Double) val).doubleValue());
             }
-
-            if (val instanceof Double) {
-                return BigDecimal.valueOf((Double) val).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
-            }
-
             return val;
         } catch (APIException e) {
             throw new IllegalArgumentException("Cannot get property: " + propertyName, e);
@@ -218,13 +222,7 @@ public class Workitem {
 
     public String getPropertyAsString(String propertyName) throws IllegalArgumentException {
         Object value = getProperty(propertyName);
-        if (value == null) {
-            return "";
-        } else if (value instanceof Double) {
-            // return numberFormat.format(value);
-            return BigDecimal.valueOf((Double) value).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
-        }
-        return value.toString();
+        return value == null ? "" : value.toString();
     }
 
     /**
@@ -268,12 +266,10 @@ public class Workitem {
         return attrDef.getAttributeType() == AttributeType.Numeric;
     }
 
-    private void setNumericProperty(String propertyName, Object newValue) throws APIException {
+    private void setNumericProperty(String propertyName, Object newValue) throws APIException, ParseException {
         Double doubleValue = null;
         if (newValue != null) {
-            // newValue = numberFormat.parse((String) newValue);
-            doubleValue = Double.parseDouble(BigDecimal.valueOf(Double.parseDouble((String) newValue)).setScale(2,
-                    BigDecimal.ROUND_HALF_UP).toPlainString());
+            doubleValue = numberFormat.parse((String) newValue).doubleValue();
         }
 
         if (propertyName.equals(EFFORT_PROPERTY)) {

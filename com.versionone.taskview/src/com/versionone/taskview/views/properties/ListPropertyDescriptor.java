@@ -12,11 +12,11 @@ public class ListPropertyDescriptor extends PropertyDescriptor {
     private final Workitem workitem;
     private final String propertyName;
 	
-	public ListPropertyDescriptor(Object id, String propertyName, Workitem workitem) {
-    	super(id, propertyName);
-    	Assert.isNotNull(workitem);
-    	this.workitem = workitem;
-    	this.propertyName = propertyName;
+    public ListPropertyDescriptor(Object id, String propertyName, Workitem workitem) {
+        super(id, propertyName);
+        Assert.isNotNull(workitem);
+        this.workitem = workitem;
+        this.propertyName = propertyName;
     }
     
     @Override

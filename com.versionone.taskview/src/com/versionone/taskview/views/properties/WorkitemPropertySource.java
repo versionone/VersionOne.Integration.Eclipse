@@ -48,7 +48,7 @@ public class WorkitemPropertySource implements IPropertySource {
         final PropertyDescriptor desc;
         if (col.type.equals(AssetDetailSettings.STRING_TYPE)) {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly);
-        } else if (col.type.equals("List")) {
+        } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else {
             desc = new PropertyDescriptor(col.attribute, localName);

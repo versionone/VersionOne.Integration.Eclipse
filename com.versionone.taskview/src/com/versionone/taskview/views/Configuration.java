@@ -2,8 +2,8 @@ package com.versionone.taskview.views;
 
 import com.versionone.common.sdk.Workitem;
 
-//import javax.xml.bind.JAXBContext;
-//import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 public class Configuration {
 
@@ -24,12 +24,11 @@ public class Configuration {
             // TODO load from XML
             configuration = new Configuration();
 
-            // try {
-            // JAXBContext jc = JAXBContext.newInstance(Configuration.class);
-            // } catch (JAXBException e) {
-            // throw new RuntimeException("Cannot read " + CONFIGURATION_FILE,
-            // e);
-            // }
+            try {
+                JAXBContext jc = JAXBContext.newInstance(Configuration.class);
+            } catch (JAXBException e) {
+                throw new RuntimeException("Cannot read " + CONFIGURATION_FILE, e);
+            }
         }
         return configuration;
     }
@@ -89,14 +88,17 @@ public class Configuration {
     }
 
     public static class ColumnSetting {
-        public final String name;
-        public final String type;
-        public final String attribute;
-        public final String category;
-        public final boolean readOnly;
-        public final boolean effortTracking;
-        public final int width = 100;
+        public String name;
+        public String type;
+        public String attribute;
+        public String category;
+        public boolean readOnly;
+        public boolean effortTracking;
+        public int width = 100;
 
+        public ColumnSetting() {
+        }
+        
         ColumnSetting(String name, String type, String attribute, String category, boolean readOnly,
                 boolean effortTracking) {
             super();

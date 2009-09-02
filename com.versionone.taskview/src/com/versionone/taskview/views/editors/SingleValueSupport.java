@@ -2,26 +2,30 @@ package com.versionone.taskview.views.editors;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
 public class SingleValueSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
     private String propertyName;
-    private TreeViewer viewer;
     private final ApiDataLayer dataLayer;
     private ValueId currentValue;
+    private final ISelectionProvider selectionProvider;
     
-    public SingleValueSupport(String propertyName, TreeViewer viewer) {
+    
+    public SingleValueSupport(String propertyName, TreeViewer viewer, ISelectionProvider selectionProvider) {
         super(viewer);
         this.propertyName = propertyName;
-        this.viewer = viewer;
-        dataLayer = ApiDataLayer.getInstance();               
+        this.selectionProvider = selectionProvider;
+        dataLayer = ApiDataLayer.getInstance();
     }
     
     @Override
@@ -32,7 +36,7 @@ public class SingleValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
-        return new SingleValueEditor(viewer.getTree(), workitem.getTypePrefix(), propertyName);
+        return new SingleValueEditor(((TreeViewer)getViewer()).getTree(), workitem.getTypePrefix(), propertyName);
     }
 
     @Override
@@ -55,7 +59,9 @@ public class SingleValueSupport extends EditingSupport {
                 !currentValue.equals(newValue) && newValue != null) {
             workitem.setProperty(propertyName, newValue);
         }
-        viewer.refresh();
+        
+        getViewer().update(element, null);
+        selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
     }
 
 }

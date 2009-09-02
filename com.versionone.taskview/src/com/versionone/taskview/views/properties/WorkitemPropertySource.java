@@ -1,5 +1,7 @@
 package com.versionone.taskview.views.properties;
 
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -14,9 +16,11 @@ import com.versionone.taskview.views.Configuration.ColumnSetting;
 public class WorkitemPropertySource implements IPropertySource {
 
     private final Workitem item;
+    private final ISelectionProvider proxy;
 
-    public WorkitemPropertySource(Workitem item) {
+    public WorkitemPropertySource(Workitem item, ISelectionProvider proxy) {
         this.item = item;
+        this.proxy = proxy;
     }
 
     public Object getEditableValue() {
@@ -76,6 +80,7 @@ public class WorkitemPropertySource implements IPropertySource {
     public void setPropertyValue(Object id, Object value) {
         try {
             item.setProperty((String) id, value);
+            ((Viewer)proxy).refresh();
         } catch (Exception e) {
             // Do nothing
         }

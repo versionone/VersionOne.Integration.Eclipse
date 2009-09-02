@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Text;
 public class ReadOnlySupport extends TextSupport {
 
     public ReadOnlySupport(String propertyName, TreeViewer viewer) {
-        super(propertyName, viewer);
+        super(propertyName, viewer, null);
     }
 
     @Override

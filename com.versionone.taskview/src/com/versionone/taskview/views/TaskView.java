@@ -10,6 +10,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.window.Window;
@@ -38,6 +39,7 @@ import com.versionone.taskview.views.editors.MultiValueSupport;
 import com.versionone.taskview.views.editors.ReadOnlySupport;
 import com.versionone.taskview.views.editors.TextSupport;
 import com.versionone.taskview.views.htmleditor.HTMLEditor;
+import com.versionone.taskview.views.properties.WorkitemPropertySource;
 import com.versionone.taskview.views.providers.SimpleProvider;
 
 /**
@@ -66,6 +68,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
     private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
     private static final String MENU_ITEM_EDIT_DESCRIPTION_KEY = "Edit description";
+    private ProxySelectionProvider selectionProvider;
 
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
 
@@ -75,6 +78,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private Action refreshAction = null;
     private Action saveAction = null;
     private Action filåterAction = null;
+    
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -87,6 +91,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void createPartControl(Composite parent) {
 
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        selectionProvider = new ProxySelectionProvider(viewer);
 
         if (isEnabled()) {
             configureTable();
@@ -96,7 +101,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         contributeToActionBars();
         createContextMenu(viewer);
         selectProvider();
-        getSite().setSelectionProvider(new ProxySelectionProvider(viewer));
+        getSite().setSelectionProvider(selectionProvider);
     }
 
     private boolean validRowSelected() {
@@ -229,7 +234,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         viewer.getTree().clearAll(true);
 
         if (viewer.getContentProvider() == null) {
-            viewer.setContentProvider(new ViewContentProvider());
+            viewer.setContentProvider(new ViewContentProvider(selectionProvider));
         }
 
         if (isEnabled) {
@@ -271,23 +276,23 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
-        column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer));
+        column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.STATUS_PROPERTY, false));
-        column.setEditingSupport(new SingleValueSupport(Workitem.STATUS_PROPERTY, viewer));
+        column.setEditingSupport(new SingleValueSupport(Workitem.STATUS_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
         column.setLabelProvider(new SimpleProvider(Workitem.TODO_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Workitem.TODO_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.TODO_PROPERTY, viewer, selectionProvider));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
@@ -303,7 +308,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 6);
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer, selectionProvider));
 
         // viewer.refresh();
         isEffortColumsShow = true;
@@ -472,10 +477,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         super.dispose();
     }
 
-    /*
-     * protected void updateStatusCodes() {
-     * statusEditor.setStatusCodes(getStatusValues()); }
-     */
     protected void reCreateTable() {
 
         if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
@@ -484,6 +485,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             addEffortColumns();
         }
         selectProvider();
+        selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(getCurrentWorkitem(), getViewer())));
     }
 
 }

@@ -3,11 +3,14 @@ package com.versionone.taskview.views.editors;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
 public class TextSupport extends EditingSupport {
 
@@ -16,11 +19,13 @@ public class TextSupport extends EditingSupport {
     private final CellEditor editor;
     private final String property;
     private String oldValue;
+    private final ISelectionProvider selectionProvider;
 
-    public TextSupport(String propertyName, TreeViewer viewer) {
+    public TextSupport(String propertyName, TreeViewer viewer, ISelectionProvider selectionProvider) {
         super(viewer);
         property = propertyName;
         editor = createEditor(viewer);
+        this.selectionProvider = selectionProvider; 
     }
 
     protected CellEditor createEditor(TreeViewer viewer) {
@@ -52,6 +57,8 @@ public class TextSupport extends EditingSupport {
                 ((Workitem) element).setProperty(property, value);
             }
             getViewer().update(element, null);
+
+            selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource((Workitem) element, getViewer())));
         } catch (IllegalArgumentException e) {
             editor.setValue(""); // prevents two error dialogs
             Activator.logError(e);

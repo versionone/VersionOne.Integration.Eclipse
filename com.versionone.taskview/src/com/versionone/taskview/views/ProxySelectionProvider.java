@@ -42,10 +42,12 @@ public class ProxySelectionProvider implements ISelectionProvider {
             IStructuredSelection sSel = (IStructuredSelection) sel;
             final Object element = sSel.getFirstElement();
             Object res = null;
-            if (element instanceof Workitem)
-                res = new WorkitemPropertySource((Workitem) element);
-            else if (element instanceof WorkitemPropertySource)
+            if (element instanceof Workitem) {
+                res = new WorkitemPropertySource((Workitem) element, proxy);
+            }
+            else if (element instanceof WorkitemPropertySource) {
                 res = ((WorkitemPropertySource) element).getItem();
+            }
             if (res != null) {
                 return new StructuredSelection(res);
             }

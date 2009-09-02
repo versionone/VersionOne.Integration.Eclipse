@@ -12,6 +12,12 @@ import com.versionone.common.sdk.Workitem;
  */
 class ViewContentProvider implements ITreeContentProvider {
 
+    private final ProxySelectionProvider propertySelectionProvider;
+    
+    public ViewContentProvider(ProxySelectionProvider selectionProvider) {
+        propertySelectionProvider = selectionProvider;
+    }
+
     public Object[] getChildren(Object parentElement) {
 
         return ((Workitem) parentElement).children.toArray();

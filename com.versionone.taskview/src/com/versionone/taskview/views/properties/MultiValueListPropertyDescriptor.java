@@ -11,16 +11,16 @@ import com.versionone.taskview.views.editors.MultiValueEditor;
  */
 public class MultiValueListPropertyDescriptor extends PropertyDescriptor {
     private final String typePrefix;
-    private final String propertyName;
+    private final String property;
     
     public MultiValueListPropertyDescriptor(Object id, String typePrefix, String propertyName) {
         super(id, propertyName);
         this.typePrefix = typePrefix;
-        this.propertyName = propertyName;
+        this.property = (String) id;
     }
     
     @Override
     public CellEditor createPropertyEditor(Composite parent) {
-        return new MultiValueEditor(parent, typePrefix, propertyName);
+        return new MultiValueEditor(parent, typePrefix, property);
     }
 }

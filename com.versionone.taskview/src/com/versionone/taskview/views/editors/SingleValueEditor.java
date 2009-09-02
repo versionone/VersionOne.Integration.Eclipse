@@ -9,22 +9,22 @@ import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 
 public class SingleValueEditor extends ComboBoxCellEditor {
-	private final PropertyValues allValues;
-	
-	public SingleValueEditor(Composite parent, String typePrefix, String propertyName) {
-		super(parent, new String[0], SWT.DROP_DOWN | SWT.READ_ONLY);
-		allValues = ApiDataLayer.getInstance().getListPropertyValues(typePrefix, propertyName);
-		setItems(allValues.toStringArray());
-	}
-	
-	@Override
-	protected void doSetValue(Object value) {
-		super.doSetValue(allValues.getStringArrayIndex((ValueId)value));
-	}
-	
-	@Override
-	protected Object doGetValue() {
-		Integer index = (Integer) super.doGetValue();
-		return allValues.getValueIdByIndex(index);
-	}
+    private final PropertyValues allValues;
+
+    public SingleValueEditor(Composite parent, String typePrefix, String propertyName) {
+        super(parent, new String[0], SWT.DROP_DOWN | SWT.READ_ONLY);
+        allValues = ApiDataLayer.getInstance().getListPropertyValues(typePrefix, propertyName);
+        setItems(allValues.toStringArray());
+    }
+
+    @Override
+    protected void doSetValue(Object value) {
+        super.doSetValue(allValues.getStringArrayIndex((ValueId) value));
+    }
+
+    @Override
+    protected Object doGetValue() {
+        Integer index = (Integer) super.doGetValue();
+        return allValues.getValueIdByIndex(index);
+    }
 }

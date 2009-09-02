@@ -14,7 +14,7 @@ import com.versionone.taskview.views.properties.WorkitemPropertySource;
 public class MultiValueSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
-    
+
     private final String propertyName;
     private PropertyValues currentValue;
     private final ISelectionProvider selectionProvider;
@@ -33,7 +33,7 @@ public class MultiValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
-        return new MultiValueEditor(((TreeViewer)getViewer()).getTree(), workitem.getTypePrefix(), propertyName);
+        return new MultiValueEditor(((TreeViewer) getViewer()).getTree(), workitem.getTypePrefix(), propertyName);
     }
 
     @Override
@@ -51,32 +51,11 @@ public class MultiValueSupport extends EditingSupport {
     protected void setValue(Object element, Object value) {
         Workitem workitem = ((Workitem) element);
         PropertyValues newValue = (PropertyValues) value;
-        
+
         if (currentValue == null || !currentValue.equals(newValue)) {
             workitem.setProperty(propertyName, newValue);
         }
         getViewer().update(element, null);
         selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
     }
-
-    /*
-     * Fill Owners list.
-     */
-    /*
-    private static void fillList(List list, PropertyValues values, Object value) {
-        int[] selectedIndexes = new int[values.size()];
-        int i = 0;
-        int currentIndex = 0;
-        for (String owner : values.toStringArray()) {
-            list.add(owner);
-            if (values.contains(values.getValueIdByIndex(i))) {
-                selectedIndexes[currentIndex] = i;
-                currentIndex++;
-            }
-            i++;
-        }
-
-        list.select(selectedIndexes);
-    }
-     */
 }

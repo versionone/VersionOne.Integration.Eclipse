@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.commands.Category;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -14,8 +13,8 @@ import org.osgi.framework.BundleContext;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
-import com.versionone.taskview.views.Configuration;
-import com.versionone.taskview.views.Configuration.ColumnSetting;
+import com.versionone.taskview.views.properties.Configuration;
+import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -61,14 +60,11 @@ public class Activator extends AbstractUIPlugin {
 
     private void setDetailsAttributes() throws Exception {
         Configuration cfg = Configuration.getInstance();
-        String[] prefixes = new String[] {
-                Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, 
-                Workitem.TEST_PREFIX, Workitem.TASK_PREFIX};
-        setAttributes(cfg.assetDetailSettings.defectColumns, prefixes);
-        setAttributes(cfg.assetDetailSettings.storyColumns, prefixes);
-        setAttributes(cfg.assetDetailSettings.testColumns, prefixes);
-        setAttributes(cfg.assetDetailSettings.taskColumns, prefixes);
-        setAttributes(cfg.assetDetailSettings.projectColumns, Workitem.PROJECT_PREFIX);
+        setAttributes(cfg.assetDetailSettings.defectColumns, Workitem.DEFECT_PREFIX);
+        setAttributes(cfg.assetDetailSettings.storyColumns, Workitem.STORY_PREFIX);
+        setAttributes(cfg.assetDetailSettings.testColumns, Workitem.TEST_PREFIX);
+        setAttributes(cfg.assetDetailSettings.taskColumns, Workitem.TASK_PREFIX);
+        // setAttributes(cfg.assetDetailSettings.projectColumns, Workitem.PROJECT_PREFIX);
     }
 
     private static void setAttributes(ColumnSetting[] columns, String... typePrefixes) {
@@ -79,13 +75,12 @@ public class Activator extends AbstractUIPlugin {
             }
         }
     }
-    
+
     private static boolean isListType(String type) {
         return type.equals(Configuration.AssetDetailSettings.LIST_TYPE)
                 || type.equals(Configuration.AssetDetailSettings.MULTI_VALUE_TYPE);
     }
 
-    
     private void setAttributes() throws Exception {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         Map<String, Boolean> properties = new HashMap<String, Boolean>();
@@ -111,7 +106,6 @@ public class Activator extends AbstractUIPlugin {
         }
         dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
     }
-    
 
     /*
      * (non-Javadoc)

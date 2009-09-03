@@ -9,9 +9,8 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
-import com.versionone.taskview.views.Configuration;
-import com.versionone.taskview.views.Configuration.AssetDetailSettings;
-import com.versionone.taskview.views.Configuration.ColumnSetting;
+import com.versionone.taskview.views.properties.Configuration.AssetDetailSettings;
+import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
 public class WorkitemPropertySource implements IPropertySource {
 
@@ -54,9 +53,9 @@ public class WorkitemPropertySource implements IPropertySource {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly);
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
-        } else if(col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
+        } else if (col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
             desc = new MultiValueListPropertyDescriptor(col.attribute, item.getTypePrefix(), localName);
-        } else if(col.type.equals(AssetDetailSettings.RICH_TEXT_TYPE)) {
+        } else if (col.type.equals(AssetDetailSettings.RICH_TEXT_TYPE)) {
             desc = new RichTextPropertyDescriptor(col.attribute, localName);
         } else {
             desc = new PropertyDescriptor(col.attribute, localName);
@@ -80,7 +79,7 @@ public class WorkitemPropertySource implements IPropertySource {
     public void setPropertyValue(Object id, Object value) {
         try {
             item.setProperty((String) id, value);
-            ((Viewer)proxy).refresh();
+            ((Viewer) proxy).refresh();
         } catch (Exception e) {
             // Do nothing
         }

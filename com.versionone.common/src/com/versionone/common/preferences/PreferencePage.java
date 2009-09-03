@@ -200,6 +200,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             try {
                 Activator.connect(userEditor.getStringValue(), pwdField.getStringValue(), 
                         urlEditor.getStringValue(), integratedAuthEditor.getBooleanValue());
+                updateMemberToken(urlEditor.getStringValue());
+                PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN, ApiDataLayer.getInstance().getCurrentProjectId());
                 resetConnection = false;
                 rc = super.performOk();
             } catch (Exception e) {
@@ -213,6 +215,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             rc = super.performOk();
         }
         return rc;
+    }
+    
+    private void updateMemberToken(String path) {
+        String userToken = ApiDataLayer.getInstance().getCurrentMemberToken();
+
+        String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
+        if (userToken != null && !currentOid.equals(userToken + ":" + path)) {
+            PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, userToken + ":" + path);
+        }
+
+        
     }
 
     @Override

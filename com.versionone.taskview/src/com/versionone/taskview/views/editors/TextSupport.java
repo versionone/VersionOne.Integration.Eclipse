@@ -36,7 +36,7 @@ public class TextSupport extends EditingSupport {
     protected boolean canEdit(Object element) {
         Workitem workitem = (Workitem) element;
                 
-        return !Workitem.isPropertyReadOnly(workitem, property.equals(Workitem.EFFORT_PROPERTY), property); 
+        return !workitem.isPropertyReadOnly(property.equals(Workitem.EFFORT_PROPERTY), property); 
     }
 
     @Override

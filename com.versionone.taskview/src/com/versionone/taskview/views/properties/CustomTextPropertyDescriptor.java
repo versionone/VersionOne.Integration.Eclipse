@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
-import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.editors.ReadOnlySupport;
 
 /**

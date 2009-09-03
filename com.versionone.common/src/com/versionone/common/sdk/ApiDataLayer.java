@@ -129,20 +129,27 @@ public class ApiDataLayer {
 
     public boolean connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
         isConnected = false;
+        boolean isUserChanged = true;
+        if (this.userName != null && this.password != null && this.path != null) {
+            isUserChanged = !this.userName.equals(userName) || !this.password.equals(password) || !this.path.equals(path);
+        }
+        
+        
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
         assetList = null;
         boolean isUpdateData = true;
-        boolean isTokenChanged = true;
+        //TODO for remove
+        //boolean isTokenChanged = true;
 
-        String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
-        if (memberOid != null) {
-            // location or user was changed
-            isTokenChanged = !currentOid.equals(memberOid.getToken() + ":" + path);
-        }
+//        String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
+//        if (memberOid != null) {
+//            // location or user was changed
+//            isTokenChanged = !currentOid.equals(memberOid.getToken() + ":" + path);
+//        }
         // TODO test optimization of refresh. need to test
-        isUpdateData = isTokenChanged || metaModel == null || localizer == null || services == null;
+        isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
         if (isUpdateData) {
             assetsToIgnore.clear();
             efforts.clear();
@@ -176,11 +183,11 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
 
             isConnected = true;
-
-            if (isTokenChanged) {
-                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN,
-                        memberOid.getToken() + ":" + path);
-            }
+            //TODO for remove
+//            if (isTokenChanged) {
+//                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN,
+//                        memberOid.getToken() + ":" + path);
+//            }
 
             this.path = path;
             return true;
@@ -631,6 +638,10 @@ public class ApiDataLayer {
         }
         return getProjectById(currentProjectId);
     }
+    
+    public String getCurrentMemberToken() {
+        return memberOid != null ? memberOid.getToken() : null;
+    }
 
     private String getDefaultProjectId() {
         String id = "";
@@ -653,8 +664,9 @@ public class ApiDataLayer {
     /***
      * Update current project Id to the root project Id from current server
      */
-    public void updateCurrentProjectId() {
+    public String updateCurrentProjectId() {
         currentProjectId = getDefaultProjectId();
+        return currentProjectId;
     }
 
     private boolean isProjectExist(String id) {

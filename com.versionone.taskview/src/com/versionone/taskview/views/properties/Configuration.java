@@ -38,6 +38,7 @@ public class Configuration {
                 configuration = (Configuration) um.unmarshal(stream);
             } catch (JAXBException e) {
                 Activator.logError("Cannot load configuration", e);
+                configuration = new Configuration(); 
             } finally {
                 if (stream != null) {
                     try {
@@ -75,7 +76,7 @@ public class Configuration {
         public final ColumnSetting[] defectColumns;
 
         public AssetDetailSettings() {
-            taskColumns = new ColumnSetting[7];
+            taskColumns = new ColumnSetting[8];
             testColumns = new ColumnSetting[1];
             storyColumns = new ColumnSetting[1];
             defectColumns = new ColumnSetting[1];
@@ -92,6 +93,7 @@ public class Configuration {
             taskColumns[5] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
                     false);
             taskColumns[6] = new ColumnSetting("ColumnTitle'ID", STRING_TYPE, "Number", MAIN_CATEGORY, true, false);
+            taskColumns[7] = new ColumnSetting("ColumnTitle'Effort", STRING_TYPE, "Actuals", MAIN_CATEGORY, false, true);
 
             storyColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
                     false);

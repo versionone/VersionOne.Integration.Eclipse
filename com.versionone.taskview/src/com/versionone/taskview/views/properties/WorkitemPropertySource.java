@@ -50,19 +50,19 @@ public class WorkitemPropertySource implements IPropertySource {
         }
         final PropertyDescriptor desc;
         if (col.type.equals(AssetDetailSettings.STRING_TYPE)) {
-            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly);
+            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || Workitem.isPropertyReadOnly(item, col.effortTracking, col.attribute));
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else if (col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
             desc = new MultiValueListPropertyDescriptor(col.attribute, item.getTypePrefix(), localName);
         } else if (col.type.equals(AssetDetailSettings.RICH_TEXT_TYPE)) {
-            desc = new RichTextPropertyDescriptor(col.attribute, localName);
+            desc = new RichTextPropertyDescriptor(col.attribute, localName, item.getPropertyAsString(col.attribute));
         } else {
             desc = new PropertyDescriptor(col.attribute, localName);
         }
         desc.setCategory(col.category);
         return desc;
-    }
+    }   
 
     public Object getPropertyValue(Object id) {
         return item.getProperty((String) id);

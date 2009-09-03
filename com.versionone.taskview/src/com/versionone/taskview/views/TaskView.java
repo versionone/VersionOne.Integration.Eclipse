@@ -13,7 +13,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -38,7 +37,6 @@ import com.versionone.taskview.views.editors.SingleValueSupport;
 import com.versionone.taskview.views.editors.MultiValueSupport;
 import com.versionone.taskview.views.editors.ReadOnlySupport;
 import com.versionone.taskview.views.editors.TextSupport;
-import com.versionone.taskview.views.htmleditor.HTMLEditor;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 import com.versionone.taskview.views.providers.SimpleProvider;
 
@@ -67,7 +65,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String MENU_ITEM_CLOSE_KEY = "Close";
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
     private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
-    private static final String MENU_ITEM_EDIT_DESCRIPTION_KEY = "Edit description";
     private ProxySelectionProvider selectionProvider;
 
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
@@ -173,22 +170,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             }
         });
         menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
-
-        new MenuItem(menu, SWT.SEPARATOR);
-
-        MenuItem editDescription = new MenuItem(menu, SWT.PUSH);
-        editDescription.setText(MENU_ITEM_EDIT_DESCRIPTION_KEY);
-        editDescription.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
-                HTMLEditor htmlEditor = new HTMLEditor(shell, getCurrentWorkitem());
-                htmlEditor.create();
-                int response = htmlEditor.open();
-                if (response == Window.OK) {
-                    updateDescription(getCurrentWorkitem(), htmlEditor.getValue());
-                }
-            }
-        });
-        menuItemsMap.put(MENU_ITEM_EDIT_DESCRIPTION_KEY, editDescription);
 
         menu.addMenuListener(new MenuListener() {
 
@@ -408,6 +389,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     protected void loadTable() {
         try {
             viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
+            updateProperty();
         } catch (Exception e) {
             enableViewer(false);
             Activator.logError(e);
@@ -485,7 +467,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             addEffortColumns();
         }
         selectProvider();
-        selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(getCurrentWorkitem(), getViewer())));
+    }
+    
+    private void updateProperty() {
+        Workitem workitem = getCurrentWorkitem();
+        if (workitem != null) {
+            selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
+        }
     }
 
 }

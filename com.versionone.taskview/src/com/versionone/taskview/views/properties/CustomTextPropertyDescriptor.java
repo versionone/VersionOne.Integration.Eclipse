@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.editors.ReadOnlySupport;
 
 /**
@@ -11,7 +12,7 @@ import com.versionone.taskview.views.editors.ReadOnlySupport;
  * 
  */
 public class CustomTextPropertyDescriptor extends TextPropertyDescriptor {
-    private boolean readOnly;
+    private final boolean readOnly;
 
     public CustomTextPropertyDescriptor(Object id, String propertyName) {
         this(id, propertyName, false);
@@ -22,19 +23,12 @@ public class CustomTextPropertyDescriptor extends TextPropertyDescriptor {
         this.readOnly = readOnly;
     }
 
-    public void setReadOnly(boolean value) {
-        readOnly = value;
-    }
-
-    public boolean getReadOnly() {
-        return readOnly;
-    }
-
     @Override
     public CellEditor createPropertyEditor(Composite parent) {
         if (readOnly) {
             return new ReadOnlySupport.ReadOnlyCellEditor(parent);
         }
+        
         return super.createPropertyEditor(parent);
     }
 }

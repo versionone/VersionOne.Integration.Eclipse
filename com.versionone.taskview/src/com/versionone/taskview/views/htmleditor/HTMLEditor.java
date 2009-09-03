@@ -7,19 +7,14 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.CoolBar;
-import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
-
-import com.versionone.common.sdk.Workitem;
 
 import de.spiritlink.richhtml4eclipse.widgets.HtmlComposer;
 import de.spiritlink.richhtml4eclipse.widgets.JavaScriptCommands;
@@ -28,14 +23,14 @@ public class HTMLEditor extends Dialog {
 
     static int WINDOW_HEIGHT = 300;
     static int WINDOW_WIDTH = 450;
-    private static Workitem workitem;
+    private final String richText;
     private String value = "";
     private HtmlComposer composer;
 
-    public HTMLEditor(Shell parentShell, Workitem workitem) {
+    public HTMLEditor(Shell parentShell, String richText) {
         super(parentShell);
 
-        this.workitem = workitem;
+        this.richText = richText;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
     }
 
@@ -55,7 +50,7 @@ public class HTMLEditor extends Dialog {
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         composer.setFocus();
 
-        composer.execute(JavaScriptCommands.SET_HTML(workitem.getPropertyAsString(Workitem.DESCRIPTION_PROPERTY)));
+        composer.execute(JavaScriptCommands.SET_HTML(richText));
 
 
         manager.add(new BoldAction(composer));

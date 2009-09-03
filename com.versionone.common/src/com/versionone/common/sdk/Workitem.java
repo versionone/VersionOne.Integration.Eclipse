@@ -426,4 +426,15 @@ public class Workitem {
     public String toString() {
         return getId() + (asset.hasChanged() ? " (Changed)" : "");
     }
+    
+    public static boolean isPropertyReadOnly(Workitem item,boolean isEffort, String propertyName) {
+        boolean result = false;
+        if (isEffort) {
+            result = item.isPropertyReadOnly(propertyName);
+        } else {
+            result = item.isPropertyDefinitionReadOnly(propertyName) || item.isPropertyReadOnly(propertyName);
+        }
+        
+        return result;
+    }
 }

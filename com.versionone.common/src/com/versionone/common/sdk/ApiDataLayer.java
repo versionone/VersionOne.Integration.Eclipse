@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.versionone.Oid;
 import com.versionone.apiclient.AndFilterTerm;
@@ -36,7 +37,6 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
-import com.versionone.common.Activator;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 
@@ -58,10 +58,6 @@ public class ApiDataLayer {
     public static final String OP_SIGNUP = "QuickSignup";
 
     private IAssetType projectType;
-    private IAssetType taskType;
-    private IAssetType testType;
-    private IAssetType defectType;
-    private IAssetType storyType;
     private IAssetType workitemType;
     private IAssetType primaryWorkitemType;
     private IAssetType effortType;
@@ -77,7 +73,7 @@ public class ApiDataLayer {
 
     private QueryResult assetList;
     private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
-    private static LinkedList<AttributeInfo> attributesToQuery = new LinkedList<AttributeInfo>();
+    private static Set<AttributeInfo> attributesToQuery = new HashSet<AttributeInfo>();
     private Map<String, PropertyValues> listPropertyValues;
 
     private boolean trackEffort;
@@ -186,7 +182,7 @@ public class ApiDataLayer {
                         memberOid.getToken() + ":" + path);
             }
 
-            this.path = path; //
+            this.path = path;
             return true;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);
@@ -197,10 +193,10 @@ public class ApiDataLayer {
 
     private void initTypes() {
         projectType = getAssetType(Workitem.PROJECT_PREFIX);
-        taskType = getAssetType(Workitem.TASK_PREFIX);
-        testType = getAssetType(Workitem.TEST_PREFIX);
-        defectType = getAssetType(Workitem.DEFECT_PREFIX);
-        storyType = getAssetType(Workitem.STORY_PREFIX);
+        getAssetType(Workitem.TASK_PREFIX);
+        getAssetType(Workitem.TEST_PREFIX);
+        getAssetType(Workitem.DEFECT_PREFIX);
+        getAssetType(Workitem.STORY_PREFIX);
         workitemType = metaModel.getAssetType("Workitem");
         primaryWorkitemType = metaModel.getAssetType("PrimaryWorkitem");
     }
@@ -255,7 +251,7 @@ public class ApiDataLayer {
                 IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
 
                 Query query = new Query(workitemType, parentDef);
-                
+
                 // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
                 addSelection(query, Workitem.TASK_PREFIX);
@@ -386,10 +382,10 @@ public class ApiDataLayer {
     }
 
     public void addProperty(String attr, String prefix, boolean isList) {
-        attributesToQuery.addLast(new AttributeInfo(attr, prefix, isList));
+        attributesToQuery.add(new AttributeInfo(attr, prefix, isList));
     }
 
-    private Map<String, PropertyValues> getListPropertyValues() throws Exception { 
+    private Map<String, PropertyValues> getListPropertyValues() throws Exception {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {
@@ -545,13 +541,10 @@ public class ApiDataLayer {
             IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
             AssetState state = AssetState.valueOf((Integer) asset.getAttribute(stateDef).getValue());
             return state == AssetState.Closed || assetsToIgnore.contains(asset.getOid().getMomentless());
-        } catch (APIException e) {
-            Activator.logError("Unable to resolve asset state.", e);
-            return false;
         } catch (MetaException e) {
-            Activator.logError("Unable to resolve asset state.", e);
-            return false;
+        } catch (APIException e) {
         }
+        return false;
     }
 
     public boolean isAssetSuspended(Asset asset) {

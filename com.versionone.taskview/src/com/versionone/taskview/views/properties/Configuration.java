@@ -1,12 +1,10 @@
 package com.versionone.taskview.views.properties;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -21,7 +19,7 @@ public class Configuration {
     private static Configuration configuration;
 
     @XmlElement(name = "APIVersion")
-    public String apiVersion = "8.3";
+    public final String apiVersion = "8.3";
     // private GridSettings gridSettings = new GridSettings();
     @XmlElement(name = "AssetDetail")
     public final AssetDetailSettings assetDetailSettings = new AssetDetailSettings();
@@ -41,7 +39,7 @@ public class Configuration {
             } catch (JAXBException e) {
                 Activator.logError("Cannot load configuration", e);
             } finally {
-                if (stream != null){
+                if (stream != null) {
                     try {
                         stream.close();
                     } catch (IOException e) {
@@ -135,21 +133,23 @@ public class Configuration {
 
     public static class ColumnSetting {
         @XmlElement(name = "Name")
-        public String name;
+        public final String name;
         @XmlElement(name = "Category")
-        public String category;
+        public final String category;
         @XmlElement(name = "Type")
-        public String type;
+        public final String type;
         @XmlElement(name = "Attribute")
-        public String attribute;
+        public final String attribute;
         @XmlElement(name = "ReadOnly", defaultValue = "false")
-        public boolean readOnly;
+        public final boolean readOnly;
         @XmlElement(name = "EffortTracking", defaultValue = "false")
-        public boolean effortTracking;
+        public final boolean effortTracking;
         @XmlElement(name = "Name", defaultValue = "100", required = false)
         public int width = 100;
 
         public ColumnSetting() {
+            name = category = type = attribute = null;
+            readOnly = effortTracking = false;
         }
 
         ColumnSetting(String name, String type, String attribute, String category, boolean readOnly,

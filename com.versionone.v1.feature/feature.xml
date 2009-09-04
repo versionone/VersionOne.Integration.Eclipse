@@ -49,28 +49,29 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
    <plugin
          id="com.versionone.apiclient"
-         download-size="0"
-         install-size="0"
+         download-size="116"
+         install-size="127"
          version="0.0.0"/>
 
    <plugin
          id="com.versionone.taskview"
-         download-size="0"
-         install-size="0"
+         download-size="320"
+         install-size="320"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.versionone.common"
-         download-size="0"
-         install-size="0"
+         download-size="28"
+         install-size="28"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="de.spiritlink.richhtml4eclipse"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
+         download-size="557"
+         install-size="557"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>

@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.Assert;
+
 import com.versionone.Oid;
 import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
@@ -107,9 +109,8 @@ public class Workitem {
     }
 
     private boolean isEffortTrackingPropertyReadOnly(String propertyName) {
-        if (!dataLayer.isEffortTrackingRelated(propertyName)) {
-            throw new IllegalArgumentException("This property is not related to effort tracking.");
-        }
+        String notEffortRelatedMessage = "This property is not related to effort tracking.";
+        Assert.isTrue(dataLayer.isEffortTrackingRelated(propertyName), notEffortRelatedMessage);
 
         EffortTrackingLevel storyLevel = dataLayer.storyTrackingLevel;
         EffortTrackingLevel defectLevel = dataLayer.defectTrackingLevel;

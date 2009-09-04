@@ -573,11 +573,9 @@ public class ApiDataLayer {
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
-            Asset[] parentArray = new Asset[0];
+            Asset[] parentArray = assetList.getAssets();
             List<Asset> parentList = null;
-            if (workitem.parent == null) {
-                parentArray = assetList.getAssets();
-            } else {
+            if (workitem.parent != null) {
                 parentList = workitem.parent.asset.getChildren();
             }
 

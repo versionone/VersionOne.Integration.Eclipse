@@ -1,9 +1,5 @@
 package com.versionone.common;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -13,7 +9,6 @@ import org.osgi.framework.BundleContext;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Workitem;
 
 /**
  * The activator class controls the plug-in life cycle

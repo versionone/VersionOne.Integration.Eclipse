@@ -1,5 +1,7 @@
 package com.versionone.common.test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.JUnit4TestAdapter;
@@ -19,7 +21,6 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
-
 
 public class TestModel {
 
@@ -46,7 +47,18 @@ public class TestModel {
         MetaModel metaModel = new MetaModel(metaConnector);
         Services services = new Services(metaModel, dataConnector);
         Localizer localizer = new Localizer(localizeConnector);
-        datalayer = ApiDataLayer.getInitializedInstance(services, metaModel, localizer);
+        datalayer = ApiDataLayer.getInstance();
+
+        final String[] all = {Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, Workitem.TASK_PREFIX, Workitem.TEST_PREFIX};
+        setDataLayerAttribute(Workitem.STATUS_PROPERTY, true, all);
+        setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true, all);
+        datalayer.connectFotTesting(services, metaModel, localizer, null);
+    }
+
+    private static void setDataLayerAttribute(String attribute, boolean isListType, String... typePrefixes) {
+        for (String prefix : typePrefixes) {
+            datalayer.addProperty(attribute, prefix, isListType);
+        }
     }
 
     @Before
@@ -99,11 +111,11 @@ public class TestModel {
          */
         validateTask(allWorkItem[0], "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done",
                 Workitem.STORY_PREFIX);
-        validateTask(allWorkItem[2], "D-01093", "Defect:2248", "defect 1", "0.02", "-2.00", null, "0.01", "Done",
+        validateTask(allWorkItem[2], "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done",
                 Workitem.DEFECT_PREFIX);
-        validateTask(allWorkItem[1].children.get(0), "AT-01010", "Test:2273", "AT4", "13.00", null, null, "18.00",
+        validateTask(allWorkItem[1].children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00",
                 "", Workitem.TEST_PREFIX);
-        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9.30", "5.00", null, "9.30",
+        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null, "9,30",
                 "In Progress", Workitem.TASK_PREFIX);
     }
     
@@ -117,13 +129,13 @@ public class TestModel {
          * expectedEstimate, String expectedDone, String expectedEffort, String
          * expectedTodo, String expectedStatus
          */
-        validateTask(allWorkItem[1].children.get(1), "TK-01030", "Task:2268", "task1", "10.00", "5.00", null, "0.00", "Completed",
+        validateTask(allWorkItem[1].children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00", "Completed",
                 Workitem.TASK_PREFIX);
 
-        validateTask(allWorkItem[6], "D-01093", "Defect:2248", "defect 1", "0.02", "-2.00", null, "0.01", "Done",
+        validateTask(allWorkItem[6], "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done",
                 Workitem.DEFECT_PREFIX);
 
-        validateTask(allWorkItem[5].children.get(1), "AT-01008", "Test:2244", "test1", "0.00", "35.00", null, "0.00",
+        validateTask(allWorkItem[5].children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null, "0,00",
                 "Passed", Workitem.TEST_PREFIX);
     }
 	
@@ -172,18 +184,18 @@ public class TestModel {
     private void validateSetToDo(Workitem testMe) throws Exception {
 
         testMe.setProperty(Workitem.TODO_PROPERTY, "0");
-        Assert.assertEquals("0.00", testMe.getProperty(Workitem.TODO_PROPERTY));
+        Assert.assertEquals("0,00", testMe.getProperty(Workitem.TODO_PROPERTY));
 
-        testMe.setProperty(Workitem.TODO_PROPERTY, "10.01");
-        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));
+        testMe.setProperty(Workitem.TODO_PROPERTY, "10,125");
+        Assert.assertEquals("10,125", testMe.getProperty(Workitem.TODO_PROPERTY));
 
-        try {
-            testMe.setProperty(Workitem.TODO_PROPERTY, "-1");
-            Assert.fail("ToDo cannot be negative");
-        }
-        catch(IllegalArgumentException e) {}        
-        Assert.assertEquals("10.01", testMe.getProperty(Workitem.TODO_PROPERTY));       
+        testMe.setProperty(Workitem.TODO_PROPERTY, "10,01");
+        Assert.assertEquals("10,01", testMe.getProperty(Workitem.TODO_PROPERTY));
+
+        testMe.setProperty(Workitem.TODO_PROPERTY, "-1");
+        Assert.assertEquals("10,01", testMe.getProperty(Workitem.TODO_PROPERTY));
     }
+
 //
 //	/**
 //	 * SetStatus must accept an TaskStatus OID
@@ -221,25 +233,21 @@ public class TestModel {
 //		Assert.assertEquals("New Name", testMe.getName());
 //	}
 //
-	/**
-	 * Estimate must be a positive value
-	 * @param testMe
-	 */
-	private void validateSetEstimate(Workitem testMe) throws Exception {
-	
-		testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "0");
-		Assert.assertEquals("0.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
-		
-		testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "10");
-		Assert.assertEquals("10.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
-		
-		try {
-		    testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "-1");
-		    Assert.fail("Estimate cannot be negative");
-		}
-		catch(IllegalArgumentException e) {}
-		
-		Assert.assertEquals("10.00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+    /**
+     * Estimate must be a positive value
+     * 
+     * @param testMe
+     */
+    private void validateSetEstimate(Workitem testMe) throws Exception {
+
+        testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "0");
+        Assert.assertEquals("0,00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+
+        testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "10");
+        Assert.assertEquals("10,00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
+
+        testMe.setProperty(Workitem.DETAIL_ESTIMATE_PROPERTY, "-1");
+        Assert.assertEquals("10,00", testMe.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY));
     }
 
     /**
@@ -252,21 +260,21 @@ public class TestModel {
         PropertyValues owners = (PropertyValues) testMe.getProperty(Workitem.OWNERS_PROPERTY);
         Assert.assertEquals("Cat", owners.toString());
         Assert.assertEquals(1, owners.size());
+        Assert.assertEquals("Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         final ValueId cat = owners.getValueIdByIndex(0);
         Assert.assertEquals("Cat", cat.toString());
         PropertyValues users = datalayer.getListPropertyValues(testMe.getTypePrefix(), Workitem.OWNERS_PROPERTY);
         ValueId admin = users.getValueIdByIndex(1);
         Assert.assertEquals("Administrator", admin.toString());
-        owners.add(admin);
-        owners.remove(cat);
+        owners = new PropertyValues(Arrays.asList(admin));
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals("Administrator", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
-        owners.remove(admin);
+        owners = new PropertyValues();
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals("", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
-        owners.add(cat);
+        owners = new PropertyValues(Arrays.asList(admin, cat));
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+        Assert.assertEquals("Administrator,Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
     
 

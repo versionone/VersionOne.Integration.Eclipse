@@ -194,7 +194,7 @@ public class Workitem {
     public Object getProperty(String propertyName) throws IllegalArgumentException {
         if (propertyName.equals(EFFORT_PROPERTY)) {
             final Double effort = dataLayer.getEffort(asset);
-            return effort == null ? "" : numberFormat.format(effort.doubleValue());
+            return effort == null ? null : numberFormat.format(effort.doubleValue());
         }
         final String fullName = getTypePrefix() + '.' + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);

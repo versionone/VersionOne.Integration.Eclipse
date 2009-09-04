@@ -5,10 +5,16 @@ import com.versionone.common.sdk.Workitem;
 
 import org.junit.Assert;
 
+/**
+ * This is unit test and it must be run as JUnit test 
+ * (NOT as JUnit Plug-in Test).
+ * 
+ * @author rozhnev
+ */
 public class WorkitemTester {
 
     @org.junit.Test
-    public void StoryConstructorTest(){
+    public void StoryConstructorTest() {
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.showAllTasks = true;
         IAssetType storyType = new AssetTypeMock(Workitem.STORY_PREFIX);
@@ -24,7 +30,7 @@ public class WorkitemTester {
     }
 
     @org.junit.Test
-    public void ProjectConstructorTest(){
+    public void ProjectConstructorTest() {
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.showAllTasks = false;
         IAssetType prjType = new AssetTypeMock(Workitem.PROJECT_PREFIX);

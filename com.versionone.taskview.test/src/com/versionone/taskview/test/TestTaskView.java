@@ -134,7 +134,7 @@ public class TestTaskView {
             waitForJobs();            
             ApiDataLayer.resetConnection();
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(testView);
-            ApiDataLayer.getInitializedInstance(services, metaModel, localizer, config);
+            ApiDataLayer.getInstance().connectFotTesting(services, metaModel, localizer, config);
             
             waitForJobs();
             preference = new PreferencePage();
@@ -169,7 +169,7 @@ public class TestTaskView {
             waitForJobs();            
             ApiDataLayer.resetConnection();
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(testView);
-            ApiDataLayer.getInitializedInstance(services, metaModel, localizer, config);
+            ApiDataLayer.getInstance().connectFotTesting(services, metaModel, localizer, config);
             
             waitForJobs();
             preference = new PreferencePage();

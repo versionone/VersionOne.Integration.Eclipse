@@ -37,8 +37,6 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
-import com.versionone.common.preferences.PreferenceConstants;
-import com.versionone.common.preferences.PreferencePage;
 
 public class ApiDataLayer {
 
@@ -96,19 +94,20 @@ public class ApiDataLayer {
     private ApiDataLayer() {
     }
 
-    /*
-     * Special constructor for testing
+    /**
+     * Special method ONLY for testing.
      */
-    private ApiDataLayer(IServices services, IMetaModel metaModel, ILocalizer localizer, V1Configuration configConnector)
+    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object v1Configuration)
             throws Exception {
-        this.metaModel = metaModel;
-        this.services = services;
-        this.localizer = localizer;
+        this.metaModel = (IMetaModel) metaModel;
+        this.services = (IServices) services;
+        this.localizer = (ILocalizer) localizer;
 
+        final V1Configuration configConnector = (V1Configuration) v1Configuration;
         if (configConnector != null) {
             trackEffort = configConnector.isEffortTracking();
             if (trackEffort) {
-                effortType = metaModel.getAssetType("Actual");
+                effortType = this.metaModel.getAssetType("Actual");
             }
             storyTrackingLevel = EffortTrackingLevel.translate(configConnector.getStoryTrackingLevel());
             defectTrackingLevel = EffortTrackingLevel.translate(configConnector.getDefectTrackingLevel());
@@ -717,28 +716,6 @@ public class ApiDataLayer {
         } catch (Exception ex) {
             throw warning("Failed to resolve key.", ex);
         }
-    }
-
-    // ** Special test methods
-    private static boolean isTestEnable = false;
-
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer,
-            V1Configuration configConnector) throws Exception {
-        if (!isTestEnable && instance != null) {
-            resetConnection();
-            isTestEnable = true;
-        }
-
-        if (null == instance) {
-            instance = new ApiDataLayer(services, metaModel, localizer, configConnector);
-        }
-
-        return instance;
-    }
-
-    public static ApiDataLayer getInitializedInstance(IServices services, IMetaModel metaModel, ILocalizer localizer)
-            throws Exception {
-        return getInitializedInstance(services, metaModel, localizer, null);
     }
 
     public static void resetConnection() {

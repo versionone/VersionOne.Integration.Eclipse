@@ -108,6 +108,7 @@ public class Workitem {
         }
     }
 
+    // TODO refactor (current complexity is 10)
     private boolean isEffortTrackingPropertyReadOnly(String propertyName) {
         String notEffortRelatedMessage = "This property is not related to effort tracking.";
         Assert.isTrue(dataLayer.isEffortTrackingRelated(propertyName), notEffortRelatedMessage);

@@ -136,6 +136,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     /**
      * {@link #checkState()}
      */
+    // TODO refactor
     @Override
     protected void checkState() {
         super.checkState();

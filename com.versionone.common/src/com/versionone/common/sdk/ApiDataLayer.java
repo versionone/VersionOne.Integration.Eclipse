@@ -468,12 +468,10 @@ public class ApiDataLayer {
     }
 
     static DataLayerException warning(String string, Exception ex) {
-        // TODO Auto-generated method stub
         return new DataLayerException(string, ex);
     }
 
     static DataLayerException warning(String string) {
-        // TODO Auto-generated method stub
         return new DataLayerException(string);
     }
 
@@ -564,6 +562,7 @@ public class ApiDataLayer {
         }
     }
 
+    // TODO refactor
     void refreshAsset(Workitem workitem) throws DataLayerException {
         try {
             IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");

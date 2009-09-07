@@ -13,6 +13,8 @@ Require-Bundle: org.eclipse.ui,
  de.spiritlink.richhtml4eclipse;bundle-version="1.0.0"
 Export-Package: com.versionone.taskview.views
 Bundle-ClassPath: .,
- jaxb-api-2.1.jar,
- jaxp-api-1.4.jar
+ activation.jar,
+ jaxb-api.jar,
+ jaxb-impl.jar,
+ jsr173_1.0_api.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

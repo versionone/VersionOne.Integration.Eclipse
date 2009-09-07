@@ -83,7 +83,7 @@ public class Workitem {
         return asset.hasChanged();
     }
 
-    public boolean isPropertyReadOnly(String propertyName) {
+    private boolean isPropertyReadOnly(String propertyName) {
         String fullName = getTypePrefix() + '.' + propertyName;
         try {
             if (dataLayer.isEffortTrackingRelated(propertyName)) {
@@ -97,7 +97,7 @@ public class Workitem {
         }
     }
 
-    public boolean isPropertyDefinitionReadOnly(String propertyName) {
+    private boolean isPropertyDefinitionReadOnly(String propertyName) {
         String fullName = getTypePrefix() + '.' + propertyName;
         try {
             Attribute attribute = asset.getAttributes().get(fullName);

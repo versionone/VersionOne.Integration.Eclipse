@@ -253,7 +253,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void configureTable() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.ID_PROPERTY, true));
-        column.setEditingSupport(new ReadOnlySupport(Workitem.ID_PROPERTY, viewer));
+        column.setEditingSupport(new TextSupport(Workitem.ID_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
         column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));

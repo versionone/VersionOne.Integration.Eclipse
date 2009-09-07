@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
-import com.versionone.taskview.views.editors.ReadOnlySupport;
+import com.versionone.taskview.views.editors.TextSupport;
 
 /**
  * Text property descriptor with ability to skip entering edit mode.
@@ -25,7 +25,7 @@ public class CustomTextPropertyDescriptor extends TextPropertyDescriptor {
     @Override
     public CellEditor createPropertyEditor(Composite parent) {
         if (readOnly) {
-            return new ReadOnlySupport.ReadOnlyCellEditor(parent);
+            return new TextSupport.ReadOnlyCellEditor(parent);
         }
         
         return super.createPropertyEditor(parent);

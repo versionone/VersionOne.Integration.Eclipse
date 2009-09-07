@@ -1,5 +1,7 @@
 package com.versionone.taskview.views.properties;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -34,11 +36,15 @@ public class WorkitemPropertySource implements IPropertySource {
     public IPropertyDescriptor[] getPropertyDescriptors() {
         Configuration cfg = Configuration.getInstance();
         ColumnSetting[] columns = cfg.assetDetailSettings.getColumns(item.getTypePrefix());
-        IPropertyDescriptor[] res = new IPropertyDescriptor[columns.length];
-        for (int i = 0; i < columns.length; i++) {
-            res[i] = createPropertyDescriptor(columns[i]);
+        ArrayList<IPropertyDescriptor> res = new ArrayList<IPropertyDescriptor>(columns.length);
+        for(ColumnSetting column : columns) {
+            if (column.effortTracking && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+                continue;
+            }
+            res.add(createPropertyDescriptor(column));
         }
-        return res;
+        res.trimToSize();
+        return res.toArray(new IPropertyDescriptor[0]);
     }
 
     private PropertyDescriptor createPropertyDescriptor(ColumnSetting col) {
@@ -49,7 +55,7 @@ public class WorkitemPropertySource implements IPropertySource {
             localName = col.name;
         }
         final PropertyDescriptor desc;
-        if (col.type.equals(AssetDetailSettings.STRING_TYPE)) {
+        if (col.type.equals(AssetDetailSettings.STRING_TYPE) || col.type.equals(AssetDetailSettings.EFFORT_TYPE)) {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || item.isPropertyReadOnly(col.effortTracking, col.attribute));
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
@@ -65,7 +71,7 @@ public class WorkitemPropertySource implements IPropertySource {
     }   
 
     public Object getPropertyValue(Object id) {
-        return item.getProperty((String) id);
+        return item.getProperty((String) id) == null ? "" : item.getProperty((String) id);
     }
 
     public boolean isPropertySet(Object id) {

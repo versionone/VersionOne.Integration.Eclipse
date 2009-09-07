@@ -61,6 +61,7 @@ public class Configuration {
         public static final String MULTI_VALUE_TYPE = "Multi";
         public static final String RICH_TEXT_TYPE = "RichText";
         public static final String STRING_TYPE = "String";
+        public static final String EFFORT_TYPE = "Effort";
 
         @XmlElementWrapper(name = "TaskColumns")
         @XmlElement(name = "ColumnSetting")

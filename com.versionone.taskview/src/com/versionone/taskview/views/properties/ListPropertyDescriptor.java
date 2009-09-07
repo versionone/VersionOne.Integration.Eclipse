@@ -10,17 +10,15 @@ import com.versionone.taskview.views.editors.SingleValueEditor;
 
 public class ListPropertyDescriptor extends PropertyDescriptor {
     private final Workitem workitem;
-    private final String propertyName;
 	
     public ListPropertyDescriptor(Object id, String propertyName, Workitem workitem) {
         super(id, propertyName);
         Assert.isNotNull(workitem);
         this.workitem = workitem;
-        this.propertyName = propertyName;
     }
     
     @Override
     public CellEditor createPropertyEditor(Composite parent) {
-    	return new SingleValueEditor(parent, workitem.getTypePrefix(), propertyName);
+    	return new SingleValueEditor(parent, workitem.getTypePrefix(), getId().toString());
     }
 }

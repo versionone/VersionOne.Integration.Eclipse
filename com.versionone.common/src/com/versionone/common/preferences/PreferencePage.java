@@ -7,6 +7,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -58,17 +59,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
                 "Windows Integrated Authentication", this.getFieldEditorParent());
         addField(integratedAuthEditor);
 
-        urlEditor = new StringFieldEditor(PreferenceConstants.P_URL, "Application URL:", this.getFieldEditorParent());
+        urlEditor = new UrlFieldEditor(PreferenceConstants.P_URL, "Application URL:", this.getFieldEditorParent());
         addField(urlEditor);
 
-        userEditor = new StringFieldEditor(PreferenceConstants.P_USER, "Username:", this.getFieldEditorParent());
+        userEditor = new UserNameFieldEditor(PreferenceConstants.P_USER, "Username:", this.getFieldEditorParent());
         addField(userEditor);
 
         pwdField = new StringFieldEditor(PreferenceConstants.P_PASSWORD, "Password:", this.getFieldEditorParent());
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
         
-        requiresValidation = new ButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
+        requiresValidation = new ConnectValidateButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
                 new ConnectionValidator(), this.getFieldEditorParent());
         addField(requiresValidation);
 
@@ -136,37 +137,44 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     /**
      * {@link #checkState()}
      */
-    // TODO refactor
+    // TODO refactored delete after review. now all validation making in the controls classes
+    /*
     @Override
     protected void checkState() {
         super.checkState();
-        if (this.isValid() && enabledEditor.getBooleanValue()) {
+        //boolean isValid = true;
+        //String message = null;
+        //if (!this.isValid() || !enabledEditor.getBooleanValue()) {
+        //    return;
+        //}
 
-            if (0 == urlEditor.getStringValue().length()) {
-                setErrorMessage("Application URL Is a required field");
-                setValid(false);
-                requiresValidation.setEnabled(false, this.getFieldEditorParent());
-            }
-            if (!urlEditor.getStringValue().endsWith("/")) {
-                setErrorMessage("URL Must end with a /");
-                setValid(false);
-                requiresValidation.setEnabled(false, this.getFieldEditorParent());
-            } else if ((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
-                setErrorMessage("Username is a required field");
-                setValid(false);
-                requiresValidation.setEnabled(false, this.getFieldEditorParent());
-            } else if (requiresValidation.getValue()) {
-                setErrorMessage("Connection Parameters Require Validation");
-                setValid(false);
-            } else {
-                setErrorMessage(null);
-                setValid(true);
-            }
-        } else if (this.isValid()) {
-            setErrorMessage(null);
-            setValid(true);
+        if (0 == urlEditor.getStringValue().length()) {
+            message = "Application URL Is a required field";
+            isValid = false;
+            requiresValidation.setEnabled(false, this.getFieldEditorParent());
+        }else if (!urlEditor.getStringValue().endsWith("/")) {
+            message = "URL Must end with a /";
+            isValid = false;
+            requiresValidation.setEnabled(false, this.getFieldEditorParent());
+        } else 
+        if ((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
+            message = "Username is a required field";
+            isValid = false;
+            requiresValidation.setEnabled(false, this.getFieldEditorParent());
+        } else
+        if (requiresValidation.getValue()) {
+            message = "Connection Parameters Require Validation";
+            isValid = false;
+        } else {
+            message = null;
+            isValid = true;
         }
+        
+        setErrorMessage(message);
+        setValid(isValid);
+
     }
+*/
 
     /**
      * Validate the connection
@@ -235,4 +243,81 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         return super.performCancel();
     }
 
+    
+    
+    private class UrlFieldEditor extends StringFieldEditor {
+        
+        public UrlFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
+            super(pUrl, string, fieldEditorParent);
+        }
+
+        @Override
+        protected boolean doCheckState() {
+            boolean isValid = true;
+            String message = null;
+            
+            if (0 == urlEditor.getStringValue().length()) {
+                message = "Application URL Is a required field";
+                isValid = false;
+                requiresValidation.setEnabled(false, getFieldEditorParent());
+            }else if (!urlEditor.getStringValue().endsWith("/")) {
+                message = "URL Must end with a /";
+                isValid = false;
+                requiresValidation.setEnabled(false, getFieldEditorParent());
+            }
+
+            setErrorMessage(message);
+            
+            return isValid;
+        }
+    }
+    
+    private class UserNameFieldEditor extends StringFieldEditor {
+        public UserNameFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
+            super(pUrl, string, fieldEditorParent);
+        }
+
+        @Override
+        protected boolean doCheckState() {
+            boolean isValid = true;
+            String message = null;
+            
+            if ((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
+                message = "Username is a required field";
+                isValid = false;
+                requiresValidation.setEnabled(false, getFieldEditorParent());
+            }
+
+            setErrorMessage(message);
+            
+            return isValid;
+        }    
+    }
+    
+    private class ConnectValidateButtonFieldEditor extends ButtonFieldEditor {
+        
+        public ConnectValidateButtonFieldEditor(String pRequiresvalidation, String string,
+                ConnectionValidator connectionValidator, Composite fieldEditorParent) {
+            super(pRequiresvalidation, string, connectionValidator, fieldEditorParent);
+        }
+
+        @Override
+        public void setEnabled(boolean enabled, Composite parent) {
+            super.setEnabled(enabled, parent);
+            boolean isValid = true;
+            String message = null;
+            
+            if (enabled) {
+                message = "Connection Parameters Require Validation";
+                isValid = false;
+            } else {
+                message = null;
+                isValid = true;
+            }
+            
+            setErrorMessage(message);
+            setValid(isValid);
+            
+        }
+    }
 }

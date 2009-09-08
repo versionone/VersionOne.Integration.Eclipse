@@ -51,10 +51,6 @@ public class HTMLEditor extends Dialog {
         composer = new HtmlComposer(container, SWT.BORDER | SWT.SCROLL_LINE);
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         composer.setFocus();
-
-        //TODO debug info
-        Activator.logError(richText, new Exception());
-        Activator.logError(JavaScriptCommands.SET_HTML(richText), new Exception());
         
         composer.execute(JavaScriptCommands.SET_HTML(richText));
 

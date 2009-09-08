@@ -69,7 +69,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
         
-        requiresValidation = new ConnectValidateButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
+        requiresValidation = new ButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
                 new ConnectionValidator(), this.getFieldEditorParent());
         addField(requiresValidation);
 
@@ -138,16 +138,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
      * {@link #checkState()}
      */
     // TODO refactored delete after review. now all validation making in the controls classes
-    /*
+
     @Override
     protected void checkState() {
         super.checkState();
-        //boolean isValid = true;
-        //String message = null;
-        //if (!this.isValid() || !enabledEditor.getBooleanValue()) {
-        //    return;
-        //}
-
+        boolean isValid = true;
+        String message = null;
+        if (!this.isValid() || !enabledEditor.getBooleanValue()) {
+            setValid(false);
+            return;
+        }
+        /*
         if (0 == urlEditor.getStringValue().length()) {
             message = "Application URL Is a required field";
             isValid = false;
@@ -162,6 +163,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             isValid = false;
             requiresValidation.setEnabled(false, this.getFieldEditorParent());
         } else
+            */
         if (requiresValidation.getValue()) {
             message = "Connection Parameters Require Validation";
             isValid = false;
@@ -174,7 +176,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         setValid(isValid);
 
     }
-*/
+
 
     /**
      * Validate the connection
@@ -266,7 +268,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
                 requiresValidation.setEnabled(false, getFieldEditorParent());
             }
 
-            setErrorMessage(message);
+            setErrorMessage(message);            
             
             return isValid;
         }
@@ -292,32 +294,5 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             
             return isValid;
         }    
-    }
-    
-    private class ConnectValidateButtonFieldEditor extends ButtonFieldEditor {
-        
-        public ConnectValidateButtonFieldEditor(String pRequiresvalidation, String string,
-                ConnectionValidator connectionValidator, Composite fieldEditorParent) {
-            super(pRequiresvalidation, string, connectionValidator, fieldEditorParent);
-        }
-
-        @Override
-        public void setEnabled(boolean enabled, Composite parent) {
-            super.setEnabled(enabled, parent);
-            boolean isValid = true;
-            String message = null;
-            
-            if (enabled) {
-                message = "Connection Parameters Require Validation";
-                isValid = false;
-            } else {
-                message = null;
-                isValid = true;
-            }
-            
-            setErrorMessage(message);
-            setValid(isValid);
-            
-        }
-    }
+    }    
 }

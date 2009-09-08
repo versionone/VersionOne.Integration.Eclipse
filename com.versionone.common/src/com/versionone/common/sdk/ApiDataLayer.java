@@ -189,6 +189,10 @@ public class ApiDataLayer {
 //            }
 
             this.path = path;
+            // if project is unknown or not exist for current VersionOne instance
+            if (currentProjectId == null || !isProjectExist(currentProjectId)) {
+                updateCurrentProjectId();
+            }
             return true;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);

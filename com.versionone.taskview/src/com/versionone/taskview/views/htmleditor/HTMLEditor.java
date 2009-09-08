@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
 
+import com.versionone.common.Activator;
+
 import de.spiritlink.richhtml4eclipse.widgets.HtmlComposer;
 import de.spiritlink.richhtml4eclipse.widgets.JavaScriptCommands;
 
@@ -50,6 +52,10 @@ public class HTMLEditor extends Dialog {
         composer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         composer.setFocus();
 
+        //TODO debug info
+        Activator.logError(richText, new Exception());
+        Activator.logError(JavaScriptCommands.SET_HTML(richText), new Exception());
+        
         composer.execute(JavaScriptCommands.SET_HTML(richText));
 
 

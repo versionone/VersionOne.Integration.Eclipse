@@ -16,8 +16,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
 
-import com.versionone.common.Activator;
-
 import de.spiritlink.richhtml4eclipse.widgets.HtmlComposer;
 import de.spiritlink.richhtml4eclipse.widgets.JavaScriptCommands;
 

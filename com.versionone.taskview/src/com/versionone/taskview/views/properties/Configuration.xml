@@ -142,6 +142,7 @@
 			<Type>String</Type>
 			<Attribute>Actuals.Value.@Sum</Attribute>
 			<EffortTracking>true</EffortTracking>
+			<ReadOnly>1</ReadOnly>
 		</ColumnSetting>
 		<ColumnSetting>
 			<Name>ColumnTitle'ToDo</Name>
@@ -241,6 +242,7 @@
 				<Type>String</Type>
 				<Attribute>Actuals.Value.@Sum</Attribute>
 				<EffortTracking>true</EffortTracking>
+				<ReadOnly>1</ReadOnly>
 			</ColumnSetting>
 			<ColumnSetting>
 				<Name>ColumnTitle'ToDo</Name>
@@ -328,6 +330,7 @@
 				<Type>String</Type>
 				<Attribute>Actuals.Value.@Sum</Attribute>
 				<EffortTracking>true</EffortTracking>
+				<ReadOnly>1</ReadOnly>
 			</ColumnSetting>
 			<ColumnSetting>
 				<Name>ColumnTitle'ToDo</Name>
@@ -415,6 +418,7 @@
 				<Type>String</Type>
 				<Attribute>Actuals.Value.@Sum</Attribute>
 				<EffortTracking>true</EffortTracking>
+				<ReadOnly>1</ReadOnly>
 			</ColumnSetting>
 			<ColumnSetting>
 				<Name>ColumnTitle'ToDo</Name>

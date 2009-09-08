@@ -37,7 +37,5 @@ public class FilterAction extends Action {
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, value);
         
         workItemView.enableViewerAndActions(true);
-        //showMessage();
-        //setText(getMessage());
     }
 }

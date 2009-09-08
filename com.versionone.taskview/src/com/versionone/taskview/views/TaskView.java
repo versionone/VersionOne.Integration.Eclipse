@@ -35,7 +35,6 @@ import com.versionone.taskview.Activator;
 
 import com.versionone.taskview.views.editors.SingleValueSupport;
 import com.versionone.taskview.views.editors.MultiValueSupport;
-import com.versionone.taskview.views.editors.ReadOnlySupport;
 import com.versionone.taskview.views.editors.TextSupport;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 import com.versionone.taskview.views.providers.SimpleProvider;
@@ -286,6 +285,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void addEffortColumns() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 5);
         column.setLabelProvider(new SimpleProvider(Workitem.DONE_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.DONE_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 6);
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));

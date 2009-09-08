@@ -38,7 +38,7 @@ public class Configuration {
                 configuration = (Configuration) um.unmarshal(stream);
             } catch (JAXBException e) {
                 Activator.logError("Cannot load configuration", e);
-                configuration = new Configuration(); 
+                configuration = new Configuration();
             } finally {
                 if (stream != null) {
                     try {
@@ -65,45 +65,18 @@ public class Configuration {
 
         @XmlElementWrapper(name = "TaskColumns")
         @XmlElement(name = "ColumnSetting")
-        public final ColumnSetting[] taskColumns;
+        public ColumnSetting[] taskColumns;
         @XmlElementWrapper(name = "StoryColumns")
         @XmlElement(name = "ColumnSetting")
-        public final ColumnSetting[] storyColumns;
+        public ColumnSetting[] storyColumns;
         @XmlElementWrapper(name = "TestColumns")
         @XmlElement(name = "ColumnSetting")
-        public final ColumnSetting[] testColumns;
+        public ColumnSetting[] testColumns;
         @XmlElementWrapper(name = "DefectColumns")
         @XmlElement(name = "ColumnSetting")
-        public final ColumnSetting[] defectColumns;
+        public ColumnSetting[] defectColumns;
 
         public AssetDetailSettings() {
-            taskColumns = new ColumnSetting[8];
-            testColumns = new ColumnSetting[1];
-            storyColumns = new ColumnSetting[1];
-            defectColumns = new ColumnSetting[1];
-
-            taskColumns[0] = new ColumnSetting("ColumnTitle'Title", STRING_TYPE, "Name", MAIN_CATEGORY, false, false);
-            taskColumns[1] = new ColumnSetting("ColumnTitle'Description", RICH_TEXT_TYPE, "Description", MAIN_CATEGORY,
-                    false, false);
-            taskColumns[2] = new ColumnSetting("ColumnTitle'Project", STRING_TYPE, "Scope.Name", MAIN_CATEGORY, false,
-                    false);
-            taskColumns[3] = new ColumnSetting("ColumnTitle'Parent", STRING_TYPE, "Parent.Name", MAIN_CATEGORY, false,
-                    false);
-            taskColumns[4] = new ColumnSetting("ColumnTitle'Owner", MULTI_VALUE_TYPE, "Owners", EXTENDED_CATEGORY,
-                    false, false);
-            taskColumns[5] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
-                    false);
-            taskColumns[6] = new ColumnSetting("ColumnTitle'ID", STRING_TYPE, "Number", MAIN_CATEGORY, true, false);
-            taskColumns[7] = new ColumnSetting("ColumnTitle'Effort", STRING_TYPE, "Actuals", MAIN_CATEGORY, false, true);
-
-            storyColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
-                    false);
-
-            testColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
-                    false);
-
-            defectColumns[0] = new ColumnSetting("ColumnTitle'Status", LIST_TYPE, "Status", EXTENDED_CATEGORY, false,
-                    false);
         }
 
         public ColumnSetting[] getColumns(String type) {
@@ -147,7 +120,7 @@ public class Configuration {
         public final boolean readOnly;
         @XmlElement(name = "EffortTracking", defaultValue = "false")
         public final boolean effortTracking;
-        @XmlElement(name = "Name", defaultValue = "100", required = false)
+        @XmlElement(name = "Width", defaultValue = "100", required = false)
         public int width = 100;
 
         public ColumnSetting() {

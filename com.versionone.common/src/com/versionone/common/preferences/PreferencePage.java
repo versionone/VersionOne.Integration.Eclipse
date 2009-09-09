@@ -65,7 +65,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         userEditor = new UserNameFieldEditor(PreferenceConstants.P_USER, "Username:", this.getFieldEditorParent());
         addField(userEditor);
 
-        pwdField = new StringFieldEditor(PreferenceConstants.P_PASSWORD, "Password:", this.getFieldEditorParent());
+        pwdField = new VersionOneStringFieldEditor(PreferenceConstants.P_PASSWORD, "Password:", this.getFieldEditorParent());
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
         
@@ -137,33 +137,21 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     /**
      * {@link #checkState()}
      */
-    // TODO refactored delete after review. now all validation making in the controls classes
-
     @Override
     protected void checkState() {
         super.checkState();
         boolean isValid = true;
         String message = null;
-        if (!this.isValid() || !enabledEditor.getBooleanValue()) {
+        if (!enabledEditor.getBooleanValue()) {
+            setValid(true);
+            setErrorMessage(null);
+            return;            
+        } else if (!this.isValid()) {
             setValid(false);
+            setErrorMessage(errorMessage);
             return;
         }
-        /*
-        if (0 == urlEditor.getStringValue().length()) {
-            message = "Application URL Is a required field";
-            isValid = false;
-            requiresValidation.setEnabled(false, this.getFieldEditorParent());
-        }else if (!urlEditor.getStringValue().endsWith("/")) {
-            message = "URL Must end with a /";
-            isValid = false;
-            requiresValidation.setEnabled(false, this.getFieldEditorParent());
-        } else 
-        if ((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
-            message = "Username is a required field";
-            isValid = false;
-            requiresValidation.setEnabled(false, this.getFieldEditorParent());
-        } else
-            */
+        
         if (requiresValidation.getValue()) {
             message = "Connection Parameters Require Validation";
             isValid = false;
@@ -174,8 +162,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         setErrorMessage(message);
         setValid(isValid);
-
     }
+    
 
 
     /**
@@ -245,9 +233,35 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         return super.performCancel();
     }
 
+    // Special classes for properties
+    private String errorMessage = null;
     
+    private class VersionOneStringFieldEditor extends StringFieldEditor {
+
+        public VersionOneStringFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
+            super(pUrl, string, fieldEditorParent);            
+        }
+
+        protected boolean doCheckState() {
+            boolean isValid = super.doCheckState();
+            
+            if (requiresValidation.getValue()) {
+                errorMessage = "Connection Parameters Require Validation";
+                isValid = false;
+            }            
+            setErrorMessage(errorMessage);
+            
+            return isValid;
+        }
+        
+        @Override
+        public boolean isValid() {
+            refreshValidState();
+            return super.isValid();
+        }        
+    }
     
-    private class UrlFieldEditor extends StringFieldEditor {
+    private class UrlFieldEditor extends VersionOneStringFieldEditor {
         
         public UrlFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
             super(pUrl, string, fieldEditorParent);
@@ -255,44 +269,44 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
         @Override
         protected boolean doCheckState() {
-            boolean isValid = true;
-            String message = null;
+            boolean isValid = super.doCheckState();
             
-            if (0 == urlEditor.getStringValue().length()) {
-                message = "Application URL Is a required field";
+            if (0 == getStringValue().length()) {
+                errorMessage = "Application URL Is a required field";
                 isValid = false;
                 requiresValidation.setEnabled(false, getFieldEditorParent());
-            }else if (!urlEditor.getStringValue().endsWith("/")) {
-                message = "URL Must end with a /";
+            } else if (!getStringValue().endsWith("/")) {
+                errorMessage = "URL Must end with a /";
                 isValid = false;
                 requiresValidation.setEnabled(false, getFieldEditorParent());
-            }
+            } 
 
-            setErrorMessage(message);            
+            setErrorMessage(errorMessage);
             
             return isValid;
         }
-    }
+
+    }    
     
-    private class UserNameFieldEditor extends StringFieldEditor {
+    private class UserNameFieldEditor extends VersionOneStringFieldEditor {
         public UserNameFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
             super(pUrl, string, fieldEditorParent);
         }
 
         @Override
         protected boolean doCheckState() {
-            boolean isValid = true;
-            String message = null;
+            boolean isValid = super.doCheckState();
             
-            if ((!integratedAuthEditor.getBooleanValue()) && (0 == userEditor.getStringValue().length())) {
-                message = "Username is a required field";
+            if ((!integratedAuthEditor.getBooleanValue()) && (0 == getStringValue().length())) {
+                errorMessage = "Username is a required field";
                 isValid = false;
                 requiresValidation.setEnabled(false, getFieldEditorParent());
             }
 
-            setErrorMessage(message);
+            setErrorMessage(errorMessage);
             
             return isValid;
-        }    
-    }    
+        }
+    }
+    
 }

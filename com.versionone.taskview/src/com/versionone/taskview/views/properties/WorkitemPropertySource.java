@@ -80,6 +80,7 @@ public class WorkitemPropertySource implements IPropertySource {
 
     public void resetPropertyValue(Object id) {
         item.resetProperty((String) id);
+        ((Viewer) proxy).refresh();
     }
 
     public void setPropertyValue(Object id, Object value) {

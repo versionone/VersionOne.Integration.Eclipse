@@ -139,15 +139,7 @@ public class ApiDataLayer {
         this.integrated = integrated;
         assetList = null;
         boolean isUpdateData = true;
-        //TODO for remove
-        //boolean isTokenChanged = true;
-
-//        String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
-//        if (memberOid != null) {
-//            // location or user was changed
-//            isTokenChanged = !currentOid.equals(memberOid.getToken() + ":" + path);
-//        }
-        // TODO test optimization of refresh. need to test
+        
         isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
         if (isUpdateData) {
             assetsToIgnore.clear();
@@ -182,17 +174,10 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
 
             isConnected = true;
-            //TODO for remove
-//            if (isTokenChanged) {
-//                PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN,
-//                        memberOid.getToken() + ":" + path);
-//            }
 
             this.path = path;
-            // if project is unknown or not exist for current VersionOne instance
-            if (currentProjectId == null || !isProjectExist(currentProjectId)) {
-                updateCurrentProjectId();
-            }
+            updateCurrentProjectId();
+            
             return true;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);

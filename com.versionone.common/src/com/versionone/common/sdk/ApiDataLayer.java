@@ -60,8 +60,9 @@ public class ApiDataLayer {
     private IAssetType primaryWorkitemType;
     private IAssetType effortType;
 
-    private static ApiDataLayer instance;
+    protected static ApiDataLayer instance;
     private boolean isConnected;
+    private boolean testConnection;
 
     public Oid memberOid;
     private String path;
@@ -87,11 +88,7 @@ public class ApiDataLayer {
 
     private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
 
-    public void setShowAllTasks(boolean showAllTasks) {
-        this.showAllTasks = showAllTasks;
-    }
-
-    private ApiDataLayer() {
+    protected ApiDataLayer() {
     }
 
     /**
@@ -114,7 +111,7 @@ public class ApiDataLayer {
         }
 
         initTypes();
-        isConnected = true;
+        testConnection = isConnected = true;
         memberOid = this.services.getLoggedIn();
         listPropertyValues = getListPropertyValues();
     }
@@ -126,7 +123,10 @@ public class ApiDataLayer {
         return instance;
     }
 
-    public boolean connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
+    public void connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
+        if (testConnection) {
+            return;
+        }
         isConnected = false;
         boolean isUserChanged = true;
         if (this.userName != null && this.password != null && this.path != null) {
@@ -178,7 +178,7 @@ public class ApiDataLayer {
             this.path = path;
             updateCurrentProjectId();
             
-            return true;
+            return;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);
         } catch (Exception e) {
@@ -201,8 +201,8 @@ public class ApiDataLayer {
      * 
      * @throws DataLayerException
      */
-    public boolean reconnect() throws DataLayerException {
-        return connect(path, userName, password, integrated);
+    public void reconnect() throws DataLayerException {
+        connect(path, userName, password, integrated);
     }
 
     public List<Workitem> getProjectTree() throws DataLayerException {
@@ -329,8 +329,11 @@ public class ApiDataLayer {
     }
 
     private void checkConnection() throws DataLayerException {
-        if (!isConnected && !reconnect()) {
-            throw warning("Connection is not set.");
+        if (!isConnected) {
+            reconnect();
+            if (!isConnected) {
+                throw warning("Connection is not set.");
+            }
         }
     }
 

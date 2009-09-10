@@ -3,6 +3,7 @@ package com.versionone.common.sdk;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
@@ -31,13 +32,10 @@ public class Workitem {
     public static final String SCHEDULE_NAME_PROPERTY = "Schedule.Name";
     public static final String OWNERS_PROPERTY = "Owners";
     public static final String TODO_PROPERTY = "ToDo";
+    public static final String ESTIMATE_PROPERTY = "Estimate";
     public static final String DESCRIPTION_PROPERTY = "Description";
     public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
     public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
-
-    protected ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-    protected Asset asset;
-    public Workitem parent;
 
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     static {
@@ -45,11 +43,21 @@ public class Workitem {
         numberFormat.setMaximumFractionDigits(6);
     }
 
+    protected final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+    protected final Asset asset;
+    public final Workitem parent;
+
     /**
      * List of child Workitems.
      */
-    public final ArrayList<Workitem> children;
+    public final List<Workitem> children;
 
+    protected Workitem(List<Workitem> children, Workitem parent){
+        this.children = children;
+        this.parent = parent;
+        asset = null;
+    }
+    
     Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
@@ -65,7 +73,7 @@ public class Workitem {
                 children.add(new Workitem(childAsset, this));
             }
         }
-        children.trimToSize();
+        ((ArrayList<Workitem>)children).trimToSize();
     }
 
     public String getTypePrefix() {
@@ -426,7 +434,7 @@ public class Workitem {
 
     @Override
     public String toString() {
-        return getId() + (asset.hasChanged() ? " (Changed)" : "");
+        return getId() + (hasChanges() ? " (Changed)" : "");
     }
     
     public boolean isPropertyReadOnly(boolean isEffort, String propertyName) {

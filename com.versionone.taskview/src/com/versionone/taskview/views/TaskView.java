@@ -459,8 +459,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         super.dispose();
     }
 
-    protected void reCreateTable() {
-
+    public void reCreateTable() {
         if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             removeEffortColumns();
         } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {

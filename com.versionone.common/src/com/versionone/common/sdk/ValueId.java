@@ -4,15 +4,15 @@ import com.versionone.Oid;
 
 public class ValueId {
 
-    public Oid oid;
-    private final String name;
-    
+    protected final Oid oid;
+    protected final String name;
+
     public ValueId() {
-        this(Oid.Null, "");        
+        this(Oid.Null, "");
     }
-    
+
     protected ValueId(Oid oid, String name) {
-        this.oid = oid.getMomentless();
+        this.oid = oid == null ? Oid.Null : oid.getMomentless();
         this.name = name;
     }
 
@@ -24,17 +24,17 @@ public class ValueId {
         if (!(value instanceof ValueId)) {
             return false;
         }
-        
-        ValueId newValue = (ValueId)value;
-        
+
+        ValueId newValue = (ValueId) value;
+
         return this.oid.equals(newValue.oid);
     }
-    
+
     @Override
     public int hashCode() {
         return oid.hashCode();
     }
-    
+
     @Override
     public String toString() {
         return name;

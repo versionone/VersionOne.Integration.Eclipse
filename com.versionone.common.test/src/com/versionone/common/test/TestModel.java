@@ -101,7 +101,7 @@ public class TestModel {
 
     @Test
     public void testGetUsersTask() throws Exception {
-        datalayer.setShowAllTasks(false);
+        datalayer.showAllTasks = false;
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(7, allWorkItem.length);
         /*
@@ -121,7 +121,7 @@ public class TestModel {
     
     @Test
     public void testGetAllTasks() throws Exception {
-        datalayer.setShowAllTasks(true);
+        datalayer.showAllTasks = true;
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(11, allWorkItem.length);
         /*

@@ -7,7 +7,7 @@
 		</Response>
 	</Get>
 
-	<Get path="loc.v1/?Task">
+	<Get path="loc.v1/?ColumnTitle'Task">
 		<Response>
 			<![CDATA[Task]]>
 		</Response>

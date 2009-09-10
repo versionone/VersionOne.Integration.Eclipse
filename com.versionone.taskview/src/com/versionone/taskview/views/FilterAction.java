@@ -33,7 +33,7 @@ public class FilterAction extends Action {
         workItemView.enableViewerAndActions(false);
         
         int value = isChecked() ? 1 : 0;
-        ApiDataLayer.getInstance().setShowAllTasks(!isChecked());
+        ApiDataLayer.getInstance().showAllTasks = !isChecked();
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, value);
         
         workItemView.enableViewerAndActions(true);

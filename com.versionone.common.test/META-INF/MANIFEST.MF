@@ -11,5 +11,6 @@ Require-Bundle: org.eclipse.ui,
  com.versionone.apiclient,
  com.versionone.common;bundle-version="2.0",
  org.junit4
-Export-Package: com.versionone.common.test
+Export-Package: com.versionone.common.sdk,
+ com.versionone.common.test
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

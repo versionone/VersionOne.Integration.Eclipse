@@ -64,7 +64,7 @@ public class Activator extends AbstractUIPlugin {
         setAttributes(cfg.assetDetailSettings.storyColumns, Workitem.STORY_PREFIX);
         setAttributes(cfg.assetDetailSettings.testColumns, Workitem.TEST_PREFIX);
         setAttributes(cfg.assetDetailSettings.taskColumns, Workitem.TASK_PREFIX);
-        // setAttributes(cfg.assetDetailSettings.projectColumns, Workitem.PROJECT_PREFIX);
+        setAttributes(cfg.projectTreeSettings.projectColumns, Workitem.PROJECT_PREFIX);
     }
 
     private static void setAttributes(ColumnSetting[] columns, String... typePrefixes) {

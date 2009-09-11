@@ -430,14 +430,18 @@ public class ApiDataLayer {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
         IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NAME_PROPERTY);
-        IAttributeDefinition inactiveDef;
+        IAttributeDefinition inactiveDef = null;
 
         Query query = new Query(assetType);
         query.getSelection().add(nameDef);
 
         // TODO need to recongnize is it possible what task can have closed
         // owner
-        inactiveDef = assetType.getAttributeDefinition("Inactive");
+        try {
+            inactiveDef = assetType.getAttributeDefinition("Inactive");
+        } catch(Exception ex) {
+            //do nothing
+        }
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
             filter.Equal("False");

@@ -100,10 +100,10 @@ public class Configuration {
 
         @XmlElementWrapper(name = "Columns")
         @XmlElement(name = "ColumnSetting")
-        public final ColumnSetting[] taskColumns;
+        public final ColumnSetting[] projectColumns;
 
         ProjectTreeSettings() {
-            taskColumns = new ColumnSetting[0];
+            projectColumns = new ColumnSetting[0];
         }
     }
 

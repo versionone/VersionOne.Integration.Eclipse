@@ -1,5 +1,8 @@
 package com.versionone.taskview.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -13,13 +16,20 @@ import com.versionone.taskview.views.properties.WorkitemPropertySource;
 public class ProxySelectionProvider implements ISelectionProvider {
 
     private final ISelectionProvider proxy;
+    private final List<ISelectionChangedListener> listeners;
 
     public ProxySelectionProvider(ISelectionProvider proxy) {
         this.proxy = proxy;
+        listeners = new ArrayList<ISelectionChangedListener>();
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
         proxy.addSelectionChangedListener(new ProxyListener(listener));
+        listeners.add(listener);
+    }
+    
+    public List<ISelectionChangedListener> getListeners() {
+        return listeners;
     }
 
     public ISelection getSelection() {
@@ -54,6 +64,10 @@ public class ProxySelectionProvider implements ISelectionProvider {
         }
         return sel;
     }
+    
+//    public ISelectionChangedListener getProxyListener() {
+//        return listener_data;
+//    }
 
     private class ProxyListener implements ISelectionChangedListener {
 

@@ -11,11 +11,8 @@ import com.versionone.common.sdk.Workitem;
  * @author jerry
  */
 class ViewContentProvider implements ITreeContentProvider {
-
-    private final ProxySelectionProvider propertySelectionProvider;
     
-    public ViewContentProvider(ProxySelectionProvider selectionProvider) {
-        propertySelectionProvider = selectionProvider;
+    public ViewContentProvider() {
     }
 
     public Object[] getChildren(Object parentElement) {

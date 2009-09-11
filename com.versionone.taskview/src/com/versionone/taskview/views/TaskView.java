@@ -98,6 +98,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         createContextMenu(viewer);
         selectProvider();
         getSite().setSelectionProvider(selectionProvider);
+                
     }
 
     private boolean validRowSelected() {
@@ -214,7 +215,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         viewer.getTree().clearAll(true);
 
         if (viewer.getContentProvider() == null) {
-            viewer.setContentProvider(new ViewContentProvider(selectionProvider));
+            viewer.setContentProvider(new ViewContentProvider());
         }
 
         if (isEnabled) {
@@ -309,7 +310,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create the action menus
      */
     private void makeActions() {
-        selectProjectAction = new ProjectAction(this, viewer);
+        selectProjectAction = new ProjectAction(this, viewer, getSite());
         refreshAction = new RefreshAction(this, viewer);
         saveAction = new SaveAction(this, viewer);
         filåterAction = new FilterAction(this, viewer);

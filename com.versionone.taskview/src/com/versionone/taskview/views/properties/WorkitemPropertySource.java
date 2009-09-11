@@ -35,7 +35,12 @@ public class WorkitemPropertySource implements IPropertySource {
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
         Configuration cfg = Configuration.getInstance();
-        ColumnSetting[] columns = cfg.assetDetailSettings.getColumns(item.getTypePrefix());
+        ColumnSetting[] columns;
+        if (item.getTypePrefix().equals(Workitem.PROJECT_PREFIX)) {
+            columns = cfg.projectTreeSettings.projectColumns;
+        } else {
+            columns = cfg.assetDetailSettings.getColumns(item.getTypePrefix());
+        }
         ArrayList<IPropertyDescriptor> res = new ArrayList<IPropertyDescriptor>(columns.length);
         for(ColumnSetting column : columns) {
             if (column.effortTracking && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {

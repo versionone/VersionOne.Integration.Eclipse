@@ -3,6 +3,12 @@ package com.versionone.taskview.views;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,6 +27,7 @@ import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
+import com.versionone.taskview.views.providers.SimpleProvider;
 
 /**
  * Dialog box used to select projects. Pressing Okay updates the PreferenceStore
@@ -29,12 +36,13 @@ import com.versionone.common.preferences.PreferencePage;
  * @author Jerry D. Odenwelder Jr.
  * 
  */
-public class ProjectSelectDialog extends Dialog implements SelectionListener {
+public class ProjectSelectDialog extends Dialog {
 
-    private Tree projectTree = null;
+    //private Tree projectTree = null;
+    private TreeViewer viewer = null; 
     private List<Workitem> v1Roots;
     private Workitem selectedProjectTreeNode;
-    private TreeItem _selectedTreeItem;
+    //private TreeItem _selectedTreeItem;
 
     static int WINDOW_HEIGHT = 200;
     static int WINDOW_WIDTH = 200;
@@ -64,9 +72,9 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * 
      * @return
      */
-    public Workitem getSelectedProject() {
-        return selectedProjectTreeNode;
-    }
+//    public Workitem getSelectedProject() {
+//        return selectedProjectTreeNode;
+//    }
 
     /**
      * {@link #createDialogArea(Composite)}
@@ -75,9 +83,17 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
         container.setLayout(new FillLayout(SWT.VERTICAL));
-        projectTree = new Tree(container, SWT.SINGLE);
-        projectTree.addSelectionListener(this);
-        populateTree();
+        viewer = new TreeViewer(container, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        //projectTree = viewer.getTree();
+        //projectTree.addSelectionListener(this);
+        //populateTree();
+        if (selectedProjectTreeNode == null) {
+            selectedProjectTreeNode = v1Roots.get(0);
+        }
+        viewer.setContentProvider(new ViewContentProvider());
+        viewer.setInput(v1Roots.toArray(new Workitem[1]));
+        viewer.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
+        
         return container;
     }
 
@@ -99,19 +115,19 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * Populate the Tree control with IProjectTreeNode data
      */
     // TODO this and next methods can be optimazed        
-    private void populateTree() {
-        int i = 0;
-        for (Workitem v1Root : v1Roots) {
-            final TreeItem treeItem = new TreeItem(this.projectTree, SWT.NONE, i);
-            treeItem.setText(v1Root.getPropertyAsString(Workitem.NAME_PROPERTY));
-            treeItem.setData(v1Root);
-            treeItem.setExpanded(true);
-            int j = 0;
-            for (Workitem child : v1Root.children) {
-                populateTree(treeItem, child, j);
-                j++;
-            }
-            i++;
+//    private void populateTree() {
+//        int i = 0;
+//        for (Workitem v1Root : v1Roots) {
+//            final TreeItem treeItem = new TreeItem(this.projectTree, SWT.NONE, i);
+//            treeItem.setText(v1Root.getPropertyAsString(Workitem.NAME_PROPERTY));
+//            treeItem.setData(v1Root);
+//            treeItem.setExpanded(true);
+//            int j = 0;
+//            for (Workitem child : v1Root.children) {
+//                populateTree(treeItem, child, j);
+//                j++;
+//            }
+//            i++;
             //TreeNode node = rootNodes.Add(v1Root.GetProperty(Workitem.NameProperty) as string);
             //node.Tag = v1Root;
 //            TreeNode res2 = AddNodesRecursively(node.Nodes, v1Root.Children);
@@ -120,13 +136,21 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
 //            } else if (v1Root.Id == Settings.Instance.SelectedProjectId) {
 //                res = node;
 //            }
-        }
-
-        if (null == _selectedTreeItem) {
-            _selectedTreeItem = projectTree.getItem(0);
-            selectedProjectTreeNode = (Workitem) _selectedTreeItem.getData();
-        }
-        projectTree.setSelection(_selectedTreeItem);
+//        }
+//
+//        
+//        if (null == _selectedTreeItem) {
+//            _selectedTreeItem = viewer.getTree().getItem(0);
+//            selectedProjectTreeNode = (Workitem) _selectedTreeItem.getData();
+//        }
+        //projectTree.setSelection(_selectedTreeItem);
+        
+        
+        //viewer.getTree().select(_selectedTreeItem);        
+        //viewer.setSelection(new StructuredSelection(selectedProjectTreeNode), true);
+        //ITreeSelection
+        //StructuredViewer
+        //viewer.setSelection(new TreeSelection(_selectedTreeItem});
         
         /*
         if (projectTree1.hasChildren()) {
@@ -147,8 +171,9 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
             }
             projectTree.setSelection(_selectedTreeItem);
         }
-        */
+
     }
+         */
 
     /**
      * Populate child tree nodes with IProjectTreeNode data
@@ -160,6 +185,7 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
      * @param index
      *            - index for this TreeItem in the parent node
      */
+    /*
     private void populateTree(TreeItem tree, Workitem node, int index) {
         final TreeItem treeItem = new TreeItem(tree, SWT.NONE, index);
         if (selectedProjectTreeNode.equals(node)) {
@@ -179,28 +205,26 @@ public class ProjectSelectDialog extends Dialog implements SelectionListener {
         }
         treeItem.setExpanded(true);
     }
-
-    /**
-     * {@link #widgetDefaultSelected(SelectionEvent)}
-     */
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
-
-    /**
-     * {@link #widgetSelected(SelectionEvent)}
-     */
-    public void widgetSelected(SelectionEvent e) {
-        this.selectedProjectTreeNode = (Workitem) ((TreeItem) e.item).getData();
-    }
+    */
 
     /**
      * {@link #okPressed()}
      */
     @Override
     protected void okPressed() {
+        Workitem selectedItem = (Workitem)((IStructuredSelection)viewer.getSelection()).getFirstElement();
         super.okPressed();
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN,
-                selectedProjectTreeNode.getId());
-        ApiDataLayer.getInstance().setCurrentProject(selectedProjectTreeNode);
+                selectedItem.getId());
+        ApiDataLayer.getInstance().setCurrentProject(selectedItem);
+    }
+
+    public TreeViewer getTreeViewer() {
+        return viewer;
+    }
+
+    public void setCurrentProject() {
+        viewer.expandToLevel(selectedProjectTreeNode, 10);
+        viewer.setSelection(new StructuredSelection(selectedProjectTreeNode), true);        
     }
 }

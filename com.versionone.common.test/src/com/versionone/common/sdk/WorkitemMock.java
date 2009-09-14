@@ -14,7 +14,7 @@ public class WorkitemMock extends Workitem {
     public boolean hasChanges;
 
     public WorkitemMock() {
-        this("", "");
+        this(null, null);
     }
 
     public WorkitemMock(String id, String prefix) {
@@ -23,8 +23,8 @@ public class WorkitemMock extends Workitem {
 
     public WorkitemMock(String typePrefix, String id, Workitem parent) {
         super(new LinkedList<Workitem>(), parent);
-        prefix = typePrefix;
-        this.id = id;
+        prefix = typePrefix == null ? "" : typePrefix;
+        this.id = id == null ? "" : typePrefix;
         if (parent != null)
             parent.children.add(this);
     }
@@ -73,15 +73,9 @@ public class WorkitemMock extends Workitem {
         WorkitemMock other = (WorkitemMock) obj;
         if (hasChanges != other.hasChanges)
             return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
+        if (!id.equals(other.id))
             return false;
-        if (prefix == null) {
-            if (other.prefix != null)
-                return false;
-        } else if (!prefix.equals(other.prefix))
+        if (!prefix.equals(other.prefix))
             return false;
         return true;
     }

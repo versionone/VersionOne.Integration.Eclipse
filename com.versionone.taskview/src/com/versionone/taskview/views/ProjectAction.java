@@ -44,17 +44,20 @@ class ProjectAction extends Action {
         }
 
         ISelectionProvider oldProvider = iWorkbenchPartSite.getSelectionProvider();
-        List<ISelectionChangedListener> listeners = ((ProxySelectionProvider)oldProvider).getListeners();
-        
+        List<ISelectionChangedListener> listeners = ((ProxySelectionProvider)oldProvider).getListeners();        
+        createProjectDialog(projectList, listeners);
+        iWorkbenchPartSite.setSelectionProvider(oldProvider);        
+        workItemView.loadTable();
+        workItemView.enableViewerAndActions(true);
+    }
+
+    private void createProjectDialog(List<Workitem> projectList, List<ISelectionChangedListener> listeners) {
         try {
             ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(workItemViewer.getControl().getShell(), projectList,
                     ApiDataLayer.getInstance().getCurrentProject());                        
-            
+
             projectSelectDialog.create();
-            ProxySelectionProvider proxy = new ProxySelectionProvider(projectSelectDialog.getTreeViewer());
-            for (ISelectionChangedListener listener : listeners) {
-                proxy.addSelectionChangedListener(listener);
-            }
+            ProxySelectionProvider proxy = createSelectionProvider(listeners, projectSelectDialog.getTreeViewer());
             projectSelectDialog.setCurrentProject();
             iWorkbenchPartSite.setSelectionProvider(proxy);
             projectSelectDialog.open();
@@ -63,8 +66,15 @@ class ProjectAction extends Action {
             MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
             "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
-        iWorkbenchPartSite.setSelectionProvider(oldProvider);        
-        workItemView.loadTable();
-        workItemView.enableViewerAndActions(true);
     }
+    
+    private ProxySelectionProvider createSelectionProvider(List<ISelectionChangedListener> listeners, TreeViewer treeViewer) {
+        ProxySelectionProvider proxy = new ProxySelectionProvider(treeViewer);
+        for (ISelectionChangedListener listener : listeners) {
+            proxy.addSelectionChangedListener(listener);
+        }
+        
+        return proxy;
+    }
+    
 }

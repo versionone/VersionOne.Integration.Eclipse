@@ -10,11 +10,7 @@ import com.versionone.common.sdk.Workitem;
  * 
  * @author jerry
  */
-class ViewContentProvider implements ITreeContentProvider {
-    
-    public ViewContentProvider() {
-    }
-
+class ViewContentProvider implements ITreeContentProvider {   
     public Object[] getChildren(Object parentElement) {
 
         return ((Workitem) parentElement).children.toArray();

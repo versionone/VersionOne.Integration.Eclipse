@@ -1,14 +1,13 @@
 package com.versionone.common.test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.JUnit4TestAdapter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.versionone.apiclient.FileAPIConnector;
@@ -60,9 +59,10 @@ public class TestModel {
             datalayer.addProperty(attribute, prefix, isListType);
         }
     }
-
-    @Before
-    public void setUp() throws Exception {
+    
+        
+    @BeforeClass
+    public static void setUp() throws Exception {
         loadTestData();
         PreferencePage preference = new PreferencePage();
         if (!preference.getPreferenceStore().getBoolean(PreferenceConstants.P_ENABLED)) {
@@ -70,7 +70,7 @@ public class TestModel {
         }
     }
 
-    private void enableView(IPreferenceStore config) {
+    private static void enableView(IPreferenceStore config) {
         config.setValue(PreferenceConstants.P_URL, SERVER_URL);
         config.setValue(PreferenceConstants.P_USER, USER_ID);
         config.setValue(PreferenceConstants.P_PASSWORD, USER_PASSWORD);
@@ -274,7 +274,7 @@ public class TestModel {
         Assert.assertEquals("", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         owners = new PropertyValues(Arrays.asList(admin, cat));
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Administrator,Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+        Assert.assertEquals("Administrator, Cat", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
     
 
@@ -288,7 +288,7 @@ public class TestModel {
         owners.add(petja);
         Assert.assertEquals(3, owners.size());
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Petja, Bil, Tom", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
+        Assert.assertEquals("Tom, Bil, Petja", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
     }
 
 //

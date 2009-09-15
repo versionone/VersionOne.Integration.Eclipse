@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
+
 import com.versionone.Oid;
 import com.versionone.apiclient.AndFilterTerm;
 
@@ -573,10 +575,7 @@ public class ApiDataLayer {
                 parentList = workitem.parent.asset.getChildren();
             }
 
-            if (newAssets.getTotalAvaliable() != 1) {
-                assetsToIgnore.add(workitem.asset);
-                return;
-            }
+            Assert.isTrue(newAssets.getTotalAvaliable() == 1, "Query should return exactly one asset.");
 
             Asset newAsset = newAssets.getAssets()[0];
             if (isAssetClosed(newAsset)) {

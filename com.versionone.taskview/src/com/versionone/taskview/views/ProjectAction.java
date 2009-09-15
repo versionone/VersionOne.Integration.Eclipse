@@ -6,6 +6,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -46,6 +47,7 @@ class ProjectAction extends Action {
         ISelectionProvider oldProvider = iWorkbenchPartSite.getSelectionProvider();
         List<ISelectionChangedListener> listeners = ((ProxySelectionProvider)oldProvider).getListeners();        
         createProjectDialog(projectList, listeners);
+        oldProvider.setSelection(new StructuredSelection(new Object[]{null}));
         iWorkbenchPartSite.setSelectionProvider(oldProvider);        
         workItemView.loadTable();
         workItemView.enableViewerAndActions(true);

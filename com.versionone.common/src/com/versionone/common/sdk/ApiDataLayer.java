@@ -135,7 +135,6 @@ public class ApiDataLayer {
             isUserChanged = !this.userName.equals(userName) || !this.password.equals(password) || !this.path.equals(path);
         }
         
-        
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
@@ -143,14 +142,13 @@ public class ApiDataLayer {
         boolean isUpdateData = true;
         
         isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
-        if (isUpdateData) {
-            assetsToIgnore.clear();
-            efforts.clear();
-            types.clear();
-        }
 
         try {
             if (isUpdateData) {
+                assetsToIgnore.clear();
+                efforts.clear();
+                types.clear();
+                
                 V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
                 metaModel = new MetaModel(metaConnector);
 

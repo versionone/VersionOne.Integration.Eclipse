@@ -131,8 +131,8 @@ public class ApiDataLayer {
         }
         isConnected = false;
         boolean isUserChanged = true;
-        if (this.userName != null && this.password != null && this.path != null) {
-            isUserChanged = !this.userName.equals(userName) || !this.password.equals(password) || !this.path.equals(path);
+        if ((this.userName != null || integrated) && this.path != null) {
+            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated || !this.path.equals(path);
         }
         
         this.userName = userName;
@@ -160,15 +160,7 @@ public class ApiDataLayer {
 
                 initTypes();
             }
-            V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
-
-            trackEffort = v1Config.isEffortTracking();
-            if (trackEffort) {
-                effortType = metaModel.getAssetType("Actual");
-            }
-
-            storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
-            defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
+            processConfig(path);
 
             memberOid = services.getLoggedIn();
             listPropertyValues = getListPropertyValues();
@@ -184,6 +176,18 @@ public class ApiDataLayer {
         } catch (Exception e) {
             throw warning("Cannot connect to V1 server.", e);
         }
+    }
+
+    private void processConfig(String path) throws ConnectionException, APIException {
+        V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
+
+        trackEffort = v1Config.isEffortTracking();
+        if (trackEffort) {
+            effortType = metaModel.getAssetType("Actual");
+        }
+
+        storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
+        defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
     }
 
     private void initTypes() {

@@ -3,7 +3,6 @@ package com.versionone.common.sdk;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.versionone.Oid;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.IAssetType;
 

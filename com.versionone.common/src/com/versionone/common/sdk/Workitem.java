@@ -95,27 +95,23 @@ public class Workitem {
         return asset.hasChanged();
     }
 
-    private boolean isPropertyReadOnly(String propertyName) {
-        String fullName = getTypePrefix() + '.' + propertyName;
-        try {
-            if (dataLayer.isEffortTrackingRelated(propertyName)) {
-                return isEffortTrackingPropertyReadOnly(propertyName);
-            }
-
-            return false;
-        } catch (Exception e) {
-            ApiDataLayer.warning("Cannot get property: " + fullName, e);
+    public boolean isPropertyReadOnly(String propertyName) {
+        if (dataLayer.isEffortTrackingRelated(propertyName) && isEffortTrackingPropertyReadOnly(propertyName)) {
             return true;
         }
+        if (!propertyName.equals(EFFORT_PROPERTY)) {
+            return isPropertyDefinitionReadOnly(propertyName);
+        }
+        return false;
     }
 
     private boolean isPropertyDefinitionReadOnly(String propertyName) {
-        String fullName = getTypePrefix() + '.' + propertyName;
-        try {
-            Attribute attribute = asset.getAttributes().get(fullName);
+        final String fullName = getTypePrefix() + '.' + propertyName;
+        Attribute attribute = asset.getAttributes().get(fullName);
+        if (attribute != null)
             return attribute.getDefinition().isReadOnly();
-        } catch (Exception e) {
-            ApiDataLayer.warning("Cannot get property: " + fullName, e);
+        else {
+            ApiDataLayer.warning("Cannot get property: " + fullName);
             return true;
         }
     }
@@ -414,17 +410,6 @@ public class Workitem {
 
     public void revertChanges() {
         dataLayer.revertAsset(asset);
-    }
-
-    public boolean isPropertyReadOnly(boolean isEffort, String propertyName) {
-        boolean result = false;
-        if (isEffort) {
-            result = isPropertyReadOnly(propertyName);
-        } else {
-            result = isPropertyDefinitionReadOnly(propertyName) || isPropertyReadOnly(propertyName);
-        }
-
-        return result;
     }
 
     @Override

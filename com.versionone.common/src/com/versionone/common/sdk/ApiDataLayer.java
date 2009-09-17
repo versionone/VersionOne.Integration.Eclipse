@@ -47,8 +47,8 @@ public class ApiDataLayer {
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
 
-    private static final List<String> effortTrackingAttributesList = Arrays.asList(Workitem.DETAIL_ESTIMATE_PROPERTY,
-            "ToDo", "Done", "Effort", "Actuals");
+    private static final List<String> effortTrackingAttributesList = Arrays.asList("DetailEstimate", "ToDo", "Done",
+            "Effort", "Actuals");
 
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
@@ -130,14 +130,14 @@ public class ApiDataLayer {
         if ((this.userName != null || integrated) && this.path != null) {
             isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated || !this.path.equals(path);
         }
-        
+
         this.path = path;
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
         assetList = null;
         boolean isUpdateData = true;
-        
+
         isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
 
         try {
@@ -145,7 +145,7 @@ public class ApiDataLayer {
                 assetsToIgnore.clear();
                 efforts.clear();
                 types.clear();
-                
+
                 V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
                 metaModel = new MetaModel(metaConnector);
 
@@ -437,8 +437,8 @@ public class ApiDataLayer {
         // owner
         try {
             inactiveDef = assetType.getAttributeDefinition("Inactive");
-        } catch(Exception ex) {
-            //do nothing
+        } catch (Exception ex) {
+            // do nothing
         }
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
@@ -625,7 +625,7 @@ public class ApiDataLayer {
         }
         return getProjectById(currentProjectId);
     }
-    
+
     public String getCurrentMemberToken() {
         return memberOid != null ? memberOid.getToken() : null;
     }

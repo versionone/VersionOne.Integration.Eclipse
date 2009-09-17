@@ -61,7 +61,7 @@ public class WorkitemPropertySource implements IPropertySource {
         }
         final PropertyDescriptor desc;
         if (col.type.equals(AssetDetailSettings.STRING_TYPE) || col.type.equals(AssetDetailSettings.EFFORT_TYPE)) {
-            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || item.isPropertyReadOnly(col.effortTracking, col.attribute));
+            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || item.isPropertyReadOnly(col.attribute));
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else if (col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {

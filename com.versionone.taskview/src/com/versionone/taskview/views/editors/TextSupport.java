@@ -48,7 +48,7 @@ public class TextSupport extends EditingSupport {
     }
     
     private boolean isEditable(Workitem workitem) {
-        return !workitem.isPropertyReadOnly(property.equals(Workitem.EFFORT_PROPERTY), property);
+        return !workitem.isPropertyReadOnly(property);
     }
 
     @Override

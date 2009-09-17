@@ -34,16 +34,17 @@ class ProjectAction extends Action {
         if (!isEnabled()) {
             return;
         }
-        workItemView.enableViewerAndActions(false);
-        List<Workitem> projectList = null;
+        List<Workitem> projectList;
         try {
             projectList = ApiDataLayer.getInstance().getProjectTree();
         } catch (Exception ex) {
             Activator.logError(ex);
             MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
-            "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+            "Error Occurred Retrieving Projects List. Check ErrorLog for more Details");
+            return;
         }
 
+        workItemView.enableViewerAndActions(false);
         ISelectionProvider oldProvider = iWorkbenchPartSite.getSelectionProvider();
         List<ISelectionChangedListener> listeners = ((ProxySelectionProvider)oldProvider).getListeners();        
         createProjectDialog(projectList, listeners);

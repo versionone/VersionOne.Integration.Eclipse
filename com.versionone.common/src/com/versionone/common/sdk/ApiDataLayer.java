@@ -135,6 +135,7 @@ public class ApiDataLayer {
             isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated || !this.path.equals(path);
         }
         
+        this.path = path;
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
@@ -164,12 +165,8 @@ public class ApiDataLayer {
 
             memberOid = services.getLoggedIn();
             listPropertyValues = getListPropertyValues();
-
             isConnected = true;
-
-            this.path = path;
             updateCurrentProjectId();
-            
             return;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);
@@ -210,6 +207,7 @@ public class ApiDataLayer {
     }
 
     public List<Workitem> getProjectTree() throws DataLayerException {
+        checkConnection();
         try {
             Query scopeQuery = new Query(projectType, projectType.getAttributeDefinition("Parent"));
             FilterTerm stateTerm = new FilterTerm(projectType.getAttributeDefinition("AssetState"));

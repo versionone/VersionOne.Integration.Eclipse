@@ -35,7 +35,7 @@ public class ProxySelectionProvider implements ISelectionProvider {
         proxy.addSelectionChangedListener(new ProxyListener(listener));
         listeners.add(listener);
     }
-    
+
     public List<ISelectionChangedListener> getListeners() {
         return listeners;
     }
@@ -62,8 +62,7 @@ public class ProxySelectionProvider implements ISelectionProvider {
             Object res = null;
             if (element instanceof Workitem) {
                 res = new WorkitemPropertySource((Workitem) element, proxy);
-            }
-            else if (element instanceof WorkitemPropertySource) {
+            } else if (element instanceof WorkitemPropertySource) {
                 res = ((WorkitemPropertySource) element).getItem();
             }
             if (res != null) {
@@ -72,10 +71,6 @@ public class ProxySelectionProvider implements ISelectionProvider {
         }
         return sel;
     }
-    
-//    public ISelectionChangedListener getProxyListener() {
-//        return listener_data;
-//    }
 
     private class ProxyListener implements ISelectionChangedListener {
 

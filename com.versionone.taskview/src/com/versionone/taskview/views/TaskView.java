@@ -111,7 +111,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
             ApiDataLayer.getInstance().updateCurrentProjectId();
             setupEffortColumns();
-        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
+        } else if (property.equals(PreferenceConstants.P_ONLY_USER_WORKITEMS)) {
             loadDataToTable();
             viewer.refresh();
         }

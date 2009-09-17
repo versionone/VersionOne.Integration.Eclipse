@@ -22,7 +22,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.P_MEMBER_TOKEN, "");
         store.setDefault(PreferenceConstants.P_PROJECT_TOKEN, "Scope:0");
         store.setDefault(PreferenceConstants.P_ATTRIBUTE_SELECTION, DEFAULT_TASK_ATTRIBUTE_SELECTION);
-        store.setDefault(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, 0);
+        store.setDefault(PreferenceConstants.P_ONLY_USER_WORKITEMS, false);
     }
 
 }

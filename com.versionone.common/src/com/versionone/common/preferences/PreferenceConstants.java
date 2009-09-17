@@ -50,6 +50,6 @@ public class PreferenceConstants {
     /**
      * Filter for workitem (show only assigned task or all)
      */
-    public static final String P_WORKITEM_FILTER_SELECTION = "workitemFilter";
+    public static final String P_ONLY_USER_WORKITEMS = "onlyUserworkitems";
 
 }

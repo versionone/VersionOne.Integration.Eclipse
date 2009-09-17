@@ -21,8 +21,7 @@ public class FilterAction extends Action {
         this.treeViewer = workitemViewer;
 
         setToolTipText(MESSAGE);
-        boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false
-                : true;
+        boolean showAllTask = PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ONLY_USER_WORKITEMS);
         setChecked(!showAllTask);
 
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.FILTER_WORKITEM_IMAGE_ID));
@@ -32,9 +31,8 @@ public class FilterAction extends Action {
     public void run() {
         workitemView.enableTreeAndActions(false);
 
-        int value = isChecked() ? 1 : 0;
         ApiDataLayer.getInstance().showAllTasks = !isChecked();
-        PreferencePage.getPreferences().setValue(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, value);
+        PreferencePage.getPreferences().setValue(PreferenceConstants.P_ONLY_USER_WORKITEMS, !isChecked());
 
         workitemView.enableTreeAndActions(true);
     }

@@ -53,10 +53,6 @@ public class ApiDataLayer {
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
 
-    public static final String OP_QUICK_CLOSE = "QuickClose";
-    public static final String OP_CLOSE = "Inactivate";
-    public static final String OP_SIGNUP = "QuickSignup";
-
     private IAssetType projectType;
     private IAssetType workitemType;
     private IAssetType primaryWorkitemType;
@@ -711,9 +707,4 @@ public class ApiDataLayer {
             throw warning("Failed to resolve key.", ex);
         }
     }
-
-    public static void resetConnection() {
-        instance = null;
-    }
-
 }

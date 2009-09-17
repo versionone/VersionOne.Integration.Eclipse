@@ -1,19 +1,18 @@
 package com.versionone.taskview.views;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.taskview.Activator;
 
 class RefreshAction extends Action {
 
-    private TaskView workItemView;
-    private TreeViewer workitemViewer;
+    private final TaskView workitemView;
+    private final TreeViewer treeViewer;
 
     public RefreshAction(TaskView workItemView, TreeViewer workitemViewer) {
-        this.workItemView = workItemView;
-        this.workitemViewer = workitemViewer;
+        this.workitemView = workItemView;
+        this.treeViewer = workitemViewer;
 
         setText("Refresh");
         setToolTipText("Refresh");
@@ -21,15 +20,14 @@ class RefreshAction extends Action {
     }
 
     public void run() {
-        workItemView.enableTreeAndActions(false);
-        try {
+        workitemView.enableTreeAndActions(false);
+        try {// connect not throws -> delete try
             Activator.connect();
         } catch (Exception e) {
             Activator.logError(e);
-            MessageDialog.openError(workitemViewer.getTree().getShell(), "Task View Error",
-                    "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+            workitemView.showMessage("Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
-        workItemView.enableTreeAndActions(true);
-        workItemView.reCreateTable();
+        workitemView.enableTreeAndActions(true);
+        workitemView.setupEffortColumns();
     }
 }

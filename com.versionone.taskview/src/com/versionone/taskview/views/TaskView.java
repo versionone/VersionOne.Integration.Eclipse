@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -65,16 +66,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String MENU_ITEM_CLOSE_KEY = "Close";
     private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
     private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
-    
+
     private ProxySelectionProvider selectionProvider;
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
-    private boolean isEffortColumsShow;
+    private boolean isEffortColumsShown;
     private TreeViewer viewer;
     private Action selectProjectAction = null;
     private Action refreshAction = null;
     private Action saveAction = null;
     private Action filåterAction = null;
-    
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -85,18 +85,37 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     public void createPartControl(Composite parent) {
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        viewer.setContentProvider(new ViewContentProvider());
         selectionProvider = new ProxySelectionProvider(viewer);
 
         if (isEnabled()) {
-            configureTable();
+            createColumns();
         }
 
-        makeActions();
-        setupActionBars();
+        createActions();
         createContextMenu(viewer);
-        selectProvider();
+        setProviders();
         getSite().setSelectionProvider(selectionProvider);
-                
+    }
+
+    /**
+     * Called when preferences changed
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+        String property = event.getProperty();
+        if (property.equals(PreferenceConstants.P_ENABLED)) {
+            if (0 == viewer.getTree().getColumnCount()) {
+                createColumns();
+            }
+            setProviders();
+        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+            ApiDataLayer.getInstance().updateCurrentProjectId();
+            setupEffortColumns();
+        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
+            loadDataToTable();
+            viewer.refresh();
+        }
+
     }
 
     private boolean validRowSelected() {
@@ -203,24 +222,16 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     /**
-     * Select the content and label providers
+     * Set the label providers. And load data.
      */
-    private void selectProvider() {
-        boolean isEnabled = isEnabled();
-
-        enableTreeAndActions(isEnabled);
+    private void setProviders() {
+        enableTreeAndActions(isEnabled());
 
         viewer.getTree().clearAll(true);
 
-        if (viewer.getContentProvider() == null) {
-            viewer.setContentProvider(new ViewContentProvider());
-        }
-
-        if (isEnabled) {
+        if (isEnabled()) {
             loadDataToTable();
-
         } else {
-            viewer.getTree().clearAll(true);
             viewer.setSorter(null);
             viewer.setInput(getViewSite());
         }
@@ -232,9 +243,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     private void enableTree(boolean enabled) {
-        viewer.getTree().setLinesVisible(enabled);
-        viewer.getTree().setHeaderVisible(enabled);
-        viewer.getTree().setEnabled(enabled);
+        final Tree tree = viewer.getTree();
+        tree.setLinesVisible(enabled);
+        tree.setHeaderVisible(enabled);
+        tree.setEnabled(enabled);
     }
 
     public void enableAction(boolean enabled) {
@@ -244,31 +256,39 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         filåterAction.setEnabled(enabled);
     }
 
+    public void disableAllButRefresh() {
+        viewer.getTree().setEnabled(false);
+        selectProjectAction.setEnabled(false);
+        saveAction.setEnabled(false);
+        filåterAction.setEnabled(false);
+        refreshAction.setEnabled(true);
+    }
+
     /**
      * Configure the table
      */
-    private void configureTable() {
-        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT);
+    private void createColumns() {
+        TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.ID_PROPERTY, true));
         column.setEditingSupport(new TextSupport(Workitem.ID_PROPERTY, viewer, selectionProvider));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer, selectionProvider));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
         column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer, selectionProvider));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.STATUS_PROPERTY, false));
         column.setEditingSupport(new SingleValueSupport(Workitem.STATUS_PROPERTY, viewer, selectionProvider));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer, selectionProvider));
 
-        column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER);
+        column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER, -1);
         column.setLabelProvider(new SimpleProvider(Workitem.TODO_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.TODO_PROPERTY, viewer, selectionProvider));
 
@@ -289,7 +309,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
         column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer, selectionProvider));
 
-        isEffortColumsShow = true;
+        isEffortColumsShown = true;
     }
 
     /**
@@ -298,23 +318,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private void removeEffortColumns() {
         viewer.getTree().getColumn(6).dispose();
         viewer.getTree().getColumn(5).dispose();
-        isEffortColumsShow = false;
+        isEffortColumsShown = false;
     }
 
     /**
-     * Create the action menus
+     * Create the action menus and add them to Action bars and pull down menu.
      */
-    private void makeActions() {
+    private void createActions() {
         selectProjectAction = new ProjectAction(this, viewer, getSite());
         refreshAction = new RefreshAction(this, viewer);
         saveAction = new SaveAction(this, viewer);
         filåterAction = new FilterAction(this, viewer);
-    }
 
-    /**
-     * Add actions to Action bars and pull down menu
-     */
-    private void setupActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         addActions(bars.getMenuManager());
         addActions(bars.getToolBarManager());
@@ -352,27 +367,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     /**
-     * Called when preferences change
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-        String property = event.getProperty();
-        if (property.equals(PreferenceConstants.P_ENABLED)) {
-
-            if (0 == viewer.getTree().getColumnCount()) {
-                configureTable();
-            }
-            selectProvider();
-        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
-            ApiDataLayer.getInstance().updateCurrentProjectId();
-            reCreateTable();
-        } else if (property.equals(PreferenceConstants.P_WORKITEM_FILTER_SELECTION)) {
-            loadDataToTable();
-            viewer.refresh();
-        }
-
-    }
-
-    /**
      * Load the Viewer with Task data
      */
     protected boolean loadDataToTable() {
@@ -382,33 +376,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             updateProperty();
             return true;
         } catch (Exception e) {
-            enableTreeAndActions(false);
-            refreshAction.setEnabled(true);
+            disableAllButRefresh();
             Activator.logError(e);
             MessageDialog.openError(viewer.getControl().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
             return false;
         }
-    }
-
-
-    /**
-     * Create a TableViewerColumn with specified properties and append it to the
-     * end of the table
-     * 
-     * Calls createTableViewerColumn(String label, int width, int alignment, int
-     * index) with a -1 as the index
-     * 
-     * @param label
-     *            - Column label
-     * @param width
-     *            - Column Width
-     * @param alignment
-     *            - Column alignment
-     * @return new TableViewerColumn
-     */
-    TreeViewerColumn createTableViewerColumn(String label, int width, int alignment) {
-        return createTableViewerColumn(label, width, alignment, -1);
     }
 
     /**
@@ -452,15 +425,18 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         super.dispose();
     }
 
-    public void reCreateTable() {
-        if (isEffortColumsShow && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+    /**
+     * Create or delete effort related columns according to DataLayer status.
+     */
+    public void setupEffortColumns() {
+        if (isEffortColumsShown && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             removeEffortColumns();
-        } else if (!isEffortColumsShow && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+        } else if (!isEffortColumsShown && ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
         }
-        selectProvider();
+        setProviders();
     }
-    
+
     private void updateProperty() {
         Workitem workitem = getCurrentWorkitem();
         if (workitem != null) {

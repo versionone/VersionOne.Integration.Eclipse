@@ -130,7 +130,7 @@ public class TestTaskView {
             enableView(preference.getPreferenceStore());
         }
         testView = (TaskView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(VIEW_ID);
-        testView.reCreateTable();
+        testView.setupEffortColumns();
         waitForJobs();
     }
 

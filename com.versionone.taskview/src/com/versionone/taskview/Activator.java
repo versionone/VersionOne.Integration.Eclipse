@@ -128,7 +128,7 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
-    public static void connect() throws Exception {
+    public static void connect() {
         com.versionone.common.Activator.connect();
     }
 

@@ -10,14 +10,15 @@ import com.versionone.taskview.Activator;
 
 public class FilterAction extends Action {
 
-    private TaskView workItemView;
-    private TreeViewer workItemViewer;
     private final static String MESSAGE = "Show only my workitems";
+
+    private final TaskView workitemView;
+    private final TreeViewer treeViewer;
 
     public FilterAction(TaskView workItemView, TreeViewer workitemViewer) {
         super(MESSAGE, AS_CHECK_BOX);
-        this.workItemView = workItemView;
-        this.workItemViewer = workitemViewer;
+        this.workitemView = workItemView;
+        this.treeViewer = workitemViewer;
 
         setToolTipText(MESSAGE);
         boolean showAllTask = PreferencePage.getPreferences().getInt(PreferenceConstants.P_WORKITEM_FILTER_SELECTION) == 1 ? false
@@ -29,12 +30,12 @@ public class FilterAction extends Action {
 
     @Override
     public void run() {
-        workItemView.enableTreeAndActions(false);
+        workitemView.enableTreeAndActions(false);
 
         int value = isChecked() ? 1 : 0;
         ApiDataLayer.getInstance().showAllTasks = !isChecked();
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_WORKITEM_FILTER_SELECTION, value);
 
-        workItemView.enableTreeAndActions(true);
+        workitemView.enableTreeAndActions(true);
     }
 }

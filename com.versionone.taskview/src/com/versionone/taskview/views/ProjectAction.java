@@ -3,7 +3,6 @@ package com.versionone.taskview.views;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -15,14 +14,15 @@ import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
 class ProjectAction extends Action {
-    private TaskView workItemView;
-    private TreeViewer workItemViewer;
-    private IWorkbenchPartSite iWorkbenchPartSite;
+
+    private final TaskView workitemView;
+    private final TreeViewer treeViewer;
+    private final IWorkbenchPartSite site;
 
     public ProjectAction(TaskView workItemView, TreeViewer workitemViewer, IWorkbenchPartSite iWorkbenchPartSite) {
-        this.workItemView = workItemView;
-        this.workItemViewer = workitemViewer;
-        this.iWorkbenchPartSite = iWorkbenchPartSite;
+        this.workitemView = workItemView;
+        this.treeViewer = workitemViewer;
+        this.site = iWorkbenchPartSite;
 
         setText("Select Project");
         setToolTipText("Select Project");
@@ -39,46 +39,34 @@ class ProjectAction extends Action {
             projectList = ApiDataLayer.getInstance().getProjectTree();
         } catch (Exception ex) {
             Activator.logError(ex);
-            MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
-                    "Error Occurred Retrieving Projects List. Check ErrorLog for more Details");
+            workitemView.showMessage("Error Occurred Retrieving Projects List. Check ErrorLog for more Details");
             return;
         }
 
-        workItemView.enableTreeAndActions(false);
-        ISelectionProvider oldProvider = iWorkbenchPartSite.getSelectionProvider();
+        workitemView.enableTreeAndActions(false);
+        ISelectionProvider oldProvider = site.getSelectionProvider();
         List<ISelectionChangedListener> listeners = ((ProxySelectionProvider) oldProvider).getListeners();
-        createProjectDialog(projectList, listeners);
+        openDialog(projectList, listeners);
         oldProvider.setSelection(new StructuredSelection(new Object[] { null }));
-        iWorkbenchPartSite.setSelectionProvider(oldProvider);
-        workItemView.loadDataToTable();
-        workItemView.enableTreeAndActions(true);
+        site.setSelectionProvider(oldProvider);
+        workitemView.loadDataToTable();
+        workitemView.enableTreeAndActions(true);
     }
 
-    private void createProjectDialog(List<Workitem> projectList, List<ISelectionChangedListener> listeners) {
+    private void openDialog(List<Workitem> projectList, List<ISelectionChangedListener> listeners) {
         try {
-            ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(workItemViewer.getControl().getShell(),
+            ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(treeViewer.getControl().getShell(),
                     projectList, ApiDataLayer.getInstance().getCurrentProject());
 
             projectSelectDialog.create();
-            ProxySelectionProvider proxy = createSelectionProvider(listeners, projectSelectDialog.getTreeViewer());
+            ProxySelectionProvider proxy = new ProxySelectionProvider(projectSelectDialog.getTreeViewer(), listeners);
             projectSelectDialog.setCurrentProject();
-            iWorkbenchPartSite.setSelectionProvider(proxy);
+            site.setSelectionProvider(proxy);
             projectSelectDialog.open();
         } catch (Exception ex) {
             Activator.logError(ex);
-            MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
-                    "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+            workitemView.showMessage("Error Occurred Getting Projects. Check ErrorLog for more Details");
         }
-    }
-
-    private ProxySelectionProvider createSelectionProvider(List<ISelectionChangedListener> listeners,
-            TreeViewer treeViewer) {
-        ProxySelectionProvider proxy = new ProxySelectionProvider(treeViewer);
-        for (ISelectionChangedListener listener : listeners) {
-            proxy.addSelectionChangedListener(listener);
-        }
-
-        return proxy;
     }
 
 }

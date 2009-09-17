@@ -37,6 +37,10 @@ public class Workitem {
     public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
     public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
 
+    public static final String OP_SIGNUP = "QuickSignup";
+    public static final String OP_CLOSE = "Inactivate";
+    public static final String OP_QUICK_CLOSE = "QuickClose";
+
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     static {
         numberFormat.setMinimumFractionDigits(2);
@@ -52,12 +56,12 @@ public class Workitem {
      */
     public final List<Workitem> children;
 
-    protected Workitem(List<Workitem> children, Workitem parent){
+    protected Workitem(List<Workitem> children, Workitem parent) {
         this.children = children;
         this.parent = parent;
         asset = null;
     }
-    
+
     Workitem(Asset asset, Workitem parent) {
         this.parent = parent;
         this.asset = asset;
@@ -73,7 +77,7 @@ public class Workitem {
                 children.add(new Workitem(childAsset, this));
             }
         }
-        ((ArrayList<Workitem>)children).trimToSize();
+        ((ArrayList<Workitem>) children).trimToSize();
     }
 
     public String getTypePrefix() {
@@ -361,7 +365,7 @@ public class Workitem {
     public void quickClose() throws DataLayerException {
         commitChanges();
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_QUICK_CLOSE));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_QUICK_CLOSE));
             dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
@@ -387,7 +391,7 @@ public class Workitem {
      */
     public void signup() throws DataLayerException {
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_SIGNUP));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_SIGNUP));
             dataLayer.refreshAsset(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
@@ -401,7 +405,7 @@ public class Workitem {
      */
     public void close() throws DataLayerException {
         try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(ApiDataLayer.OP_CLOSE));
+            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_CLOSE));
             dataLayer.addIgnoreRecursively(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
@@ -410,6 +414,17 @@ public class Workitem {
 
     public void revertChanges() {
         dataLayer.revertAsset(asset);
+    }
+
+    public boolean isPropertyReadOnly(boolean isEffort, String propertyName) {
+        boolean result = false;
+        if (isEffort) {
+            result = isPropertyReadOnly(propertyName);
+        } else {
+            result = isPropertyDefinitionReadOnly(propertyName) || isPropertyReadOnly(propertyName);
+        }
+
+        return result;
     }
 
     @Override
@@ -435,16 +450,5 @@ public class Workitem {
     @Override
     public String toString() {
         return getId() + (hasChanges() ? " (Changed)" : "");
-    }
-    
-    public boolean isPropertyReadOnly(boolean isEffort, String propertyName) {
-        boolean result = false;
-        if (isEffort) {
-            result = isPropertyReadOnly(propertyName);
-        } else {
-            result = isPropertyDefinitionReadOnly(propertyName) || isPropertyReadOnly(propertyName);
-        }
-        
-        return result;
     }
 }

@@ -2,14 +2,20 @@ package com.versionone.taskview.test;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerEditor;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -179,9 +185,8 @@ public class TestTaskView {
         testView.getViewer().expandAll();
 
         // story
-        Object selectedElement = testView.getViewer().getTree().getItem(0).getData();
+        TreeItem selectedElement = testView.getViewer().getTree().getItem(0);
         waitForJobs();
-        delay(10000);
         checkEditor(selectedElement, ID_COLUMN_INDEX, true);
         checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
         checkEditor(selectedElement, OWNER_COLUMN_INDEX, true);
@@ -192,7 +197,7 @@ public class TestTaskView {
         checkEditor(selectedElement, STATUS_COLUMN_INDEX, true);
 
         // test
-        selectedElement = testView.getViewer().getTree().getItem(1).getItem(0).getData();
+        selectedElement = testView.getViewer().getTree().getItem(1).getItem(0);
         waitForJobs();
         checkEditor(selectedElement, ID_COLUMN_INDEX, true);
         checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
@@ -204,7 +209,7 @@ public class TestTaskView {
         checkEditor(selectedElement, STATUS_COLUMN_INDEX, true);
 
         // defect
-        selectedElement = testView.getViewer().getTree().getItem(1).getData();
+        selectedElement = testView.getViewer().getTree().getItem(1);
         waitForJobs();
         checkEditor(selectedElement, ID_COLUMN_INDEX, true);
         checkEditor(selectedElement, NAME_COLUMN_INDEX, true);
@@ -226,12 +231,24 @@ public class TestTaskView {
      * @param expected
      *            - expected result of isActivated() method
      */
-    private void checkEditor(Object selectedElement, int columnIndex, boolean expected) {
-        testView.getViewer().editElement(selectedElement, columnIndex);
+    private void checkEditor(TreeItem item, int columnIndex, boolean expected) {
+        Object data = item.getData();
+        final TreeViewer viewer = testView.getViewer();
+        viewer.editElement(data, columnIndex);
+        waitForJobs();
+        Tree tree = viewer.getTree();
+        String text = item.getText(columnIndex);
+        TreeColumn column = tree.getColumn(columnIndex);
+        
+        CellEditor[] cellEditors = viewer.getCellEditors();
+        TreeViewerEditor editor = (TreeViewerEditor) viewer.getColumnViewerEditor();
+
+//        delay(10000);
+        
         if (expected) {
-            Assert.assertTrue(testView.getViewer().isCellEditorActive());
+            Assert.assertTrue(viewer.isCellEditorActive());
         } else {
-            Assert.assertFalse(testView.getViewer().isCellEditorActive());
+            Assert.assertFalse(viewer.isCellEditorActive());
         }
     }
 

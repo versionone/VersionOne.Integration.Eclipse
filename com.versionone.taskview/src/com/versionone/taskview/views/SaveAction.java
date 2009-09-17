@@ -36,10 +36,10 @@ public class SaveAction extends Action {
             workItemView.showMessage("Error saving task. Check Error log for more information.");
         } catch (Exception e) {
             Activator.logError(e);
-            workItemView.showMessage("Error saving task. Check Error log for more information.");            
+            workItemView.showMessage("Error saving task. Check Error log for more information.");
         }
-        
-        workItemView.loadTable();
+
+        workItemView.loadDataToTable();
         workItemView.enableAction(true);
     }
 }

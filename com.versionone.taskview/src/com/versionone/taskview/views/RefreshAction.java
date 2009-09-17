@@ -21,15 +21,15 @@ class RefreshAction extends Action {
     }
 
     public void run() {
-        workItemView.enableViewerAndActions(false);
+        workItemView.enableTreeAndActions(false);
         try {
-            Activator.connect();            
+            Activator.connect();
         } catch (Exception e) {
             Activator.logError(e);
             MessageDialog.openError(workitemViewer.getTree().getShell(), "Task View Error",
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
-        workItemView.enableViewerAndActions(true);
+        workItemView.enableTreeAndActions(true);
         workItemView.reCreateTable();
     }
 }

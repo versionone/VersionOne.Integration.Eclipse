@@ -40,24 +40,24 @@ class ProjectAction extends Action {
         } catch (Exception ex) {
             Activator.logError(ex);
             MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
-            "Error Occurred Retrieving Projects List. Check ErrorLog for more Details");
+                    "Error Occurred Retrieving Projects List. Check ErrorLog for more Details");
             return;
         }
 
-        workItemView.enableViewerAndActions(false);
+        workItemView.enableTreeAndActions(false);
         ISelectionProvider oldProvider = iWorkbenchPartSite.getSelectionProvider();
-        List<ISelectionChangedListener> listeners = ((ProxySelectionProvider)oldProvider).getListeners();        
+        List<ISelectionChangedListener> listeners = ((ProxySelectionProvider) oldProvider).getListeners();
         createProjectDialog(projectList, listeners);
-        oldProvider.setSelection(new StructuredSelection(new Object[]{null}));
-        iWorkbenchPartSite.setSelectionProvider(oldProvider);        
-        workItemView.loadTable();
-        workItemView.enableViewerAndActions(true);
+        oldProvider.setSelection(new StructuredSelection(new Object[] { null }));
+        iWorkbenchPartSite.setSelectionProvider(oldProvider);
+        workItemView.loadDataToTable();
+        workItemView.enableTreeAndActions(true);
     }
 
     private void createProjectDialog(List<Workitem> projectList, List<ISelectionChangedListener> listeners) {
         try {
-            ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(workItemViewer.getControl().getShell(), projectList,
-                    ApiDataLayer.getInstance().getCurrentProject());                        
+            ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(workItemViewer.getControl().getShell(),
+                    projectList, ApiDataLayer.getInstance().getCurrentProject());
 
             projectSelectDialog.create();
             ProxySelectionProvider proxy = createSelectionProvider(listeners, projectSelectDialog.getTreeViewer());
@@ -67,17 +67,18 @@ class ProjectAction extends Action {
         } catch (Exception ex) {
             Activator.logError(ex);
             MessageDialog.openError(workItemViewer.getTree().getShell(), "Project list error",
-            "Error Occurred Retrieving Task. Check ErrorLog for more Details");
+                    "Error Occurred Retrieving Task. Check ErrorLog for more Details");
         }
     }
-    
-    private ProxySelectionProvider createSelectionProvider(List<ISelectionChangedListener> listeners, TreeViewer treeViewer) {
+
+    private ProxySelectionProvider createSelectionProvider(List<ISelectionChangedListener> listeners,
+            TreeViewer treeViewer) {
         ProxySelectionProvider proxy = new ProxySelectionProvider(treeViewer);
         for (ISelectionChangedListener listener : listeners) {
             proxy.addSelectionChangedListener(listener);
         }
-        
+
         return proxy;
     }
-    
+
 }

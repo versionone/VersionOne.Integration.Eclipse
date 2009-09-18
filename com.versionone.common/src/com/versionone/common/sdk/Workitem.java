@@ -5,8 +5,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
-
 import com.versionone.Oid;
 import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
@@ -96,7 +94,7 @@ public class Workitem {
     }
 
     public boolean isPropertyReadOnly(String propertyName) {
-        if (dataLayer.isEffortTrackingRelated(propertyName) && isEffortTrackingPropertyReadOnly(propertyName)) {
+        if (dataLayer.isEffortTrackingRelated(propertyName) && !dataLayer.trackingLevel.isTracking(this)) {
             return true;
         }
         if (!propertyName.equals(EFFORT_PROPERTY)) {
@@ -113,33 +111,6 @@ public class Workitem {
         else {
             ApiDataLayer.warning("Cannot get property: " + fullName);
             return true;
-        }
-    }
-
-    // TODO refactor (current complexity is 10)
-    private boolean isEffortTrackingPropertyReadOnly(String propertyName) {
-        String notEffortRelatedMessage = "This property is not related to effort tracking.";
-        Assert.isTrue(dataLayer.isEffortTrackingRelated(propertyName), notEffortRelatedMessage);
-
-        EffortTrackingLevel storyLevel = dataLayer.storyTrackingLevel;
-        EffortTrackingLevel defectLevel = dataLayer.defectTrackingLevel;
-
-        if (getTypePrefix().equals(STORY_PREFIX)) {
-            return storyLevel != EffortTrackingLevel.PRIMARY_WORKITEM && storyLevel != EffortTrackingLevel.BOTH;
-        } else if (getTypePrefix().equals(DEFECT_PREFIX)) {
-            return defectLevel != EffortTrackingLevel.PRIMARY_WORKITEM && defectLevel != EffortTrackingLevel.BOTH;
-        } else if (getTypePrefix().equals(TASK_PREFIX) || getTypePrefix().equals(TEST_PREFIX)) {
-            EffortTrackingLevel parentLevel;
-            if (parent.getTypePrefix().equals(STORY_PREFIX)) {
-                parentLevel = storyLevel;
-            } else if (parent.getTypePrefix().equals(DEFECT_PREFIX)) {
-                parentLevel = defectLevel;
-            } else {
-                throw new IllegalStateException("Unexpected parent asset type.");
-            }
-            return parentLevel != EffortTrackingLevel.SECONDARY_WORKITEM && parentLevel != EffortTrackingLevel.BOTH;
-        } else {
-            throw new IllegalStateException("Unexpected asset type.");
         }
     }
 

@@ -74,8 +74,7 @@ public class ApiDataLayer {
     private Map<String, PropertyValues> listPropertyValues;
 
     private boolean trackEffort;
-    public EffortTrackingLevel defectTrackingLevel;
-    public EffortTrackingLevel storyTrackingLevel;
+    public final EffortTrackingLevel trackingLevel = new EffortTrackingLevel(Workitem.TASK_PREFIX, Workitem.TEST_PREFIX);
 
     private IMetaModel metaModel;
     private IServices services;
@@ -104,8 +103,9 @@ public class ApiDataLayer {
             if (trackEffort) {
                 effortType = this.metaModel.getAssetType("Actual");
             }
-            storyTrackingLevel = EffortTrackingLevel.translate(configConnector.getStoryTrackingLevel());
-            defectTrackingLevel = EffortTrackingLevel.translate(configConnector.getDefectTrackingLevel());
+            trackingLevel.clear();
+            trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, configConnector.getStoryTrackingLevel());
+            trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, configConnector.getDefectTrackingLevel());
         }
 
         initTypes();
@@ -128,7 +128,8 @@ public class ApiDataLayer {
         isConnected = false;
         boolean isUserChanged = true;
         if ((this.userName != null || integrated) && this.path != null) {
-            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated || !this.path.equals(path);
+            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated
+                    || !this.path.equals(path);
         }
 
         this.path = path;
@@ -179,8 +180,9 @@ public class ApiDataLayer {
             effortType = metaModel.getAssetType("Actual");
         }
 
-        storyTrackingLevel = EffortTrackingLevel.translate(v1Config.getStoryTrackingLevel());
-        defectTrackingLevel = EffortTrackingLevel.translate(v1Config.getDefectTrackingLevel());
+        trackingLevel.clear();
+        trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, v1Config.getStoryTrackingLevel());
+        trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, v1Config.getDefectTrackingLevel());
     }
 
     private void initTypes() {

@@ -54,6 +54,9 @@ public class Workitem {
      */
     public final List<Workitem> children;
 
+    /**
+     * Constructor for testing purposes ONLY.
+     */
     protected Workitem(List<Workitem> children, Workitem parent) {
         this.children = children;
         this.parent = parent;
@@ -83,7 +86,7 @@ public class Workitem {
     }
 
     public String getId() {
-        if (asset == null) {// temporary
+        if (asset == null) {// for testing purposes ONLY
             return "NULL";
         }
         return asset.getOid().getMomentless().getToken();
@@ -93,8 +96,13 @@ public class Workitem {
         return asset.hasChanged();
     }
 
+    private boolean isEffortTrackingRelated(String property) {
+        return property.startsWith("Actuals") || property.equals(DETAIL_ESTIMATE_PROPERTY)
+                || property.equals(TODO_PROPERTY);
+    }
+
     public boolean isPropertyReadOnly(String propertyName) {
-        if (dataLayer.isEffortTrackingRelated(propertyName) && !dataLayer.trackingLevel.isTracking(this)) {
+        if (isEffortTrackingRelated(propertyName) && !dataLayer.trackingLevel.isTracking(this)) {
             return true;
         }
         if (!propertyName.equals(EFFORT_PROPERTY)) {

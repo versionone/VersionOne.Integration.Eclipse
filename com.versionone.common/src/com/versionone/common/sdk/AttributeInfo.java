@@ -44,5 +44,4 @@ public class AttributeInfo {
             return false;
         return true;
     }
-
 }

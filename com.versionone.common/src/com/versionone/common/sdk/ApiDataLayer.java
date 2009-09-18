@@ -46,12 +46,16 @@ public class ApiDataLayer {
     private static final String LocalizerUrlSuffix = "loc.v1/";
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
-
+    // TODO Check attributes names
     private static final List<String> effortTrackingAttributesList = Arrays.asList("DetailEstimate", "ToDo", "Done",
             "Effort", "Actuals");
 
-    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
+    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(4);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
+    // TODO must be Set. Check IAttributeDefinition.equals() and hashCode()
+    private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
+    // TODO Must be Set. Check IAttributeDefinition.equals() and hashCode()
+    private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
 
     private IAssetType projectType;
     private IAssetType workitemType;
@@ -69,7 +73,6 @@ public class ApiDataLayer {
     private boolean integrated;
 
     private QueryResult assetList;
-    private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
     private static Set<AttributeInfo> attributesToQuery = new HashSet<AttributeInfo>();
     private Map<String, PropertyValues> listPropertyValues;
 
@@ -82,8 +85,6 @@ public class ApiDataLayer {
 
     private String currentProjectId;
     public boolean showAllTasks = true;
-
-    private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
 
     protected ApiDataLayer() {
     }
@@ -137,15 +138,11 @@ public class ApiDataLayer {
         this.password = password;
         this.integrated = integrated;
         assetList = null;
-        boolean isUpdateData = true;
-
-        isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
+        boolean isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
 
         try {
             if (isUpdateData) {
-                assetsToIgnore.clear();
-                efforts.clear();
-                types.clear();
+                cleanConnectionData();
 
                 V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
                 metaModel = new MetaModel(metaConnector);
@@ -155,7 +152,8 @@ public class ApiDataLayer {
 
                 V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
                 services = new Services(metaModel, dataConnector);
-
+            }
+            if (types.isEmpty()) {
                 initTypes();
             }
             processConfig(path);
@@ -183,6 +181,15 @@ public class ApiDataLayer {
         trackingLevel.clear();
         trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, v1Config.getStoryTrackingLevel());
         trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, v1Config.getDefectTrackingLevel());
+    }
+
+    private void cleanConnectionData() {
+        assetsToIgnore.clear();
+        efforts.clear();
+        types.clear();
+        projectType = null;
+        workitemType = null;
+        primaryWorkitemType = null;
     }
 
     private void initTypes() {

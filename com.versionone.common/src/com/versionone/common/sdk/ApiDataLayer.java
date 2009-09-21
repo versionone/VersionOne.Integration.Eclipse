@@ -46,16 +46,11 @@ public class ApiDataLayer {
     private static final String LocalizerUrlSuffix = "loc.v1/";
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
-    // TODO Check attributes names
-    private static final List<String> effortTrackingAttributesList = Arrays.asList("DetailEstimate", "ToDo", "Done",
-            "Effort", "Actuals");
 
     private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(4);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
-    // TODO must be Set. Check IAttributeDefinition.equals() and hashCode()
-    private final ArrayList<Asset> assetsToIgnore = new ArrayList<Asset>();
-    // TODO Must be Set. Check IAttributeDefinition.equals() and hashCode()
-    private final List<IAttributeDefinition> alreadyUsedDefinition = new ArrayList<IAttributeDefinition>();
+    private final Set<Asset> assetsToIgnore = new HashSet<Asset>();
+    private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
 
     private IAssetType projectType;
     private IAssetType workitemType;
@@ -442,9 +437,7 @@ public class ApiDataLayer {
         Query query = new Query(assetType);
         query.getSelection().add(nameDef);
 
-        // TODO need to recongnize is it possible what task can have closed
-        // owner
-        try {
+        try {// Some properties may not have INACTIVE attribute
             inactiveDef = assetType.getAttributeDefinition("Inactive");
         } catch (Exception ex) {
             // do nothing
@@ -492,10 +485,6 @@ public class ApiDataLayer {
         } else {
             efforts.put(asset, value);
         }
-    }
-
-    public boolean isEffortTrackingRelated(String propertyName) {
-        return effortTrackingAttributesList.contains(propertyName);
     }
 
     void commitAsset(Asset asset) throws V1Exception {
@@ -709,11 +698,7 @@ public class ApiDataLayer {
         return null;
     }
 
-    public String localizerResolve(String key) throws DataLayerException {
-        try {
-            return localizer.resolve(key);
-        } catch (Exception ex) {
-            throw warning("Failed to resolve key.", ex);
-        }
+    public String localizerResolve(String key) {
+        return localizer.resolve(key);
     }
 }

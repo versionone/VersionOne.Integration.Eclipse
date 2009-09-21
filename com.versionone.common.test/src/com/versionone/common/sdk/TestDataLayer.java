@@ -102,17 +102,12 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public boolean isEffortTrackingRelated(String propertyName) {
-        return false;
-    }
-
-    @Override
     public boolean isTrackEffortEnabled() {
         return isEffortTracking;
     }
 
     @Override
-    public String localizerResolve(String key) throws DataLayerException {
+    public String localizerResolve(String key) {
         if (key.startsWith("ColumnTitle'")) {
             if (key.equals("ColumnTitle'DetailEstimate")) {
                 return "Detail Estimate";

@@ -288,7 +288,7 @@ public class TestModel {
         owners.add(petja);
         Assert.assertEquals(3, owners.size());
         testMe.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Tom, Bil, Petja", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
+        Assert.assertEquals("Petja, Bil, Tom", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
     }
 
 //

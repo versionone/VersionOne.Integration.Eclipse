@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionManager;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -406,12 +404,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
         rc.getColumn().setWidth(width);
         rc.getColumn().setAlignment(alignment);
-        try {
-            rc.getColumn().setText(ApiDataLayer.getInstance().localizerResolve(label));
-        } catch (DataLayerException e) {
-            Activator.logError(e);
-            rc.getColumn().setText("**Error**");
-        }
+        String localName = ApiDataLayer.getInstance().localizerResolve(label);
+        if (localName.startsWith(WorkitemPropertySource.COLUMN_TITLE_PREFIX))
+            localName = localName.substring(WorkitemPropertySource.COLUMN_TITLE_PREFIX.length());
+        rc.getColumn().setText(localName);
         return rc;
     }
 
@@ -443,5 +439,4 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
         }
     }
-
 }

@@ -16,6 +16,8 @@ import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
 public class WorkitemPropertySource implements IPropertySource {
 
+    public static final String COLUMN_TITLE_PREFIX = "ColumnTitle'";
+
     private final Workitem item;
     private final ISelectionProvider proxy;
 
@@ -54,11 +56,9 @@ public class WorkitemPropertySource implements IPropertySource {
 
     private PropertyDescriptor createPropertyDescriptor(ColumnSetting col) {
         String localName;
-        try {
-            localName = ApiDataLayer.getInstance().localizerResolve(col.name);
-        } catch (DataLayerException e) {
-            localName = col.name;
-        }
+        localName = ApiDataLayer.getInstance().localizerResolve(col.name);
+        if (localName.startsWith(COLUMN_TITLE_PREFIX))
+            localName = localName.substring(COLUMN_TITLE_PREFIX.length());
         final PropertyDescriptor desc;
         if (col.type.equals(AssetDetailSettings.STRING_TYPE) || col.type.equals(AssetDetailSettings.EFFORT_TYPE)) {
             desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || item.isPropertyReadOnly(col.attribute));

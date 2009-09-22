@@ -53,7 +53,7 @@ public class TestModel {
         final String[] all = {Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, Workitem.TASK_PREFIX, Workitem.TEST_PREFIX};
         setDataLayerAttribute(Workitem.STATUS_PROPERTY, true, all);
         setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true, all);
-        datalayer.connectFotTesting(services, metaModel, localizer, TrackingLevel.On, TrackingLevel.Off);
+        datalayer.connectFotTesting(services, metaModel, localizer, TrackingLevel.Off, TrackingLevel.On);
     }
 
     private static void setDataLayerAttribute(String attribute, boolean isListType, String... typePrefixes) {
@@ -299,7 +299,6 @@ public class TestModel {
     @Test
     public void testTrackingLevel() throws Exception {
         EffortTrackingLevel tracking = datalayer.trackingLevel;
-        Workitem defect0 = datalayer.getWorkitemTree()[0];
         Workitem story1 = datalayer.getWorkitemTree()[1];
         Workitem s1Test0 = story1.children.get(0);
         Workitem s1Task1 = story1.children.get(1);
@@ -307,12 +306,12 @@ public class TestModel {
         Workitem d9Task0 = defect9.children.get(0);
         Workitem d9Test2 = defect9.children.get(2);
         
-        Assert.assertFalse(tracking.isTracking(defect0));
-        Assert.assertTrue(tracking.isTracking(story1));
-        Assert.assertFalse(tracking.isTracking(s1Test0));
-        Assert.assertFalse(tracking.isTracking(s1Task1));
-        Assert.assertTrue(tracking.isTracking(d9Task0));
-        Assert.assertTrue(tracking.isTracking(d9Test2));
+        Assert.assertTrue(tracking.isTracking(defect9));
+        Assert.assertFalse(tracking.isTracking(story1));
+        Assert.assertTrue(tracking.isTracking(s1Test0));
+        Assert.assertTrue(tracking.isTracking(s1Task1));
+        Assert.assertFalse(tracking.isTracking(d9Task0));
+        Assert.assertFalse(tracking.isTracking(d9Test2));
     }
 
     @Test

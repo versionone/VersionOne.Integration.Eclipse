@@ -14,9 +14,11 @@ import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.Services;
+import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.EffortTrackingLevel;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
@@ -30,14 +32,14 @@ public class TestModel {
     /**
      * Configuration Parameters
      */
-    static final String SERVER_URL = "http://localhost/V1_71";
-    static final String USER_ID = "andre";
-    static final String USER_PASSWORD = "andre";
-    static final String USER_MEMBER_ID = "Member:1000";
-    static final String SCOPE_ID = "Scope:1012";
-    static final boolean VALIDATION_REQUIRED = false;
-    static final boolean TRACKING = false;
-    private static ApiDataLayer datalayer = null;
+    private static final String SERVER_URL = "http://localhost/V1_71";
+    private static final String USER_ID = "andre";
+    private static final String USER_PASSWORD = "andre";
+    private static final String USER_MEMBER_ID = "Member:1000";
+    private static final String SCOPE_ID = "Scope:1012";
+    private static final boolean VALIDATION_REQUIRED = false;
+    private static final boolean TRACKING = false;
+    private static ApiDataLayer datalayer;
 
     private static void loadTestData() throws Exception {
         FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
@@ -51,7 +53,7 @@ public class TestModel {
         final String[] all = {Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, Workitem.TASK_PREFIX, Workitem.TEST_PREFIX};
         setDataLayerAttribute(Workitem.STATUS_PROPERTY, true, all);
         setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true, all);
-        datalayer.connectFotTesting(services, metaModel, localizer, null);
+        datalayer.connectFotTesting(services, metaModel, localizer, TrackingLevel.On, TrackingLevel.Off);
     }
 
     private static void setDataLayerAttribute(String attribute, boolean isListType, String... typePrefixes) {
@@ -155,7 +157,6 @@ public class TestModel {
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         // Assert.assertEquals(2, allWorkItem.length);
         Workitem testMe = allWorkItem[0];
-        // validateSetEffort(testMe);
         validateSetEstimate(testMe);
         // validateSetName(testMe);
         // validatSetStatus(testMe);
@@ -291,22 +292,45 @@ public class TestModel {
         Assert.assertEquals("Petja, Bil, Tom", testMe.getPropertyAsString(Workitem.OWNERS_PROPERTY));        
     }
 
-//
-//	/**
-//	 * Effort is allowed to accept any float value
-//	 * @param testMe
-//	 * @throws Exception
-//	 */
-//	private void validateSetEffort(Task testMe) throws Exception {
-//		testMe.setEffort(0);
-//		Assert.assertEquals(0, testMe.getEffort(), EPSILON);
-//		
-//		testMe.setEffort(10);
-//		Assert.assertEquals(10, testMe.getEffort(), EPSILON);
-//
-//		testMe.setEffort(-1);
-//		Assert.assertEquals(-1, testMe.getEffort(), EPSILON);
-//	}
+
+    /**
+     * Effort is allowed to accept doubles and strings default locale encoded.
+     */
+    @Test
+    public void testTrackingLevel() throws Exception {
+        EffortTrackingLevel tracking = datalayer.trackingLevel;
+        Workitem defect0 = datalayer.getWorkitemTree()[0];
+        Workitem story1 = datalayer.getWorkitemTree()[1];
+        Workitem s1Test0 = story1.children.get(0);
+        Workitem s1Task1 = story1.children.get(1);
+        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem d9Task0 = defect9.children.get(0);
+        Workitem d9Test2 = defect9.children.get(2);
+        
+        Assert.assertFalse(tracking.isTracking(defect0));
+        Assert.assertTrue(tracking.isTracking(story1));
+        Assert.assertFalse(tracking.isTracking(s1Test0));
+        Assert.assertFalse(tracking.isTracking(s1Task1));
+        Assert.assertTrue(tracking.isTracking(d9Task0));
+        Assert.assertTrue(tracking.isTracking(d9Test2));
+    }
+
+    @Test
+    public void testSetEffort() throws Exception {
+        Workitem story0 = datalayer.getWorkitemTree()[1];
+        
+        story0.setProperty(Workitem.EFFORT_PROPERTY, 0);
+        Assert.assertEquals(null, story0.getProperty(Workitem.EFFORT_PROPERTY));
+
+        story0.setProperty(Workitem.EFFORT_PROPERTY, 10.125);
+        Assert.assertEquals("10,125", story0.getProperty(Workitem.EFFORT_PROPERTY));
+
+        story0.setProperty(Workitem.EFFORT_PROPERTY, "20");
+        Assert.assertEquals("20,00", story0.getProperty(Workitem.EFFORT_PROPERTY));
+
+        story0.setProperty(Workitem.EFFORT_PROPERTY, "-1");
+        Assert.assertEquals("-1,00", story0.getProperty(Workitem.EFFORT_PROPERTY));
+    }
 //	
 //	
 //	

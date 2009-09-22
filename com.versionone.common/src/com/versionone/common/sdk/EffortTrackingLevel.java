@@ -19,7 +19,7 @@ public class EffortTrackingLevel {
         setSecondaryTypes(secondaryTypes);
     }
 
-    boolean isTracking(Workitem item) {
+    public boolean isTracking(Workitem item) {
         String token = item.getTypePrefix();
         if (item.parent != null) {
             token = item.parent.getTypePrefix() + "." + token;

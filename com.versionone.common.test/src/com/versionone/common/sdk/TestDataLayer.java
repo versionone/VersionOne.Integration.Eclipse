@@ -51,7 +51,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object v1Configuration)
+    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTL, Object defectTL)
             throws Exception {
     }
 

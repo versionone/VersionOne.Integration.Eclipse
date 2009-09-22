@@ -39,6 +39,7 @@ import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
+import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 
 public class ApiDataLayer {
 
@@ -87,21 +88,20 @@ public class ApiDataLayer {
     /**
      * Special method ONLY for testing.
      */
-    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object v1Configuration)
+    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTrackingLevel, Object defectTrackingLevel)
             throws Exception {
         this.metaModel = (IMetaModel) metaModel;
         this.services = (IServices) services;
         this.localizer = (ILocalizer) localizer;
 
-        final V1Configuration configConnector = (V1Configuration) v1Configuration;
-        if (configConnector != null) {
-            trackEffort = configConnector.isEffortTracking();
-            if (trackEffort) {
-                effortType = this.metaModel.getAssetType("Actual");
-            }
+        if (storyTrackingLevel != null && defectTrackingLevel != null) {
+            trackEffort = true;
+            effortType = this.metaModel.getAssetType("Actual");
             trackingLevel.clear();
-            trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, configConnector.getStoryTrackingLevel());
-            trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, configConnector.getDefectTrackingLevel());
+            trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, (TrackingLevel) storyTrackingLevel);
+            trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, (TrackingLevel) defectTrackingLevel);
+        } else {
+            trackEffort = false;
         }
 
         initTypes();

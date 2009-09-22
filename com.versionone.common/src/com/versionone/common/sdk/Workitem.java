@@ -39,7 +39,7 @@ public class Workitem {
     public static final String OP_CLOSE = "Inactivate";
     public static final String OP_QUICK_CLOSE = "QuickClose";
 
-    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    public static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     static {
         numberFormat.setMinimumFractionDigits(2);
         numberFormat.setMaximumFractionDigits(6);
@@ -256,8 +256,10 @@ public class Workitem {
 
     private void setNumericProperty(String propertyName, Object newValue) throws APIException, ParseException {
         Double doubleValue = null;
-        if (newValue != null) {
+        if (newValue instanceof String) {
             doubleValue = numberFormat.parse((String) newValue).doubleValue();
+        } else if (newValue instanceof Double) {
+            doubleValue = (Double) newValue;
         }
 
         if (propertyName.equals(EFFORT_PROPERTY)) {

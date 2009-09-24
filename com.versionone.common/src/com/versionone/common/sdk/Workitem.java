@@ -25,6 +25,7 @@ public class Workitem {
     public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
     public static final String NAME_PROPERTY = "Name";
     public static final String STATUS_PROPERTY = "Status";
+    public static final String TYPE_PROPERTY = "Category";
     public static final String EFFORT_PROPERTY = "Actuals";
     public static final String DONE_PROPERTY = "Actuals.Value.@Sum";
     public static final String SCHEDULE_NAME_PROPERTY = "Schedule.Name";
@@ -32,6 +33,7 @@ public class Workitem {
     public static final String TODO_PROPERTY = "ToDo";
     public static final String ESTIMATE_PROPERTY = "Estimate";
     public static final String DESCRIPTION_PROPERTY = "Description";
+    public static final String PARENT_NAME_PROPERTY = "Parent.Name";
     public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
     public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
 

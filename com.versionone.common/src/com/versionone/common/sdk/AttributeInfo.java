@@ -21,7 +21,7 @@ public class AttributeInfo {
 
     @Override
     public int hashCode() {
-        int result = 31 + attr.hashCode();
+        int result = attr.hashCode();
         result = 31 * result + prefix.hashCode();
         result = 31 * result + (isList ? 1231 : 1237);
         return result;

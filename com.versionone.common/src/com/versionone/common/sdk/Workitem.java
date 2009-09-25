@@ -306,11 +306,6 @@ public class Workitem {
         return false;
     }
 
-    public boolean propertyChanged(String propertyName) {
-        IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
-        return asset.getAttribute(attrDef).hasChanged();
-    }
-
     public void commitChanges() throws DataLayerException {
         try {
             dataLayer.commitAsset(asset);

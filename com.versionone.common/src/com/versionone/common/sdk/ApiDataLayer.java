@@ -464,10 +464,13 @@ public class ApiDataLayer {
     }
 
     static DataLayerException warning(String string, Exception ex) {
+        System.out.println(string);
+        ex.printStackTrace();
         return new DataLayerException(string, ex);
     }
 
     static DataLayerException warning(String string) {
+        System.out.println(string);
         return new DataLayerException(string);
     }
 
@@ -532,7 +535,7 @@ public class ApiDataLayer {
         services.executeOperation(operation, asset.getOid());
     }
 
-    public boolean isAssetClosed(Asset asset) {
+    boolean isAssetClosed(Asset asset) {
         try {
             IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
             AssetState state = AssetState.valueOf((Integer) asset.getAttribute(stateDef).getValue());
@@ -543,11 +546,11 @@ public class ApiDataLayer {
         return false;
     }
 
-    public boolean isAssetSuspended(Asset asset) {
+    boolean isAssetSuspended(Asset asset) {
         return assetsToIgnore.contains(asset);
     }
 
-    public void addIgnoreRecursively(Workitem item) {
+    void addIgnoreRecursively(Workitem item) {
         assetsToIgnore.add(item.asset);
         for (Workitem child : item.children) {
             addIgnoreRecursively(child);

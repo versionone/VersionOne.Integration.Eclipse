@@ -14,6 +14,7 @@ import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.Services;
 import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.AttributeInfo;
 import com.versionone.common.sdk.EffortTrackingLevel;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
@@ -108,20 +109,8 @@ public class TestModel {
         Assert.assertEquals(typePrefix, task.getTypePrefix());
     }
 
-    // @Test
-    // public void testGetStatusCodes() throws Exception {
-    // IStatusCodes statusCodes = V1Server.getInstance().getTaskStatusValues();
-    // Assert.assertNotNull(statusCodes);
-    // validateGetDisplayValues(statusCodes);
-    // validateGetID(statusCodes);
-    // validateGetDisplayValue(statusCodes);
-    // validateGetDisplayFromOid(statusCodes);
-    // validateGetOidIndex(statusCodes);
-    // }
-    //
-
     @Test
-    public void testDescription() throws Exception {
+    public void testSetDescription() throws Exception {
         final Workitem defect0 = datalayer.getWorkitemTree()[0];
 
         defect0.setProperty(Workitem.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
@@ -158,6 +147,9 @@ public class TestModel {
         validateNumberProperty(datalayer.getWorkitemTree()[0], Workitem.DETAIL_ESTIMATE_PROPERTY);
     }
 
+    /**
+     * Effort is allowed to accept doubles and strings.
+     */
     @Test
     public void testSetEffort() throws Exception {
         Workitem workitem = datalayer.getWorkitemTree()[0];
@@ -173,6 +165,9 @@ public class TestModel {
 
         workitem.setProperty(property, "-1");
         Assert.assertEquals(format.format(-1), workitem.getProperty(property));
+
+        workitem.resetProperty(property);
+        Assert.assertEquals(null, workitem.getProperty(property));
     }
 
     private void validateNumberProperty(Workitem workitem, String property) {
@@ -230,13 +225,33 @@ public class TestModel {
             // Do nothing
         }
         Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
-    }
+
+        Assert.assertTrue(defect0.isPropertyChanged(Workitem.STATUS_PROPERTY));
+        defect0.resetProperty(Workitem.STATUS_PROPERTY);
+        Assert.assertFalse(defect0.isPropertyChanged(Workitem.STATUS_PROPERTY));
+        Assert.assertEquals("Accepted", defect0.getPropertyAsString(Workitem.STATUS_PROPERTY));
+
+        defect0.setProperty(Workitem.STATUS_PROPERTY, statuses.getValueIdByIndex(0));
+        Assert.assertTrue(defect0.hasChanges());
+        defect0.revertChanges();
+        Assert.assertFalse(defect0.hasChanges());
+}
 
     @Test
     public void testSetName() throws Exception {
         final Workitem defect0 = datalayer.getWorkitemTree()[0];
         defect0.setProperty(Workitem.NAME_PROPERTY, "New Name");
         Assert.assertEquals("New Name", defect0.getProperty(Workitem.NAME_PROPERTY));
+        Assert.assertTrue(defect0.isPropertyChanged(Workitem.NAME_PROPERTY));
+        defect0.resetProperty(Workitem.NAME_PROPERTY);
+        Assert.assertFalse(defect0.isPropertyChanged(Workitem.NAME_PROPERTY));
+        Assert.assertEquals("New Defect1", defect0.getProperty(Workitem.NAME_PROPERTY));
+
+        defect0.setProperty(Workitem.NAME_PROPERTY, "New Name");
+        Assert.assertTrue(defect0.hasChanges());
+        defect0.revertChanges();
+        Assert.assertFalse(defect0.hasChanges());
+        Assert.assertEquals("New Defect1", defect0.getProperty(Workitem.NAME_PROPERTY));
     }
 
     @Test
@@ -280,9 +295,27 @@ public class TestModel {
         Assert.assertEquals("Petja, Bil, Tom", story1.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
 
-    /**
-     * Effort is allowed to accept doubles and strings default locale encoded.
-     */
+    @Test
+    public void testReadonlyProperties() throws Exception {
+        Workitem story1 = datalayer.getWorkitemTree()[1];
+        Workitem s1Test0 = story1.children.get(0);
+        Workitem s1Task1 = story1.children.get(1);
+        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem d9Task0 = defect9.children.get(0);
+        Workitem d9Test2 = defect9.children.get(2);
+
+        Assert.assertTrue(story1.isPropertyReadOnly(Workitem.ID_PROPERTY));
+        Assert.assertFalse(story1.isPropertyReadOnly(Workitem.NAME_PROPERTY));
+        Assert.assertFalse(story1.isPropertyReadOnly(Workitem.OWNERS_PROPERTY));
+
+        Assert.assertTrue(story1.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(s1Task1.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(s1Test0.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(defect9.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertTrue(d9Task0.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertTrue(d9Test2.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+    }
+
     @Test
     public void testTrackingLevel() throws Exception {
         EffortTrackingLevel tracking = datalayer.trackingLevel;
@@ -301,51 +334,65 @@ public class TestModel {
         Assert.assertFalse(tracking.isTracking(d9Test2));
     }
 
-    // private void validateGetOidIndex(IStatusCodes statusCodes) {
-    // Assert.assertEquals(0, statusCodes.getOidIndex(""));
-    // Assert.assertEquals(1, statusCodes.getOidIndex("TaskStatus:123"));
-    // Assert.assertEquals(2, statusCodes.getOidIndex("TaskStatus:125"));
-    // Assert.assertEquals(3, statusCodes.getOidIndex("TaskStatus:126"));
-    // }
-    //
-    // private void validateGetDisplayFromOid(IStatusCodes statusCodes) {
-    // Assert.assertEquals("*** Invalid OID ***",
-    // statusCodes.getDisplayFromOid(""));
-    // Assert.assertEquals("", statusCodes.getDisplayFromOid("NULL"));
-    // Assert.assertEquals("In Progress",
-    // statusCodes.getDisplayFromOid("TaskStatus:123"));
-    // Assert.assertEquals("Completed",
-    // statusCodes.getDisplayFromOid("TaskStatus:125"));
-    // Assert.assertEquals("On Hold",
-    // statusCodes.getDisplayFromOid("TaskStatus:126"));
-    // }
-    //
-    // private void validateGetDisplayValue(IStatusCodes statusCodes) {
-    // Assert.assertEquals("", statusCodes.getDisplayValue(0));
-    // Assert.assertEquals("In Progress", statusCodes.getDisplayValue(1));
-    // Assert.assertEquals("Completed", statusCodes.getDisplayValue(2));
-    // Assert.assertEquals("On Hold", statusCodes.getDisplayValue(3));
-    // }
-    //
-    // private void validateGetID(IStatusCodes statusCodes) {
-    // Assert.assertEquals("NULL", statusCodes.getID(0));
-    // Assert.assertEquals("TaskStatus:123", statusCodes.getID(1));
-    // Assert.assertEquals("TaskStatus:125", statusCodes.getID(2));
-    // Assert.assertEquals("TaskStatus:126", statusCodes.getID(3));
-    // try {
-    // statusCodes.getID(4);
-    // Assert.fail("Expected IndexOutOfBoundsException");
-    // }
-    // catch(IndexOutOfBoundsException e){}
-    // }
-    //
-    // private void validateGetDisplayValues(IStatusCodes statusCodes) {
-    // String[] displayNames = statusCodes.getDisplayValues();
-    // Assert.assertEquals(4, displayNames.length);
-    // Assert.assertEquals("", displayNames[0]);
-    // Assert.assertEquals("In Progress", displayNames[1]);
-    // Assert.assertEquals("Completed", displayNames[2]);
-    // Assert.assertEquals("On Hold", displayNames[3]);
-    // }
-    //
+    @Test
+    public void testWorkitemIsMine() throws Exception {
+        Workitem defect0 = datalayer.getWorkitemTree()[0];
+        Workitem story1 = datalayer.getWorkitemTree()[1];
+        Workitem s1Test0 = story1.children.get(0);
+        Workitem s1Task1 = story1.children.get(1);
+        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem d9Task0 = defect9.children.get(0);
+        Workitem d9Test2 = defect9.children.get(2);
+
+        Assert.assertTrue(defect0.isMine());
+        Assert.assertFalse(story1.isMine());
+        Assert.assertFalse(s1Task1.isMine());
+        Assert.assertTrue(s1Test0.isMine());
+        Assert.assertTrue(defect9.isMine());
+        Assert.assertTrue(d9Task0.isMine());
+        Assert.assertTrue(d9Test2.isMine());
+    }
+
+    @Test
+    public void testWorkitemCanSignup() throws Exception {
+        Workitem defect0 = datalayer.getWorkitemTree()[0];
+        Workitem story1 = datalayer.getWorkitemTree()[1];
+        Workitem s1Test0 = story1.children.get(0);
+        Workitem s1Task1 = story1.children.get(1);
+        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem d9Task0 = defect9.children.get(0);
+        Workitem d9Test2 = defect9.children.get(2);
+
+        Assert.assertTrue(defect0.canSignup());
+        Assert.assertTrue(story1.canSignup());
+        Assert.assertTrue(s1Task1.canSignup());
+        Assert.assertTrue(s1Test0.canSignup());
+        Assert.assertTrue(defect9.canSignup());
+        Assert.assertTrue(d9Task0.canSignup());
+        Assert.assertTrue(d9Test2.canSignup());
+    }
+
+    @Test
+    public void testGetTestStatuses() throws Exception {
+        PropertyValues statuses = datalayer.getListPropertyValues(Workitem.TEST_PREFIX, Workitem.STATUS_PROPERTY);
+        Assert.assertNotNull(statuses);
+        validatePropertyValues(statuses, "", "Failed", "Passed");
+    }
+
+    @Test
+    public void testGetStoryStatuses() throws Exception {
+        PropertyValues statuses = datalayer.getListPropertyValues(Workitem.STORY_PREFIX, Workitem.STATUS_PROPERTY);
+        Assert.assertNotNull(statuses);
+        validatePropertyValues(statuses, "", "Future", "In Progress", "Done", "Accepted");
+    }
+
+    private void validatePropertyValues(PropertyValues statuses, String... expecteds) {
+        Assert.assertArrayEquals(expecteds, statuses.toStringArray());
+    }
+
+    @Test
+    public void testAttributeInfo() {
+        Assert.assertEquals("Story.Status(List:true)", new AttributeInfo("Status", "Story", true).toString());
+        Assert.assertEquals("Test.Description(List:false)", new AttributeInfo("Description", "Test", false).toString());
+    }
 }

@@ -1,4 +1,4 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.actions;
 
 import java.util.List;
 
@@ -12,6 +12,9 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.ProjectSelectDialog;
+import com.versionone.taskview.views.ProxySelectionProvider;
+import com.versionone.taskview.views.TaskView;
 
 class ProjectAction extends Action {
 

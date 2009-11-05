@@ -2,8 +2,6 @@ package com.versionone.taskview.views;
 
 import java.util.HashMap;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -33,6 +31,7 @@ import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
+import com.versionone.taskview.views.actions.ActionsManager;
 import com.versionone.taskview.views.editors.SingleValueSupport;
 import com.versionone.taskview.views.editors.MultiValueSupport;
 import com.versionone.taskview.views.editors.TextSupport;
@@ -61,18 +60,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
     private static final String V1_COLUMN_TITLE_OWNER = "ColumnTitle'Owner";
 
-    private static final String MENU_ITEM_CLOSE_KEY = "Close";
-    private static final String MENU_ITEM_QUICK_CLOSE_KEY = "Quick Close";
-    private static final String MENU_ITEM_SIGNUP_KEY = "Signup";
 
-    private ProxySelectionProvider selectionProvider;
-    private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
+    private ProxySelectionProvider selectionProvider;    
     private boolean isEffortColumsShown;
     private TreeViewer viewer;
-    private Action selectProjectAction = null;
-    private Action refreshAction = null;
-    private Action saveAction = null;
-    private Action filåterAction = null;
+    
+    private ActionsManager actionsManager = new ActionsManager();
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -84,6 +77,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void createPartControl(Composite parent) {
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
         viewer.setContentProvider(new ViewContentProvider());
+        viewer.addSelectionChangedListener(actionsManager);
         selectionProvider = new ProxySelectionProvider(viewer);
 
         if (isEnabled()) {
@@ -116,11 +110,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     }
 
-    private boolean validRowSelected() {
+    boolean validRowSelected() {
         return !viewer.getSelection().isEmpty();
     }
 
-    private Workitem getCurrentWorkitem() {
+    Workitem getCurrentWorkitem() {
         ISelection selection = viewer.getSelection();
         if (selection != null && selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
@@ -139,69 +133,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         final Control control = viewer.getControl();
         final Shell shell = control.getShell();
         final Menu menu = new Menu(shell, SWT.POP_UP);
-        final TaskView openingViewer = this;
-
-        final MenuItem closeItem = new MenuItem(menu, SWT.PUSH);
-        closeItem.setText(MENU_ITEM_CLOSE_KEY);
-        closeItem.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
-                CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(shell, getCurrentWorkitem(), openingViewer);
-                closeDialog.setBlockOnOpen(true);
-                closeDialog.open();
-            }
-        });
-        menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
-
-        final MenuItem quickCloseItem = new MenuItem(menu, SWT.PUSH);
-        quickCloseItem.setText(MENU_ITEM_QUICK_CLOSE_KEY);
-        quickCloseItem.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
-                try {
-                    getCurrentWorkitem().quickClose();
-                    refreshViewer();
-                } catch (DataLayerException ex) {
-                    Activator.logError(ex);
-                    MessageDialog.openError(shell, "Task View Error",
-                            "Error during closing Workitem. Check Error Log for more details.");
-                }
-            }
-        });
-        menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
-
-        new MenuItem(menu, SWT.SEPARATOR);
-
-        final MenuItem signupItem = new MenuItem(menu, SWT.PUSH);
-        signupItem.setText(MENU_ITEM_SIGNUP_KEY);
-        signupItem.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
-                try {
-                    getCurrentWorkitem().signup();
-                    refreshViewer();
-                } catch (DataLayerException ex) {
-                    Activator.logError(ex);
-                    MessageDialog.openError(shell, "Task View Error",
-                            "Error during signing up. Check Error Log for more details.");
-                }
-            }
-        });
-        menuItemsMap.put(MENU_ITEM_SIGNUP_KEY, signupItem);
-
-        menu.addMenuListener(new MenuListener() {
-
-            public void menuHidden(MenuEvent e) {
-            }
-
-            public void menuShown(MenuEvent e) {
-                Workitem item = getCurrentWorkitem();
-                if (menu.getVisible() && (item == null || !validRowSelected())) {
-                    menu.setVisible(false);
-                }
-
-                quickCloseItem.setEnabled(item.canQuickClose());
-                signupItem.setEnabled(item.canSignup() && !item.isMine());
-            }
-        });
-        control.setMenu(menu);
+        ContextMenuManager contextMenuManager = new ContextMenuManager(shell, menu, this);
+        contextMenuManager.init(control);        
     }
 
     protected void updateDescription(Workitem currentWorkitem, String value) {
@@ -236,7 +169,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     public void enableTreeAndActions(boolean enabled) {
-        enableAction(enabled);
+        actionsManager.enableAction(enabled, enabled);
         enableTree(enabled);
     }
 
@@ -247,20 +180,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         tree.setEnabled(enabled);
     }
 
-    public void enableAction(boolean enabled) {
-        selectProjectAction.setEnabled(enabled);
-        refreshAction.setEnabled(enabled);
-        saveAction.setEnabled(enabled);
-        filåterAction.setEnabled(enabled);
-    }
-
     public void disableAllButRefresh() {
         viewer.getTree().setEnabled(false);
-        selectProjectAction.setEnabled(false);
-        saveAction.setEnabled(false);
-        filåterAction.setEnabled(false);
-        refreshAction.setEnabled(true);
+        actionsManager.enableAction(false, true);
     }
+    
+    
 
     /**
      * Configure the table
@@ -323,22 +248,14 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create the action menus and add them to Action bars and pull down menu.
      */
     private void createActions() {
-        selectProjectAction = new ProjectAction(this, viewer, getSite());
-        refreshAction = new RefreshAction(this, viewer);
-        saveAction = new SaveAction(this, viewer);
-        filåterAction = new FilterAction(this, viewer);
+        actionsManager.init(this, viewer, getSite());
 
         IActionBars bars = getViewSite().getActionBars();
-        addActions(bars.getMenuManager());
-        addActions(bars.getToolBarManager());
+        actionsManager.addActions(bars.getMenuManager());
+        actionsManager.addActions(bars.getToolBarManager());
     }
 
-    private void addActions(IContributionManager manager) {
-        manager.add(filåterAction);
-        manager.add(selectProjectAction);
-        manager.add(refreshAction);
-        manager.add(saveAction);
-    }
+
 
     /**
      * Set focus to the Tree.
@@ -367,7 +284,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     /**
      * Load the Viewer with Task data
      */
-    protected boolean loadDataToTable() {
+    public boolean loadDataToTable() {
         try {
             final Workitem[] workitems = ApiDataLayer.getInstance().getWorkitemTree();
             viewer.setInput(workitems);
@@ -380,6 +297,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
                     "Error Occurred Retrieving Task. Check ErrorLog for more Details");
             return false;
         }
+    }
+    
+    /**
+     * Returns actions manager for working with actions
+     * 
+     * @return actions manager
+     */
+    public ActionsManager getActionsManager() {
+        return actionsManager;
     }
 
     /**
@@ -411,7 +337,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         return rc;
     }
 
-    protected void showMessage(String message) {
+    public void showMessage(String message) {
         MessageDialog.openInformation(viewer.getControl().getShell(), "Task View", message);
     }
 

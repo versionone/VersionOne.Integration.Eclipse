@@ -1,4 +1,4 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -7,8 +7,9 @@ import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.TaskView;
 
-public class FilterAction extends Action {
+class FilterAction extends Action {
 
     private final static String MESSAGE = "Show only my workitems";
 

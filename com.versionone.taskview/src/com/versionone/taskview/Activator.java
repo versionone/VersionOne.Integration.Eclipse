@@ -33,6 +33,7 @@ public class Activator extends AbstractUIPlugin {
     public static final String REFRESH_IMAGE_ID = "image.refresh";
     public static final String SAVE_IMAGE_ID = "image.save";
     public static final String FILTER_WORKITEM_IMAGE_ID = "image.workitemfilter";
+    public static final String ADD_TASK_ID = "image.addtask";
 
     // The shared instance
     private static Activator plugin;
@@ -175,5 +176,7 @@ public class Activator extends AbstractUIPlugin {
         registry.put(REFRESH_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/refresh.gif"));
         registry.put(SAVE_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/save.gif"));
         registry.put(FILTER_WORKITEM_IMAGE_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/member.gif"));
+        registry.put(ADD_TASK_ID, imageDescriptorFromPlugin(PLUGIN_ID, "icons/AddTask.gif"));
+        
     }
 }

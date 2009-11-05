@@ -1,14 +1,14 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.TaskView;
 
-public class SaveAction extends Action {
+class SaveAction extends Action {
 
     private static final ApiDataLayer DATA = ApiDataLayer.getInstance();
 
@@ -25,7 +25,7 @@ public class SaveAction extends Action {
     }
 
     public void run() {
-        workitemView.enableAction(false);
+        workitemView.getActionsManager().enableAction(false, false);
         if (treeViewer.isCellEditorActive()) {
             treeViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         }
@@ -39,6 +39,6 @@ public class SaveAction extends Action {
         }
 
         if (workitemView.loadDataToTable())
-            workitemView.enableAction(true);
+            workitemView.getActionsManager().enableAction(true, true);
     }
 }

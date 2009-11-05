@@ -1,9 +1,10 @@
-package com.versionone.taskview.views;
+package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.TaskView;
 
 class RefreshAction extends Action {
 

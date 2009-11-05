@@ -276,10 +276,16 @@ public class Workitem {
 
     private void setPropertyInternal(String propertyName, Object newValue) throws APIException {
         final Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
-        final Object oldValue = attribute.getValue();
-        if ((oldValue == null && newValue != null) || !oldValue.equals(newValue)) {
+        if (attribute == null || !areEqual(attribute.getValue(), newValue)) {
             asset.setAttributeValue(asset.getAssetType().getAttributeDefinition(propertyName), newValue);
         }
+    }
+
+    private static boolean areEqual(Object o1, Object o2) {
+        if (o1 == null) {
+            return o2 == null;
+        }
+        return o1.equals(o2);
     }
 
     private void setMultiValueProperty(String propertyName, PropertyValues newValues) throws APIException {
@@ -388,6 +394,10 @@ public class Workitem {
 
     public void revertChanges() {
         dataLayer.revertAsset(asset);
+    }
+    
+    public Workitem createChild(String prefix) {
+        return dataLayer.createWorkitem(prefix, this);
     }
 
     @Override

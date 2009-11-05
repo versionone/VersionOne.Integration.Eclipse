@@ -48,7 +48,7 @@ public class ApiDataLayer {
     private static final String DataUrlSuffix = "rest-1.v1/";
     private static final String ConfigUrlSuffix = "config.v1/";
 
-    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(4);
+    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
     private final Set<Asset> assetsToIgnore = new HashSet<Asset>();
     private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
@@ -703,5 +703,9 @@ public class ApiDataLayer {
 
     public String localizerResolve(String key) {
         return localizer.resolve(key);
+    }
+
+    public Workitem createWorkitem(String prefix, Workitem parent) {
+        return new VirtualWorkitem(types.get(prefix), parent);
     }
 }

@@ -16,12 +16,13 @@ public class ApiDataLayerTester {
 
     @Ignore("This test is integrational. It works with V1 server.")
     @Test
-    public void ApiDataLayerTest() throws DataLayerException {
+    public void testVirtualWorkitem() throws DataLayerException {
         final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", "Test", false);
-        data.addProperty("Owners", "Test", true);
+        data.addProperty("Name", "Task", false);
+        data.addProperty("Owners", "Task", true);
+        data.addProperty("Status", "Task", true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem test = data.createWorkitem(Workitem.TEST_PREFIX, null);
+        final Workitem test = data.createWorkitem(Workitem.TASK_PREFIX, null);
         assertEquals(null, test.parent);
         assertEquals(0, test.children.size());
         assertFalse(test.canQuickClose());
@@ -51,11 +52,15 @@ public class ApiDataLayerTester {
             // Do nothing
         }
         assertEquals("NULL", test.getId());
-        assertEquals(Workitem.TEST_PREFIX, test.getTypePrefix());
+        assertEquals(Workitem.TASK_PREFIX, test.getTypePrefix());
         assertTrue(test.hasChanges());
         assertFalse(test.isMine());
+        assertFalse(test.isPropertyReadOnly(Workitem.NAME_PROPERTY));
         assertEquals("", test.getPropertyAsString(Workitem.NAME_PROPERTY));
         test.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
         assertEquals("NewName53765", test.getPropertyAsString(Workitem.NAME_PROPERTY));
+        assertEquals("", test.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        test.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
+        assertEquals("In Progress", test.getPropertyAsString(Workitem.STATUS_PROPERTY));
     }
 }

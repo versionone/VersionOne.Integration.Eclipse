@@ -233,10 +233,6 @@ public class ApiDataLayer {
         return type;
     }
 
-    public boolean isCurrentUserOwnerAsset(Asset childAsset) {
-        return isCurrentUserOwnerAsset(childAsset, workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
-    }
-
     public Workitem[] getWorkitemTree() throws Exception {
         checkConnection();
         if (currentProjectId == null) {
@@ -269,7 +265,6 @@ public class ApiDataLayer {
             }
         }
 
-        IAttributeDefinition definition = workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY);
         List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
 
         for (Asset asset : assetList.getAssets()) {
@@ -277,30 +272,33 @@ public class ApiDataLayer {
                 continue;
             }
 
-            if (showAllTasks || isCurrentUserOwnerAsset(asset, definition)) {
+            if (showAllTasks || isMine(asset)) {
                 res.add(new Workitem(asset, null));
             }
         }
         return res.toArray(new Workitem[res.size()]);
     }
 
-    private boolean isCurrentUserOwnerAsset(Asset assets, IAttributeDefinition definition) {
-        Attribute attribute = assets.getAttribute(definition);
-
-        Object[] owners = attribute.getValues();
+    /**
+     * Determine whether specified Asset or it's children owned by current user (memberOid).
+     * 
+     * @param asset to determine ownership for.
+     * @return true if user owns the Asset or his children; otherwise - false.
+     */
+    public boolean isMine(Asset asset) {
+        final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
+        final Object[] owners = attribute.getValues();
         for (Object oid : owners) {
             if (memberOid.equals(oid)) {
                 return true;
             }
         }
-        if (assets.hasChanged()) {
-            for (Asset child : assets.getChildren()) {
-                if (isCurrentUserOwnerAsset(child, definition)) {
-                    return true;
-                }
+
+        for (Asset child : asset.getChildren()) {
+            if (isMine(child)) {
+                return true;
             }
         }
-
         return false;
     }
 
@@ -713,7 +711,7 @@ public class ApiDataLayer {
             }
         }
 
-        if (prefix.equals(Workitem.TASK_PREFIX)) { // TODO if item.isSecondaryWorkitem()
+        if (prefix.equals(Workitem.TEST_PREFIX)) { // TODO if item.isSecondaryWorkitem()
             setAssetAttribute(asset, "Parent", parent.asset.getOid());
         } else if (prefix.equals(Workitem.STORY_PREFIX)) { // TODO if item.isPrimaryWorkitem()
             setAssetAttribute(asset, "Scope", currentProjectId);

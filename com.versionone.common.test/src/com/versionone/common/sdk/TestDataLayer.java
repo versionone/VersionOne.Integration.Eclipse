@@ -97,7 +97,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public boolean isCurrentUserOwnerAsset(Asset childAsset) {
+    public boolean isMine(Asset asset) {
         return false;
     }
 

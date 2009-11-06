@@ -1,7 +1,6 @@
 package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.TaskView;
@@ -9,11 +8,9 @@ import com.versionone.taskview.views.TaskView;
 class RefreshAction extends Action {
 
     private final TaskView workitemView;
-    private final TreeViewer treeViewer;
 
-    public RefreshAction(TaskView workItemView, TreeViewer workitemViewer) {
+    public RefreshAction(TaskView workItemView) {
         this.workitemView = workItemView;
-        this.treeViewer = workitemViewer;
 
         setText("Refresh");
         setToolTipText("Refresh");

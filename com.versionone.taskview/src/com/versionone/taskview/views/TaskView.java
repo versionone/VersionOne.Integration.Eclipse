@@ -114,7 +114,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         return !viewer.getSelection().isEmpty();
     }
 
-    Workitem getCurrentWorkitem() {
+    public Workitem getCurrentWorkitem() {
         ISelection selection = viewer.getSelection();
         if (selection != null && selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;

@@ -30,11 +30,11 @@ public class ActionsManager implements ISelectionChangedListener{
     
 
     public void init(TaskView taskView, TreeViewer viewer, IWorkbenchPartSite site) {
-        selectProjectAction = new ProjectAction(taskView, viewer, site);
-        refreshAction = new RefreshAction(taskView, viewer);
-        saveAction = new SaveAction(taskView, viewer);
-        filterAction = new FilterAction(taskView, viewer);
-        addTask = new AddTaskAction(taskView, viewer);
+        selectProjectAction = new ProjectAction(taskView, site);
+        refreshAction = new RefreshAction(taskView);
+        saveAction = new SaveAction(taskView);
+        filterAction = new FilterAction(taskView);
+        addTask = new AddTaskAction(taskView);
     }
     
     /**

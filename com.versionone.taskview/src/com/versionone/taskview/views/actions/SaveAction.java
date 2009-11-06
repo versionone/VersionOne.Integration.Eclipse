@@ -15,9 +15,9 @@ class SaveAction extends Action {
     private final TaskView workitemView;
     private final TreeViewer treeViewer;
 
-    public SaveAction(TaskView workItemView, TreeViewer workitemViewer) {
+    public SaveAction(TaskView workItemView) {
         this.workitemView = workItemView;
-        this.treeViewer = workitemViewer;
+        this.treeViewer = workItemView.getViewer();
 
         setText("Save");
         setToolTipText("Save");

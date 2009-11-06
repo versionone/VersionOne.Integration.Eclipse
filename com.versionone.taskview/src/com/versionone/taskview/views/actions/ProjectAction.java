@@ -22,9 +22,9 @@ class ProjectAction extends Action {
     private final TreeViewer treeViewer;
     private final IWorkbenchPartSite site;
 
-    public ProjectAction(TaskView workItemView, TreeViewer workitemViewer, IWorkbenchPartSite iWorkbenchPartSite) {
+    public ProjectAction(TaskView workItemView, IWorkbenchPartSite iWorkbenchPartSite) {
         this.workitemView = workItemView;
-        this.treeViewer = workitemViewer;
+        this.treeViewer = workItemView.getViewer();
         this.site = iWorkbenchPartSite;
 
         setText("Select Project");

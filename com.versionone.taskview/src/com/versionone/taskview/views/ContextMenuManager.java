@@ -3,6 +3,7 @@ package com.versionone.taskview.views;
 import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -98,7 +99,11 @@ public class ContextMenuManager {
         addTaskItem.setText(MENU_ITEM_ADD_TASK_KEY);
         addTaskItem.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
-
+                Workitem item = view.getCurrentWorkitem();        
+                item = item.parent != null ? item.parent : item;        
+                Workitem newItem = item.createChild(Workitem.TASK_PREFIX);                
+                view.getViewer().refresh();
+                view.getViewer().setSelection(new StructuredSelection(newItem), true);
             }
         });
         

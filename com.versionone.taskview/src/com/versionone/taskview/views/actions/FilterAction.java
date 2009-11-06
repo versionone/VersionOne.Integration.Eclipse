@@ -1,7 +1,6 @@
 package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
@@ -14,12 +13,10 @@ class FilterAction extends Action {
     private final static String MESSAGE = "Show only my workitems";
 
     private final TaskView workitemView;
-    private final TreeViewer treeViewer;
 
-    public FilterAction(TaskView workItemView, TreeViewer workitemViewer) {
+    public FilterAction(TaskView workItemView) {
         super(MESSAGE, AS_CHECK_BOX);
         this.workitemView = workItemView;
-        this.treeViewer = workitemViewer;
 
         setToolTipText(MESSAGE);
         boolean showAllTask = PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ONLY_USER_WORKITEMS);

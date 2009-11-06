@@ -46,4 +46,14 @@ class VirtualWorkitem extends Workitem {
     public boolean hasChanges() {
         return true;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.asset.hashCode();
+    }
 }

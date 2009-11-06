@@ -706,6 +706,38 @@ public class ApiDataLayer {
     }
 
     public Workitem createWorkitem(String prefix, Workitem parent) {
-        return new VirtualWorkitem(types.get(prefix), parent);
+        final Asset asset = new Asset(types.get(prefix));
+        for (AttributeInfo attrInfo : attributesToQuery) {
+            if (attrInfo.prefix == prefix) {
+                setAssetAttribute(asset, attrInfo.attr, null);
+            }
+        }
+
+        if (prefix.equals(Workitem.TASK_PREFIX)) { // TODO if item.isSecondaryWorkitem()
+            setAssetAttribute(asset, "Parent", parent.asset.getOid());
+        } else if (prefix.equals(Workitem.STORY_PREFIX)) { // TODO if item.isPrimaryWorkitem()
+            setAssetAttribute(asset, "Scope", currentProjectId);
+        }
+        return new VirtualWorkitem(asset, parent);
+    }
+
+    private static boolean setAssetAttribute(final Asset asset, final String attrName, final Object value) {
+        try {
+            final IAssetType type = asset.getAssetType();
+            IAttributeDefinition def = type.getAttributeDefinition(attrName);
+            if (value != null) {
+                asset.setAttributeValue(def, value);
+            } else {
+                asset.ensureAttribute(def);
+            }
+            return true;
+        } catch (MetaException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (APIException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
     }
 }

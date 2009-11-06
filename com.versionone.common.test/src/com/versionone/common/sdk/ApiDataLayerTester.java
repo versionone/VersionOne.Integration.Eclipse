@@ -5,15 +5,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class ApiDataLayerTester {
     
     private static final String V1_PATH = "http://integsrv01/VersionOne/";
     private static final String V1_USER = "admin";
     private static final String V1_PASSWORD = "admin";
 
-    @org.junit.Test
+    @Ignore("This test is integrational. It works with V1 server.")
+    @Test
     public void ApiDataLayerTest() throws DataLayerException {
         final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", "Test", false);
+        data.addProperty("Owners", "Test", true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
         final Workitem test = data.createWorkitem(Workitem.TEST_PREFIX, null);
         assertEquals(null, test.parent);
@@ -47,8 +53,8 @@ public class ApiDataLayerTester {
         assertEquals("NULL", test.getId());
         assertEquals(Workitem.TEST_PREFIX, test.getTypePrefix());
         assertTrue(test.hasChanges());
-        assertEquals("", test.getPropertyAsString(Workitem.NAME_PROPERTY));
         assertFalse(test.isMine());
+        assertEquals("", test.getPropertyAsString(Workitem.NAME_PROPERTY));
         test.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
         assertEquals("NewName53765", test.getPropertyAsString(Workitem.NAME_PROPERTY));
     }

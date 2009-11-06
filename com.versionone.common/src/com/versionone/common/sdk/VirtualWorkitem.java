@@ -5,8 +5,8 @@ import com.versionone.apiclient.IAssetType;
 
 class VirtualWorkitem extends Workitem {
 
-    VirtualWorkitem(IAssetType type, Workitem parent) {
-        super(new Asset(type), parent);
+    VirtualWorkitem(Asset asset, Workitem parent) {
+        super(asset, parent);
         if (parent != null) {
             parent.children.add(this);
         }
@@ -46,22 +46,4 @@ class VirtualWorkitem extends Workitem {
     public boolean hasChanges() {
         return true;
     }
-
-    @Override
-    public Object getProperty(String propertyName) throws IllegalArgumentException {
-        Object res = null;
-        try {
-            res = super.getProperty(propertyName);
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        return res;
-    }
-
-    @Override
-    public boolean isMine() {
-        final PropertyValues owners = (PropertyValues) getProperty(OWNERS_PROPERTY);
-        return owners==null? false:owners.containsOid(dataLayer.memberOid);
-    }
-
 }

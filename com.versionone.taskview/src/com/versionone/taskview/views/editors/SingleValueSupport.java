@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
@@ -16,7 +15,6 @@ public class SingleValueSupport extends EditingSupport {
 
     private static final String ERROR_VALUE = "*** Error ***";
     private String propertyName;
-    private final ApiDataLayer dataLayer;
     private ValueId currentValue;
     private final ISelectionProvider selectionProvider;
     
@@ -25,7 +23,6 @@ public class SingleValueSupport extends EditingSupport {
         super(viewer);
         this.propertyName = propertyName;
         this.selectionProvider = selectionProvider;
-        dataLayer = ApiDataLayer.getInstance();
     }
     
     @Override
@@ -53,15 +50,11 @@ public class SingleValueSupport extends EditingSupport {
 
     @Override
     protected void setValue(Object element, Object value) {
-        Workitem workitem = ((Workitem) element);
-        ValueId newValue = (ValueId) value;
-        if (dataLayer.getListPropertyValues(workitem.getTypePrefix(), propertyName).contains(newValue) &&
-                !currentValue.equals(newValue) && newValue != null) {
-            workitem.setProperty(propertyName, newValue);
-        }
+        final Workitem workitem = ((Workitem) element);
+        final ValueId newValue = (ValueId) value;
+        workitem.setProperty(propertyName, newValue);
         
         getViewer().update(element, null);
         selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
     }
-
 }

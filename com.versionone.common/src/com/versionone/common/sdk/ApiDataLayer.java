@@ -80,7 +80,7 @@ public class ApiDataLayer {
     private IServices services;
     private ILocalizer localizer;
     
-    private HashMap<String,LinkedList<String>> requiredFields;
+    private HashMap<String,LinkedList<String>> requiredFields = new HashMap<String,LinkedList<String>>();
 
     private String currentProjectId;
     private boolean showAllTasks = true;

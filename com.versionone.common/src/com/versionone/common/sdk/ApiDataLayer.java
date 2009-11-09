@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +79,8 @@ public class ApiDataLayer {
     private IMetaModel metaModel;
     private IServices services;
     private ILocalizer localizer;
+    
+    private HashMap<String,LinkedList<String>> requiredFields;
 
     private String currentProjectId;
     private boolean showAllTasks = true;
@@ -147,6 +150,7 @@ public class ApiDataLayer {
 
                 V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
                 services = new Services(metaModel, dataConnector);
+                
             }
             if (types.isEmpty()) {
                 initTypes();
@@ -157,6 +161,12 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             updateCurrentProjectId();
+            
+            requiredFields.put(Workitem.TASK_PREFIX, getRequiredFields(Workitem.TASK_PREFIX));
+            requiredFields.put(Workitem.DEFECT_PREFIX, getRequiredFields(Workitem.DEFECT_PREFIX));
+            requiredFields.put(Workitem.STORY_PREFIX, getRequiredFields(Workitem.STORY_PREFIX));
+            requiredFields.put(Workitem.TEST_PREFIX, getRequiredFields(Workitem.TEST_PREFIX));
+            
             return;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);
@@ -543,6 +553,25 @@ public class ApiDataLayer {
         }
     }
 
+    private boolean isAllRequiredFieldsFilled(Asset asset) throws DataLayerException {
+        final String type = asset.getAssetType().getToken();
+        final IAssetType attributeDefinitionAssetType = metaModel.getAssetType("AttributeDefinition");
+        try {
+            for (String field : requiredFields.get(type)) {
+                final IAttributeDefinition def = attributeDefinitionAssetType.getAttributeDefinition(field);
+
+                if (asset.getAttribute(def).getValue() == null) {
+                    return false;
+                }
+            }
+        } catch (APIException e) {
+            throw warning("Can get attribute definition", e);
+        } catch (MetaException e) {
+            throw warning("Can get attribute definition", e);
+        }
+        return true;
+    }
+
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
         services.executeOperation(operation, asset.getOid());
     }
@@ -752,4 +781,61 @@ public class ApiDataLayer {
         }
         return false;
     }
+    
+    private LinkedList<String> getRequiredFields(String assetType) throws DataLayerException {
+        final LinkedList<String> fileds = new LinkedList<String>();
+        final IAssetType attributeDefinitionAssetType = metaModel.getAssetType("AttributeDefinition");
+        
+
+        final IAttributeDefinition nameAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("Name");
+        final IAttributeDefinition isRequiredAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("IsRequired");
+        final IAttributeDefinition isReadOnlyAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("IsReadOnly");
+        
+        
+        final IAttributeDefinition assetNameAttributeDef = attributeDefinitionAssetType
+                .getAttributeDefinition("Asset.AssetTypesMeAndDown.Name");
+
+        Query query = new Query(attributeDefinitionAssetType);
+        query.getSelection().add(nameAttributeDef);
+        query.getSelection().add(isRequiredAttributeDef);
+        query.getSelection().add(isReadOnlyAttributeDef);
+
+        FilterTerm assetTypeTerm = new FilterTerm(assetNameAttributeDef);
+        assetTypeTerm.Equal(assetType);
+        FilterTerm assetIsReadOnlyTerm = new FilterTerm(isReadOnlyAttributeDef);
+        assetIsReadOnlyTerm.Equal(false);
+
+        query.setFilter(new AndFilterTerm(new IFilterTerm[] { assetTypeTerm, assetIsReadOnlyTerm}));
+
+        QueryResult result = null;
+        try {
+            result = services.retrieve(query);
+        } catch (ConnectionException e) {
+            throw warning("Cannot get meta data for " + assetType, e);
+        } catch (APIException e) {
+            throw warning("Cannot get meta data for " + assetType, e);
+        } catch (OidException e) {
+            throw warning("Cannot get meta data for " + assetType, e);
+        } catch (Exception e) {
+            throw warning("Cannot get meta data for " + assetType, e);
+        }
+        System.out.println("\n\n\nCustom Text Attributes available to " + assetType + " Are:");
+        for (Asset asset : result.getAssets()) {
+            try {
+                if (Boolean.parseBoolean(asset.getAttribute(isRequiredAttributeDef).getValue().toString())) {
+                    fileds.add(asset.getAttribute(nameAttributeDef).getValue().toString());
+                    System.out.println(asset.getAttribute(nameAttributeDef).getValue().toString() + " - " + asset.getAttribute(isReadOnlyAttributeDef).getValue().toString());
+                }                
+            } catch (APIException e) {
+                throw warning("Cannot get meta data for " + assetType, e);
+            } catch (MetaException e) {
+                throw warning("Cannot get meta data for " + assetType, e);
+            } catch (Exception e) {
+                throw warning("Cannot get meta data for " + assetType, e);
+            }
+        }
+        
+        return fileds;
+    }
+    
 }

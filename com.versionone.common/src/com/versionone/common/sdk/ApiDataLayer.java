@@ -272,20 +272,36 @@ public class ApiDataLayer {
                 continue;
             }
 
-            if (showAllTasks || isMine(asset)) {
+            if (showAllTasks || isNewOrChanged(asset) || isMine(asset)) {
                 res.add(new Workitem(asset, null));
             }
         }
         return res.toArray(new Workitem[res.size()]);
     }
 
+    
     /**
-     * Determine whether specified Asset or it's children owned by current user (memberOid).
+     * Determines is it new or edited asset. 
+     * 
+     * @param asset to determine status.
+     * @return true if it is new or created asset; otherwise - false.
+     */
+    public boolean isNewOrChanged(Asset asset) {        
+        return asset.hasChanged();
+    }
+
+    /**
+     * Determines whether specified Asset or it's children owned by current user (memberOid).
      * 
      * @param asset to determine ownership for.
      * @return true if user owns the Asset or his children; otherwise - false.
      */
     public boolean isMine(Asset asset) {
+        if (asset.hasChanged()) {
+            return true;
+        }
+        
+        
         final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
         final Object[] owners = attribute.getValues();
         for (Object oid : owners) {

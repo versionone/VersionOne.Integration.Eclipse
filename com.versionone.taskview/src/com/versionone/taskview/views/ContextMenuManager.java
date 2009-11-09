@@ -113,7 +113,8 @@ public class ContextMenuManager {
     
     private HashMap<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
     public void init (Control control) {
-        menuItemsMap.put(MENU_ITEM_CLOSE_KEY, getClose());        
+        final MenuItem closeItem = getClose();
+        menuItemsMap.put(MENU_ITEM_CLOSE_KEY, closeItem);
         final MenuItem quickCloseItem = getQuickClose();
         menuItemsMap.put(MENU_ITEM_QUICK_CLOSE_KEY, quickCloseItem);
         new MenuItem(menu, SWT.SEPARATOR);
@@ -134,6 +135,7 @@ public class ContextMenuManager {
                 } else {
                     quickCloseItem.setEnabled(item.canQuickClose());
                     signUpItem.setEnabled(item.canSignup() && !item.isMine());
+                    closeItem.setEnabled(!item.isNew());
                 }
                 
             }

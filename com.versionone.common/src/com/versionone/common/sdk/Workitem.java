@@ -75,7 +75,7 @@ public class Workitem {
                 continue;
             }
 
-            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.showAllTasks|| dataLayer.isMine(childAsset)) {
+            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.showAllTasks || dataLayer.isNewOrChanged(childAsset) || dataLayer.isMine(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }
         }
@@ -397,6 +397,14 @@ public class Workitem {
     
     public Workitem createChild(String prefix) {
         return dataLayer.createWorkitem(prefix, this);
+    }
+
+    /**
+     * 
+     * @return always false for this object
+     */
+    public boolean isNew() {
+        return false;
     }
 
     @Override

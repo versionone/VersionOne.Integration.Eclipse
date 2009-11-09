@@ -1,7 +1,6 @@
 package com.versionone.common.sdk;
 
 import com.versionone.apiclient.Asset;
-import com.versionone.apiclient.IAssetType;
 
 class VirtualWorkitem extends Workitem {
 
@@ -20,6 +19,14 @@ class VirtualWorkitem extends Workitem {
     @Override
     public boolean canSignup() {
         return false;
+    }
+    
+    /**
+     * 
+     * @return always true for this object
+     */
+    public boolean isNew() {
+        return true;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.versionone.common.sdk;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     public boolean isEffortTracking;
-    public Workitem[] workitemTree = {};
+    public List<Workitem> workitemTree = new LinkedList<Workitem>();
 
     private Map<String, PropertyValues> listProperties = new HashMap<String, PropertyValues>();
 
@@ -82,7 +83,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public Workitem[] getWorkitemTree() throws Exception {
+    public List<Workitem> getWorkitemTree() throws Exception {
         return workitemTree;
     }
 

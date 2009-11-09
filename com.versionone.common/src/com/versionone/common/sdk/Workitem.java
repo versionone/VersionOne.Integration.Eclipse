@@ -48,7 +48,7 @@ public class Workitem {
     }
 
     protected final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-    protected final Asset asset;
+    final Asset asset;
     public final Workitem parent;
 
     /**
@@ -74,12 +74,10 @@ public class Workitem {
             if (dataLayer.isAssetSuspended(childAsset)) {
                 continue;
             }
-
             if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.isShowed(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }
         }
-        ((ArrayList<Workitem>) children).trimToSize();
     }
 
     public String getTypePrefix() {
@@ -87,9 +85,6 @@ public class Workitem {
     }
 
     public String getId() {
-        if (asset == null) {// for testing purposes ONLY
-            return "NULL";
-        }
         return asset.getOid().getMomentless().getToken();
     }
 

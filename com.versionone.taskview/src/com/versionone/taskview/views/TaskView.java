@@ -1,6 +1,7 @@
 package com.versionone.taskview.views;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -286,8 +287,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     public boolean loadDataToTable() {
         try {
-            final Workitem[] workitems = ApiDataLayer.getInstance().getWorkitemTree();
-            viewer.setInput(workitems);
+            final List<Workitem> workitems = ApiDataLayer.getInstance().getWorkitemTree();
+            final Workitem[] array = new Workitem[workitems.size()];
+            workitems.toArray(array);
+            viewer.setInput(array);
             updateProperty();
             return true;
         } catch (Exception e) {

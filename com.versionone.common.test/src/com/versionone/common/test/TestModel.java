@@ -69,28 +69,28 @@ public class TestModel {
     @Test
     public void testGetUsersTask() throws Exception {
         datalayer.setShowAllTasks(false);
-        Workitem[] allWorkItem = datalayer.getWorkitemTree();
-        Assert.assertEquals(7, allWorkItem.length);
-        validateTask(allWorkItem[0], "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null,
+        List<Workitem> allWorkItem = datalayer.getWorkitemTree();
+        Assert.assertEquals(7, allWorkItem.size());
+        validateTask(allWorkItem.get(0), "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null,
                 Workitem.STORY_PREFIX);
-        validateTask(allWorkItem[2], "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
+        validateTask(allWorkItem.get(2), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
                 Workitem.DEFECT_PREFIX);
-        validateTask(allWorkItem[1].children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00", "",
+        validateTask(allWorkItem.get(1).children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00", "",
                 "FAST LAND 2", Workitem.TEST_PREFIX);
-        validateTask(allWorkItem[0].children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null, "9,30",
+        validateTask(allWorkItem.get(0).children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null, "9,30",
                 "In Progress", "FAST LAND 1", Workitem.TASK_PREFIX);
     }
 
     @Test
     public void testGetAllTasks() throws Exception {
         datalayer.setShowAllTasks(true);
-        Workitem[] allWorkItem = datalayer.getWorkitemTree();
-        Assert.assertEquals(11, allWorkItem.length);
-        validateTask(allWorkItem[1].children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00",
+        List<Workitem> allWorkItem = datalayer.getWorkitemTree();
+        Assert.assertEquals(11, allWorkItem.size());
+        validateTask(allWorkItem.get(1).children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00",
                 "Completed", "FAST LAND 1", Workitem.TASK_PREFIX);
-        validateTask(allWorkItem[6], "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
+        validateTask(allWorkItem.get(6), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
                 Workitem.DEFECT_PREFIX);
-        validateTask(allWorkItem[5].children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null, "0,00",
+        validateTask(allWorkItem.get(5).children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null, "0,00",
                 "Passed", "STORY33.db", Workitem.TEST_PREFIX);
     }
 
@@ -111,7 +111,7 @@ public class TestModel {
 
     @Test
     public void testSetDescription() throws Exception {
-        final Workitem defect0 = datalayer.getWorkitemTree()[0];
+        final Workitem defect0 = datalayer.getWorkitemTree().get(0);
 
         defect0.setProperty(Workitem.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
         Assert.assertEquals("<br>test <b>new test</b>", defect0.getProperty(Workitem.DESCRIPTION_PROPERTY));
@@ -128,7 +128,7 @@ public class TestModel {
      */
     @Test
     public void testSetToDo() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree()[0], Workitem.TODO_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(0), Workitem.TODO_PROPERTY);
     }
 
     /**
@@ -136,7 +136,7 @@ public class TestModel {
      */
     @Test
     public void testSetEstimate() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree()[1], Workitem.ESTIMATE_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(1), Workitem.ESTIMATE_PROPERTY);
     }
 
     /**
@@ -144,7 +144,7 @@ public class TestModel {
      */
     @Test
     public void testSetDetailEstimate() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree()[0], Workitem.DETAIL_ESTIMATE_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(0), Workitem.DETAIL_ESTIMATE_PROPERTY);
     }
 
     /**
@@ -152,7 +152,7 @@ public class TestModel {
      */
     @Test
     public void testSetEffort() throws Exception {
-        Workitem workitem = datalayer.getWorkitemTree()[0];
+        Workitem workitem = datalayer.getWorkitemTree().get(0);
         String property = Workitem.EFFORT_PROPERTY;
         workitem.setProperty(property, "0");
         Assert.assertEquals(null, workitem.getProperty(property));
@@ -193,7 +193,7 @@ public class TestModel {
      */
     @Test
     public void testSetStatus() throws Exception {
-        final Workitem defect0 = datalayer.getWorkitemTree()[0];
+        final Workitem defect0 = datalayer.getWorkitemTree().get(0);
         PropertyValues statuses = datalayer.getListPropertyValues(defect0.getTypePrefix(), Workitem.STATUS_PROPERTY);
         PropertyValues types = datalayer.getListPropertyValues(Workitem.STORY_PREFIX, Workitem.TYPE_PROPERTY);
 
@@ -239,7 +239,7 @@ public class TestModel {
 
     @Test
     public void testSetName() throws Exception {
-        final Workitem defect0 = datalayer.getWorkitemTree()[0];
+        final Workitem defect0 = datalayer.getWorkitemTree().get(0);
         defect0.setProperty(Workitem.NAME_PROPERTY, "New Name");
         Assert.assertEquals("New Name", defect0.getProperty(Workitem.NAME_PROPERTY));
         Assert.assertTrue(defect0.isPropertyChanged(Workitem.NAME_PROPERTY));
@@ -256,7 +256,7 @@ public class TestModel {
 
     @Test
     public void testSetStoryOwner() throws Exception {
-        final Workitem defect0 = datalayer.getWorkitemTree()[0];
+        final Workitem defect0 = datalayer.getWorkitemTree().get(0);
 
         PropertyValues owners = (PropertyValues) defect0.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId cat = owners.getValueIdByIndex(0);
@@ -281,7 +281,7 @@ public class TestModel {
 
     @Test
     public void testSetDefectOwner() throws Exception {
-        final Workitem story1 = datalayer.getWorkitemTree()[1];
+        final Workitem story1 = datalayer.getWorkitemTree().get(1);
 
         PropertyValues owners = (PropertyValues) story1.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId adminForRemove = owners.getValueIdByIndex(0);
@@ -297,10 +297,11 @@ public class TestModel {
 
     @Test
     public void testReadonlyProperties() throws Exception {
-        Workitem story1 = datalayer.getWorkitemTree()[1];
+        final List<Workitem> workitems = datalayer.getWorkitemTree();
+        Workitem story1 = workitems.get(1);
         Workitem s1Test0 = story1.children.get(0);
         Workitem s1Task1 = story1.children.get(1);
-        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem defect9 = workitems.get(9);
         Workitem d9Task0 = defect9.children.get(0);
         Workitem d9Test2 = defect9.children.get(2);
 
@@ -318,11 +319,12 @@ public class TestModel {
 
     @Test
     public void testTrackingLevel() throws Exception {
-        EffortTrackingLevel tracking = datalayer.trackingLevel;
-        Workitem story1 = datalayer.getWorkitemTree()[1];
+        final EffortTrackingLevel tracking = datalayer.trackingLevel;
+        final List<Workitem> workitems = datalayer.getWorkitemTree();
+        Workitem story1 = workitems.get(1);
         Workitem s1Test0 = story1.children.get(0);
         Workitem s1Task1 = story1.children.get(1);
-        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem defect9 = workitems.get(9);
         Workitem d9Task0 = defect9.children.get(0);
         Workitem d9Test2 = defect9.children.get(2);
 
@@ -336,11 +338,12 @@ public class TestModel {
 
     @Test
     public void testWorkitemIsMine() throws Exception {
-        Workitem defect0 = datalayer.getWorkitemTree()[0];
-        Workitem story1 = datalayer.getWorkitemTree()[1];
+        final List<Workitem> workitems = datalayer.getWorkitemTree();
+        Workitem defect0 = workitems.get(0);
+        Workitem story1 = workitems.get(1);
         Workitem s1Test0 = story1.children.get(0);
         Workitem s1Task1 = story1.children.get(1);
-        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem defect9 = workitems.get(9);
         Workitem d9Task0 = defect9.children.get(0);
         Workitem d9Test2 = defect9.children.get(2);
 
@@ -355,11 +358,12 @@ public class TestModel {
 
     @Test
     public void testWorkitemCanSignup() throws Exception {
-        Workitem defect0 = datalayer.getWorkitemTree()[0];
-        Workitem story1 = datalayer.getWorkitemTree()[1];
+        final List<Workitem> workitems = datalayer.getWorkitemTree();
+        Workitem defect0 = workitems.get(0);
+        Workitem story1 = workitems.get(1);
         Workitem s1Test0 = story1.children.get(0);
         Workitem s1Task1 = story1.children.get(1);
-        Workitem defect9 = datalayer.getWorkitemTree()[9];
+        Workitem defect9 = workitems.get(9);
         Workitem d9Task0 = defect9.children.get(0);
         Workitem d9Test2 = defect9.children.get(2);
 

@@ -233,7 +233,7 @@ public class ApiDataLayer {
         return type;
     }
 
-    public Workitem[] getWorkitemTree() throws Exception {
+    public List<Workitem> getWorkitemTree() throws Exception {
         checkConnection();
         if (currentProjectId == null) {
             currentProjectId = getDefaultProjectId();
@@ -276,7 +276,7 @@ public class ApiDataLayer {
                 res.add(new Workitem(asset, null));
             }
         }
-        return res.toArray(new Workitem[res.size()]);
+        return res;
     }
 
     /**

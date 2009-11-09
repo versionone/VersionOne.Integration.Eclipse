@@ -29,7 +29,7 @@ class FilterAction extends Action {
     public void run() {
         workitemView.enableTreeAndActions(false);
 
-        ApiDataLayer.getInstance().showAllTasks = !isChecked();
+        ApiDataLayer.getInstance().setShowAllTasks(!isChecked());
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_ONLY_USER_WORKITEMS, !isChecked());
 
         workitemView.enableTreeAndActions(true);

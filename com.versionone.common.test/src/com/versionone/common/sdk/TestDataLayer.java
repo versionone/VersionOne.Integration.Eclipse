@@ -97,7 +97,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public boolean isMine(Asset asset) {
+    public boolean isShowed(Asset asset) {
         return false;
     }
 

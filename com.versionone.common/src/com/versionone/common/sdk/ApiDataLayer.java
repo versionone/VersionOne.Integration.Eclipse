@@ -80,7 +80,7 @@ public class ApiDataLayer {
     private ILocalizer localizer;
 
     private String currentProjectId;
-    public boolean showAllTasks = true;
+    private boolean showAllTasks = true;
 
     protected ApiDataLayer() {
     }
@@ -272,32 +272,30 @@ public class ApiDataLayer {
                 continue;
             }
 
-            if (showAllTasks || isNewOrChanged(asset) || isMine(asset)) {
+            if (isShowed(asset)) {
                 res.add(new Workitem(asset, null));
             }
         }
         return res.toArray(new Workitem[res.size()]);
     }
 
-    
     /**
-     * Determines is it new or edited asset. 
-     * 
-     * @param asset to determine status.
-     * @return true if it is new or created asset; otherwise - false.
+     * Sets visibility for workitems
+     * @param showAllTasks true  - all workitems can be shown
+     *                     false - only changed, new and workitem with current owner can be shown 
      */
-    public boolean isNewOrChanged(Asset asset) {        
-        return asset.hasChanged();
+    public void setShowAllTasks(boolean showAllTasks) {
+        this.showAllTasks = showAllTasks;         
     }
 
     /**
-     * Determines whether specified Asset or it's children owned by current user (memberOid).
+     * Determines whether this Asset can be showed or no. 
      * 
-     * @param asset to determine ownership for.
-     * @return true if user owns the Asset or his children; otherwise - false.
+     * @param asset to determine visibility status.
+     * @return true if Asset can be showed at the moment; otherwise - false.
      */
-    public boolean isMine(Asset asset) {
-        if (asset.hasChanged()) {
+    public boolean isShowed(Asset asset) {
+        if (showAllTasks || asset.hasChanged()) {
             return true;
         }
         
@@ -311,7 +309,7 @@ public class ApiDataLayer {
         }
 
         for (Asset child : asset.getChildren()) {
-            if (isMine(child)) {
+            if (isShowed(child)) {
                 return true;
             }
         }

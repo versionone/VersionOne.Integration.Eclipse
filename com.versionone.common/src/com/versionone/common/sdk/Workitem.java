@@ -75,7 +75,7 @@ public class Workitem {
                 continue;
             }
 
-            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.showAllTasks || dataLayer.isNewOrChanged(childAsset) || dataLayer.isMine(childAsset)) {
+            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.isShowed(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }
         }

@@ -60,7 +60,7 @@ public class Activator extends AbstractUIPlugin {
             Activator.logError(e);
         }
         boolean showAllTask = PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ONLY_USER_WORKITEMS);
-        ApiDataLayer.getInstance().showAllTasks = showAllTask;        
+        ApiDataLayer.getInstance().setShowAllTasks(showAllTask);
     }
 
     /*

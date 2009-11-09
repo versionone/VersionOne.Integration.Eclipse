@@ -68,7 +68,7 @@ public class TestModel {
 
     @Test
     public void testGetUsersTask() throws Exception {
-        datalayer.showAllTasks = false;
+        datalayer.setShowAllTasks(false);
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(7, allWorkItem.length);
         validateTask(allWorkItem[0], "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null,
@@ -83,7 +83,7 @@ public class TestModel {
 
     @Test
     public void testGetAllTasks() throws Exception {
-        datalayer.showAllTasks = true;
+        datalayer.setShowAllTasks(true);
         Workitem[] allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(11, allWorkItem.length);
         validateTask(allWorkItem[1].children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00",

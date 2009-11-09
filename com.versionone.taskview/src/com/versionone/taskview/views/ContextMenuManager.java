@@ -101,9 +101,14 @@ public class ContextMenuManager {
             public void handleEvent(Event e) {
                 Workitem item = view.getCurrentWorkitem();        
                 item = item.parent != null ? item.parent : item;        
-                Workitem newItem = item.createChild(Workitem.TASK_PREFIX);                
-                view.getViewer().refresh();
-                view.getViewer().setSelection(new StructuredSelection(newItem), true);
+                try {
+                    Workitem newItem = item.createChild(Workitem.TASK_PREFIX);                
+                    view.getViewer().refresh();
+                    view.getViewer().setSelection(new StructuredSelection(newItem), true);
+                } catch (DataLayerException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                }
             }
         });
         

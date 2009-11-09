@@ -746,40 +746,41 @@ public class ApiDataLayer {
         return localizer.resolve(key);
     }
 
-    public Workitem createWorkitem(String prefix, Workitem parent) {
-        final Asset asset = new Asset(types.get(prefix));
-        for (AttributeInfo attrInfo : attributesToQuery) {
-            if (attrInfo.prefix == prefix) {
-                setAssetAttribute(asset, attrInfo.attr, null);
+    public Workitem createWorkitem(String prefix, Workitem parent) throws DataLayerException {
+        try {
+            final Asset asset = new Asset(types.get(prefix));
+            for (AttributeInfo attrInfo : attributesToQuery) {
+                if (attrInfo.prefix == prefix) {
+                    setAssetAttribute(asset, attrInfo.attr, null);
+                }
             }
-        }
 
-        if (prefix.equals(Workitem.TEST_PREFIX)) { // TODO if item.isSecondaryWorkitem()
-            setAssetAttribute(asset, "Parent", parent.asset.getOid());
-        } else if (prefix.equals(Workitem.STORY_PREFIX)) { // TODO if item.isPrimaryWorkitem()
-            setAssetAttribute(asset, "Scope", currentProjectId);
+            if (prefix.equals(Workitem.TEST_PREFIX)) { 
+                // TODO if item.isSecondaryWorkitem()
+                setAssetAttribute(asset, "Parent", parent.asset.getOid());
+                parent.asset.getChildren().add(asset);
+            } else if (prefix.equals(Workitem.STORY_PREFIX)) {
+                // TODO if item.isPrimaryWorkitem()
+                setAssetAttribute(asset, "Scope", currentProjectId);
+                //TODO add to allAssets
+            }
+            return new VirtualWorkitem(asset, parent);
+        } catch (MetaException e) {
+            throw new DataLayerException("Cannot create workitem: " + prefix, e);
+        } catch (APIException e) {
+            throw new DataLayerException("Cannot create workitem: " + prefix, e);
         }
-        return new VirtualWorkitem(asset, parent);
     }
 
-    private static boolean setAssetAttribute(final Asset asset, final String attrName, final Object value) {
-        try {
-            final IAssetType type = asset.getAssetType();
-            IAttributeDefinition def = type.getAttributeDefinition(attrName);
-            if (value != null) {
-                asset.setAttributeValue(def, value);
-            } else {
-                asset.ensureAttribute(def);
-            }
-            return true;
-        } catch (MetaException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (APIException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    private static void setAssetAttribute(final Asset asset, final String attrName, final Object value)
+            throws MetaException, APIException {
+        final IAssetType type = asset.getAssetType();
+        IAttributeDefinition def = type.getAttributeDefinition(attrName);
+        if (value != null) {
+            asset.setAttributeValue(def, value);
+        } else {
+            asset.ensureAttribute(def);
         }
-        return false;
     }
     
     private LinkedList<String> getRequiredFields(String assetType) throws DataLayerException {

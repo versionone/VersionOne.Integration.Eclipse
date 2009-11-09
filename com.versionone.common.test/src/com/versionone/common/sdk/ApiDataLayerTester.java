@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,7 +18,19 @@ public class ApiDataLayerTester {
 
     @Ignore("This test is integrational. It works with V1 server.")
     @Test
-    public void testVirtualWorkitem() throws DataLayerException {
+    public void testCreateAndGetWorkitem() throws Exception {
+        final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", "Task", false);
+        data.addProperty("Owners", "Task", true);
+        data.addProperty("Status", "Task", true);
+        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        final Workitem child = data.getWorkitemTree().get(0).createChild(Workitem.TASK_PREFIX);
+        assertTrue(data.getWorkitemTree().get(0).children.contains(child));
+    }
+    
+    @Ignore("This test is integrational. It works with V1 server.")
+    @Test
+    public void testCreateWorkitem() throws DataLayerException {
         final ApiDataLayer data = ApiDataLayer.getInstance();
         data.addProperty("Name", "Task", false);
         data.addProperty("Owners", "Task", true);

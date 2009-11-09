@@ -390,7 +390,7 @@ public class Workitem {
         dataLayer.revertAsset(asset);
     }
     
-    public Workitem createChild(String prefix) {
+    public Workitem createChild(String prefix) throws DataLayerException {
         return dataLayer.createWorkitem(prefix, this);
     }
 

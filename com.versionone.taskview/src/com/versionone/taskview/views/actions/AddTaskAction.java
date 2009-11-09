@@ -4,6 +4,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.TaskView;
@@ -26,10 +27,13 @@ class AddTaskAction extends Action {
     public void run() {
         Workitem item = workitemView.getCurrentWorkitem();        
         item = item.parent != null ? item.parent : item;        
-        Workitem newItem = item.createChild(Workitem.TASK_PREFIX);
-        
-        treeViewer.refresh();
-        treeViewer.setSelection(new StructuredSelection(newItem), true);
-
+        try {
+            Workitem newItem = item.createChild(Workitem.TASK_PREFIX);
+            treeViewer.refresh();
+            treeViewer.setSelection(new StructuredSelection(newItem), true);
+        } catch (DataLayerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

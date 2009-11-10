@@ -811,8 +811,6 @@ public class ApiDataLayer {
         QueryResult result = null;
         try {
             result = services.retrieve(query);
-        } catch (ConnectionException e) {
-            throw warning("Cannot get meta data for " + assetType, e);
         } catch (APIException e) {
             throw warning("Cannot get meta data for " + assetType, e);
         } catch (OidException e) {
@@ -820,13 +818,12 @@ public class ApiDataLayer {
         } catch (Exception e) {
             throw warning("Cannot get meta data for " + assetType, e);
         }
-        System.out.println("\n\n\nCustom Text Attributes available to " + assetType + " Are:");
+
         for (Asset asset : result.getAssets()) {
             try {
                 if (Boolean.parseBoolean(asset.getAttribute(isRequiredAttributeDef).getValue().toString())) {
                     fileds.add(asset.getAttribute(nameAttributeDef).getValue().toString());
-                    System.out.println(asset.getAttribute(nameAttributeDef).getValue().toString() + " - " + asset.getAttribute(isReadOnlyAttributeDef).getValue().toString());
-                }                
+                }
             } catch (APIException e) {
                 throw warning("Cannot get meta data for " + assetType, e);
             } catch (MetaException e) {
@@ -835,7 +832,7 @@ public class ApiDataLayer {
                 throw warning("Cannot get meta data for " + assetType, e);
             }
         }
-        
+
         return fileds;
     }
     

@@ -151,7 +151,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         	}
 			workitem.close();
 			if(openingViewer != null) {
-				openingViewer.refreshViewer();
+				openingViewer.refreshViewer(null);
 			}
 		} catch (DataLayerException e) {
 			Activator.logError("Failed to close workitem", e);

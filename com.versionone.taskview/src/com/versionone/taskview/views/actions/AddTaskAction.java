@@ -1,8 +1,8 @@
 package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
@@ -12,11 +12,10 @@ import com.versionone.taskview.views.TaskView;
 class AddTaskAction extends Action {
 
     private final TaskView workitemView;
-    private final TreeViewer treeViewer;
 
-    public AddTaskAction(TaskView workItemView) {
+
+    AddTaskAction(TaskView workItemView) {
         this.workitemView = workItemView;
-        this.treeViewer = workItemView.getViewer();
 
         setText("Add new task");
         setToolTipText("Add new task");
@@ -29,11 +28,12 @@ class AddTaskAction extends Action {
         item = item.parent != null ? item.parent : item;        
         try {
             Workitem newItem = item.createChild(Workitem.TASK_PREFIX);
-            treeViewer.refresh();
-            treeViewer.setSelection(new StructuredSelection(newItem), true);
+            workitemView.refreshViewer(new StructuredSelection(newItem));
+            //treeViewer.setSelection(new StructuredSelection(newItem), true);
         } catch (DataLayerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Activator.logError(e);
+            MessageDialog.openError(workitemView.getViewer().getControl().getShell(), "Task View Error",
+                    "Error during addition new task. Check Error Log for more details.");
         }
     }
 }

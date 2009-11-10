@@ -11,10 +11,9 @@ import com.versionone.taskview.views.TaskView;
 class FilterAction extends Action {
 
     private final static String MESSAGE = "Show only my workitems";
-
     private final TaskView workitemView;
 
-    public FilterAction(TaskView workItemView) {
+    FilterAction(TaskView workItemView) {
         super(MESSAGE, AS_CHECK_BOX);
         this.workitemView = workItemView;
 

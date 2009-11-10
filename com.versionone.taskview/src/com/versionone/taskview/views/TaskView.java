@@ -1,8 +1,8 @@
 package com.versionone.taskview.views;
 
-import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -12,15 +12,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
@@ -28,7 +22,6 @@ import org.eclipse.ui.part.ViewPart;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
@@ -86,7 +79,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         }
 
         createActions();
-        createContextMenu(viewer);
+        createContextMenu();
         setProviders();
         getSite().setSelectionProvider(selectionProvider);
     }
@@ -111,7 +104,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     }
 
-    boolean validRowSelected() {
+    public boolean validRowSelected() {
         return !viewer.getSelection().isEmpty();
     }
 
@@ -130,13 +123,15 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create context menu, assign actions, store items in a collection to
      * manage visibility.
      */
-    private void createContextMenu(TreeViewer viewer) {
+    private void createContextMenu() {
         final Control control = viewer.getControl();
-        final Shell shell = control.getShell();
-        final Menu menu = new Menu(shell, SWT.POP_UP);
-        ContextMenuManager contextMenuManager = new ContextMenuManager(shell, menu, this);
-        contextMenuManager.init(control);        
+        final MenuManager menuManager = new MenuManager();
+        final Menu menu = menuManager.createContextMenu(control);
+        menuManager.setRemoveAllWhenShown(true);
+        menuManager.addMenuListener(actionsManager);
+        control.setMenu(menu);        
     }
+
 
     protected void updateDescription(Workitem currentWorkitem, String value) {
         currentWorkitem.setProperty(Workitem.DESCRIPTION_PROPERTY, value);
@@ -146,11 +141,17 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     /**
      * Refresh viewer, causing it to re-read data from model and remove possibly
      * non-relevant items.
+     * 
+     * @param selection select element after refresh. null - no selection
      */
-    public void refreshViewer() {
+
+    public void refreshViewer(IStructuredSelection selection) {
         viewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         loadDataToTable();
         viewer.refresh();
+        if (selection != null) {
+            viewer.setSelection(selection, true);
+        }
     }
 
     /**
@@ -249,7 +250,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create the action menus and add them to Action bars and pull down menu.
      */
     private void createActions() {
-        actionsManager.init(this, viewer, getSite());
+        actionsManager.init(this, getSite());
 
         IActionBars bars = getViewSite().getActionBars();
         actionsManager.addActions(bars.getMenuManager());

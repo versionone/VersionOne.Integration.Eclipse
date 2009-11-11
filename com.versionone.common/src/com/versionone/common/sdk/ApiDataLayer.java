@@ -80,7 +80,8 @@ public class ApiDataLayer {
     private IServices services;
     private ILocalizer localizer;
     
-    private HashMap<String,LinkedList<String>> requiredFields = new HashMap<String,LinkedList<String>>();
+    private HashMap<String,LinkedList<RequiredFieldsDTO>> requiredFieldsList;
+    private RequiredFieldsValidator reqFileds; 
 
     private String currentProjectId;
     private boolean showAllTasks = true;
@@ -161,11 +162,9 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             updateCurrentProjectId();
-            
-            requiredFields.put(Workitem.TASK_PREFIX, getRequiredFields(Workitem.TASK_PREFIX));
-            requiredFields.put(Workitem.DEFECT_PREFIX, getRequiredFields(Workitem.DEFECT_PREFIX));
-            requiredFields.put(Workitem.STORY_PREFIX, getRequiredFields(Workitem.STORY_PREFIX));
-            requiredFields.put(Workitem.TEST_PREFIX, getRequiredFields(Workitem.TEST_PREFIX));
+            reqFileds = new RequiredFieldsValidator(metaModel, services, this);
+            requiredFieldsList = reqFileds.gatherRequiredFields();
+            //reqFileds.addRequiredListFields(listPropertyValues);
             
             return;
         } catch (MetaException e) {
@@ -394,6 +393,21 @@ public class ApiDataLayer {
                 }
             }
         }
+        if (requiredFieldsList.get(typePrefix) == null) {
+            return;
+        }
+        
+        for (RequiredFieldsDTO field : requiredFieldsList.get(typePrefix)) {
+            try {
+                IAttributeDefinition def = types.get(typePrefix).getAttributeDefinition(field.name);
+                if (!alreadyUsedDefinition.contains(def)) {
+                    query.getSelection().add(def);
+                    alreadyUsedDefinition.add(def);
+                }
+            } catch (MetaException e) {
+                warning("Wrong attribute: " + field.name, e);
+            }            
+        }
     }
 
     private void addSelection(Query query, String typePrefix, boolean clearDefinitions) throws DataLayerException {
@@ -434,22 +448,43 @@ public class ApiDataLayer {
         return res;
     }
 
-    private static String resolvePropertyKey(String propertyAlias) {
-        if (propertyAlias.equals("DefectStatus")) {
-            return "StoryStatus";
-        } else if (propertyAlias.equals("DefectSource")) {
-            return "StorySource";
-        } else if (propertyAlias.equals("ScopeBuildProjects")) {
-            return "BuildProject";
-        } else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners")
-                || propertyAlias.equals("DefectOwners") || propertyAlias.equals("TestOwners")) {
-            return "Member";
+    static String resolvePropertyKey(String propertyAlias) {
+        
+        final Map<String, String> keys = new HashMap<String, String>();
+        
+        keys.put("DefectStatus", "StoryStatus");
+        keys.put("DefectSource", "StorySource");
+        keys.put("ScopeBuildProjects", "BuildProject");
+        keys.put("TaskOwners", "Member");
+        keys.put("StoryOwners", "Member");
+        keys.put("DefectOwners", "Member");
+        keys.put("TestOwners", "Member");
+        keys.put("TaskScope", "Scope");
+        keys.put("StoryScope", "Scope");
+        keys.put("DefectScope", "Scope");
+        keys.put("TestScope", "Scope");
+        
+        //if (propertyAlias.equals("DefectStatus")) {
+        //    return "StoryStatus";
+        //} else if (propertyAlias.equals("DefectSource")) {
+        //    return "StorySource";
+        //} else if (propertyAlias.equals("ScopeBuildProjects")) {
+        //    return "BuildProject";
+        //} else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners")
+        //        || propertyAlias.equals("DefectOwners") || propertyAlias.equals("TestOwners")) {
+        //    return "Member";
+        //} else if (propertyAlias.equals("TaskScope") || propertyAlias.equals("StoryScope")
+        //        || propertyAlias.equals("DefectScope") || propertyAlias.equals("TestScope")) {
+        //    return "Scope";
+        //}
+        if (keys.containsKey(propertyAlias)) {
+            return keys.get(propertyAlias);
         }
 
         return propertyAlias;
     }
 
-    private PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException,
+    PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException,
             OidException, MetaException {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
@@ -534,8 +569,22 @@ public class ApiDataLayer {
 
     public void commitChanges() throws DataLayerException {
         checkConnection();
+        
+        List<Asset> assets = Arrays.asList(assetList.getAssets());
+        Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
         try {
-            commitAssetsRecursively(Arrays.asList(assetList.getAssets()));
+            requiredData = reqFileds.validateRequiredFields(assets);
+
+            if (requiredData.size() > 0) {
+                String message = reqFileds.createErrorMessage(requiredData);
+                throw new DataLayerException("\n" + message);
+            }       
+        } catch (APIException e) {
+            throw warning("Cannot validate required fields.", e);
+        }        
+        
+        try {
+            commitAssetsRecursively(assets);
         } catch (V1Exception e) {
             throw warning("Cannot commit changes.", e);
         }
@@ -551,25 +600,6 @@ public class ApiDataLayer {
             commitAsset(asset);
             commitAssetsRecursively(asset.getChildren());
         }
-    }
-
-    private boolean isAllRequiredFieldsFilled(Asset asset) throws DataLayerException {
-        final String type = asset.getAssetType().getToken();
-        final IAssetType attributeDefinitionAssetType = metaModel.getAssetType("AttributeDefinition");
-        try {
-            for (String field : requiredFields.get(type)) {
-                final IAttributeDefinition def = attributeDefinitionAssetType.getAttributeDefinition(field);
-
-                if (asset.getAttribute(def).getValue() == null) {
-                    return false;
-                }
-            }
-        } catch (APIException e) {
-            throw warning("Can get attribute definition", e);
-        } catch (MetaException e) {
-            throw warning("Can get attribute definition", e);
-        }
-        return true;
     }
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
@@ -781,59 +811,6 @@ public class ApiDataLayer {
         } else {
             asset.ensureAttribute(def);
         }
-    }
-    
-    private LinkedList<String> getRequiredFields(String assetType) throws DataLayerException {
-        final LinkedList<String> fileds = new LinkedList<String>();
-        final IAssetType attributeDefinitionAssetType = metaModel.getAssetType("AttributeDefinition");
-        
-
-        final IAttributeDefinition nameAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("Name");
-        final IAttributeDefinition isRequiredAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("IsRequired");
-        final IAttributeDefinition isReadOnlyAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("IsReadOnly");
-        
-        
-        final IAttributeDefinition assetNameAttributeDef = attributeDefinitionAssetType
-                .getAttributeDefinition("Asset.AssetTypesMeAndDown.Name");
-
-        Query query = new Query(attributeDefinitionAssetType);
-        query.getSelection().add(nameAttributeDef);
-        query.getSelection().add(isRequiredAttributeDef);
-        query.getSelection().add(isReadOnlyAttributeDef);
-
-        FilterTerm assetTypeTerm = new FilterTerm(assetNameAttributeDef);
-        assetTypeTerm.Equal(assetType);
-        FilterTerm assetIsReadOnlyTerm = new FilterTerm(isReadOnlyAttributeDef);
-        assetIsReadOnlyTerm.Equal(false);
-
-        query.setFilter(new AndFilterTerm(new IFilterTerm[] { assetTypeTerm, assetIsReadOnlyTerm}));
-
-        QueryResult result = null;
-        try {
-            result = services.retrieve(query);
-        } catch (APIException e) {
-            throw warning("Cannot get meta data for " + assetType, e);
-        } catch (OidException e) {
-            throw warning("Cannot get meta data for " + assetType, e);
-        } catch (Exception e) {
-            throw warning("Cannot get meta data for " + assetType, e);
-        }
-
-        for (Asset asset : result.getAssets()) {
-            try {
-                if (Boolean.parseBoolean(asset.getAttribute(isRequiredAttributeDef).getValue().toString())) {
-                    fileds.add(asset.getAttribute(nameAttributeDef).getValue().toString());
-                }
-            } catch (APIException e) {
-                throw warning("Cannot get meta data for " + assetType, e);
-            } catch (MetaException e) {
-                throw warning("Cannot get meta data for " + assetType, e);
-            } catch (Exception e) {
-                throw warning("Cannot get meta data for " + assetType, e);
-            }
-        }
-
-        return fileds;
     }
     
 }

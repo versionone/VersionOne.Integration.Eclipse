@@ -110,6 +110,7 @@ public class ApiDataLayer {
         testConnection = isConnected = true;
         memberOid = this.services.getLoggedIn();
         listPropertyValues = getListPropertyValues();
+        reqFileds = new RequiredFieldsValidator(this.metaModel, this.services);
     }
 
     public static ApiDataLayer getInstance() {

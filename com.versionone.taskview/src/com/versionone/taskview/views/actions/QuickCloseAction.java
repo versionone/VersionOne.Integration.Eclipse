@@ -16,14 +16,15 @@ class QuickCloseAction extends Action {
         this.view = workItemView; 
         
         setText("Quick close");
-        setToolTipText("Quick close");                
+        setToolTipText("Quick close");
     }
     
+    @Override
     public void run() {
         try {
             Workitem item = view.getCurrentWorkitem();
             if (item != null) {
-                item.quickClose();                        
+                item.quickClose();
                 view.refreshViewer(null);
             }
         } catch (DataLayerException ex) {

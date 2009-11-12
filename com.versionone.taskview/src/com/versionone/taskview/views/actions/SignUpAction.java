@@ -2,7 +2,6 @@ package com.versionone.taskview.views.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Event;
 
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
@@ -17,10 +16,11 @@ class SignUpAction extends Action {
         this.view = workItemView; 
         
         setText("Signup");
-        setToolTipText("Signup");                
+        setToolTipText("Signup");
     }
     
-    public void run(Event e) {
+    @Override
+    public void run() {
         try {
             Workitem item = view.getCurrentWorkitem();
             if (item != null) {

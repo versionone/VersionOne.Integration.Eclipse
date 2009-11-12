@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +79,6 @@ public class ApiDataLayer {
     private IServices services;
     private ILocalizer localizer;
     
-    private HashMap<String,LinkedList<RequiredFieldsDTO>> requiredFieldsList;
     private RequiredFieldsValidator reqFileds; 
 
     private String currentProjectId;
@@ -162,9 +160,8 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             updateCurrentProjectId();
-            reqFileds = new RequiredFieldsValidator(metaModel, services, this);
-            requiredFieldsList = reqFileds.gatherRequiredFields();
-            //reqFileds.addRequiredListFields(listPropertyValues);
+            reqFileds = new RequiredFieldsValidator(metaModel, services);
+            reqFileds.init();
             
             return;
         } catch (MetaException e) {
@@ -393,11 +390,11 @@ public class ApiDataLayer {
                 }
             }
         }
-        if (requiredFieldsList.get(typePrefix) == null) {
+        if (reqFileds.getFields(typePrefix) == null) {
             return;
         }
         
-        for (RequiredFieldsDTO field : requiredFieldsList.get(typePrefix)) {
+        for (RequiredFieldsDTO field : reqFileds.getFields(typePrefix)) {
             try {
                 IAttributeDefinition def = types.get(typePrefix).getAttributeDefinition(field.name);
                 if (!alreadyUsedDefinition.contains(def)) {
@@ -577,7 +574,7 @@ public class ApiDataLayer {
 
             if (requiredData.size() > 0) {
                 String message = reqFileds.createErrorMessage(requiredData);
-                throw new DataLayerException("\n" + message);
+                throw new DataLayerException("Some fields weren't filled", message);
             }       
         } catch (APIException e) {
             throw warning("Cannot validate required fields.", e);

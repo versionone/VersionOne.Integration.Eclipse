@@ -13,9 +13,10 @@ class CloseAction extends Action {
         this.view = workItemView;
 
         setText("Close");
-        setToolTipText("Close");                
+        setToolTipText("Close");
     }
 
+    @Override
     public void run() {
         CloseWorkitemDialog closeDialog = new CloseWorkitemDialog(view.getViewer().getControl().getShell(), view.getCurrentWorkitem(), view);
         closeDialog.setBlockOnOpen(true);

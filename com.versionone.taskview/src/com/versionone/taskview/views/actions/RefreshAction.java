@@ -17,6 +17,7 @@ class RefreshAction extends Action {
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.REFRESH_IMAGE_ID));
     }
 
+    @Override
     public void run() {
         workitemView.enableTreeAndActions(false);
         try {// connect not throws -> delete try

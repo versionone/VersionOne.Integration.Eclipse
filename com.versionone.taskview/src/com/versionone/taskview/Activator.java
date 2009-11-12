@@ -159,6 +159,10 @@ public class Activator extends AbstractUIPlugin {
     public static void logInfo(String message) {
         log(IStatus.INFO, IStatus.OK, message, null);
     }
+    
+    public static void logWarning(String message) {
+        log(IStatus.WARNING, IStatus.OK, message, null);
+    }
 
     private static void log(int severity, int code, String message, Throwable t) {
         Activator.getDefault().getLog().log(createStatus(severity, code, message, t));

@@ -5,7 +5,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.DataLayerException;
 import com.versionone.taskview.Activator;
+import com.versionone.taskview.views.ErrorMessageDialog;
 import com.versionone.taskview.views.TaskView;
 
 class SaveAction extends Action {
@@ -24,6 +26,7 @@ class SaveAction extends Action {
         setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Activator.SAVE_IMAGE_ID));
     }
 
+    @Override
     public void run() {
         workitemView.getActionsManager().enableAction(false, false);
         if (treeViewer.isCellEditorActive()) {
@@ -33,6 +36,18 @@ class SaveAction extends Action {
         try {
             DATA.commitChanges();
             Activator.connect();
+        } catch(DataLayerException e) {
+            
+            if (e.getMessageToDisplay() != null) {
+                Activator.logWarning(e.getMessageToDisplay());
+                ErrorMessageDialog errorMessage = new ErrorMessageDialog(treeViewer.getTree().getShell(), e.getMessageToDisplay());
+                errorMessage.setBlockOnOpen(true);
+                errorMessage.open();
+            } else {
+                Activator.logError(e);
+                workitemView.showMessage("Error saving task. Check Error log for more information.");                
+            }
+            
         } catch (Exception e) {
             Activator.logError(e);
             workitemView.showMessage("Error saving task. Check Error log for more information.");

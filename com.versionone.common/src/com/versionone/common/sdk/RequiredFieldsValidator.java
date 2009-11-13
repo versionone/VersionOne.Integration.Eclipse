@@ -24,7 +24,7 @@ class RequiredFieldsValidator {
     
     private final IMetaModel metaModel;
     private final IServices services;
-    private final HashMap<String, LinkedList<RequiredFieldsDTO>> requiredFieldsList = new HashMap<String, LinkedList<RequiredFieldsDTO>>();
+    private final Map<String, List<RequiredFieldsDTO>> requiredFieldsList = new HashMap<String, List<RequiredFieldsDTO>>();
     
     
     RequiredFieldsValidator(IMetaModel metaModel, IServices services) {
@@ -32,8 +32,8 @@ class RequiredFieldsValidator {
         this.services = services;
     }
 
-    private LinkedList<RequiredFieldsDTO> getRequiredFields(String assetType) throws DataLayerException {
-        final LinkedList<RequiredFieldsDTO> fields = new LinkedList<RequiredFieldsDTO>();
+    private List<RequiredFieldsDTO> getRequiredFields(String assetType) throws DataLayerException {
+        final List<RequiredFieldsDTO> fields = new LinkedList<RequiredFieldsDTO>();
         final IAssetType attributeDefinitionAssetType = metaModel.getAssetType("AttributeDefinition");                
         final IAttributeDefinition nameAttributeDef = attributeDefinitionAssetType.getAttributeDefinition("Name");        
         final IAttributeDefinition assetNameAttributeDef = attributeDefinitionAssetType
@@ -92,6 +92,9 @@ class RequiredFieldsValidator {
     List<RequiredFieldsDTO> getUnfilledRequiredFields(Asset asset) throws DataLayerException, APIException {
         List<RequiredFieldsDTO> unfilledFields = new ArrayList<RequiredFieldsDTO>();
         final String type = asset.getAssetType().getToken();
+        if (!requiredFieldsList.containsKey(type)) {
+            return unfilledFields;
+        }
 
         for (RequiredFieldsDTO field : requiredFieldsList.get(type)) {
             String fullName = type + "." + field.name;
@@ -119,7 +122,7 @@ class RequiredFieldsValidator {
         return (attribute.getDefinition().isMultiValue() && attribute.getValues().length < 1);
     }
 
-    public HashMap<String, LinkedList<RequiredFieldsDTO>> init() throws DataLayerException {        
+    public Map<String, List<RequiredFieldsDTO>> init() throws DataLayerException {        
         requiredFieldsList.put(Workitem.TASK_PREFIX, getRequiredFields(Workitem.TASK_PREFIX));
         requiredFieldsList.put(Workitem.DEFECT_PREFIX, getRequiredFields(Workitem.DEFECT_PREFIX));
         requiredFieldsList.put(Workitem.STORY_PREFIX, getRequiredFields(Workitem.STORY_PREFIX));
@@ -136,18 +139,27 @@ class RequiredFieldsValidator {
             final String assetDisplayName = apiDataLayer.localizerResolve(asset.getAssetType().getDisplayName());
             final Attribute idAttribute = asset.getAttributes().get(type + ".Number");
             final String id = idAttribute != null ? idAttribute.getValue().toString() : "New Items";
-            message.append("The following fields are not filled for the ").append(id).append(" ").append(assetDisplayName).append("\n");
-            
-            for (RequiredFieldsDTO field : requiredData.get(asset)) {
-                final String fieldDisplayName = apiDataLayer.localizerResolve(field.displayName);
-                message.append("\t").append(fieldDisplayName).append("\n");                                     
-            }
+
+            message.append("The following fields are not filled for the ").append(id).append(" ").append(assetDisplayName).append(":");
+            message.append(getMessageOfUnfilledFieldsList(requiredData.get(asset), "\n\t", "\n\t")).append("\n");
         }
         
         return message.toString();
     }
+    
+    public String getMessageOfUnfilledFieldsList(List<RequiredFieldsDTO> unfilledFields, String startWith, String delimiter) {
+        StringBuilder message = new StringBuilder(startWith);
+        ApiDataLayer dataLayer = ApiDataLayer.getInstance();
 
-    public LinkedList<RequiredFieldsDTO> getFields(String typePrefix) {
+        for (RequiredFieldsDTO field : unfilledFields) {
+                String fieldDisplayName = dataLayer.localizerResolve(field.displayName);
+                message.append(fieldDisplayName).append(delimiter);
+        }
+        message.delete(message.length() - delimiter.length(), message.length());
+        return message.toString();
+}
+
+    public List<RequiredFieldsDTO> getFields(String typePrefix) {
         return requiredFieldsList.get(typePrefix);
     }   
 }

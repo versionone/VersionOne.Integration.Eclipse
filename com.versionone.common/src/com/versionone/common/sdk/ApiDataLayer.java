@@ -575,7 +575,7 @@ public class ApiDataLayer {
 
             if (requiredData.size() > 0) {
                 String message = reqFileds.createErrorMessage(requiredData);
-                throw new DataLayerException("Some fields weren't filled", message);
+                throw new ValidatorException(message);
             }       
         } catch (APIException e) {
             throw warning("Cannot validate required fields.", e);

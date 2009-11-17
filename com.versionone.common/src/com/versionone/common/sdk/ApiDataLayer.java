@@ -772,18 +772,11 @@ public class ApiDataLayer {
      */
     public Workitem createWorkitem(WorkitemType type, Workitem parent) throws DataLayerException {
         try {
-            if (!types.containsKey(type)) {
-                throw new IllegalArgumentException("Undefined prefix: " + type);
+            if (!type.isWorkitem()) {
+                throw new IllegalArgumentException("Can only create Workitems, " +
+                                "but received: " + type + " for parent: " + parent.getType());
             }
             final Asset asset = new Asset(types.get(type));
-            if (!isAWorkitem(asset) || !isAWorkitem(parent.asset)) {
-                throw new IllegalArgumentException("Can only create Workitems, " +
-                		"but received: " + type + " for parent: " + parent.getType());
-            }
-            if (isAPrimaryWorkitem(asset) == isAPrimaryWorkitem(parent.asset)) {
-                throw new IllegalArgumentException("Cannot create " + type + 
-                        " as children of " + parent.getType());
-            }
             for (AttributeInfo attrInfo : attributesToQuery) {
                 if (attrInfo.type == type) {
                     setAssetAttribute(asset, attrInfo.attr, null);
@@ -791,10 +784,18 @@ public class ApiDataLayer {
             }
 
             final Workitem item = new Workitem(asset, parent);
-            if (isAPrimaryWorkitem(asset)) {
+            if (type.isPrimary()) {
+                if (parent != null){
+                    throw new IllegalArgumentException("Cannot create " + type + 
+                            " as children of " + parent.getType());
+                }
                 setAssetAttribute(asset, "Scope", currentProjectId);
                 // TODO add to assetList
             } else { // Secondary
+                if (parent == null || parent.getType().isSecondary()){
+                    throw new IllegalArgumentException("Cannot create " + type + 
+                            " as children of " + parent);
+                }
                 setAssetAttribute(asset, "Parent", parent.asset.getOid());
                 parent.addChildren(item);
             }
@@ -805,14 +806,6 @@ public class ApiDataLayer {
         } catch (APIException e) {
             throw new DataLayerException("Cannot create workitem: " + type, e);
         }
-    }
-
-    boolean isAWorkitem(Asset asset) {
-        return asset.getAssetType().isA(workitemType);
-    }
-    
-    boolean isAPrimaryWorkitem(Asset asset) {
-        return asset.getAssetType().isA(primaryWorkitemType);
     }
 
     private static void setAssetAttribute(final Asset asset, final String attrName, final Object value)

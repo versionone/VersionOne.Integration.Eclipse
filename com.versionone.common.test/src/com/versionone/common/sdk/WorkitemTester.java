@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * 
  * @author rozhnev
  */
-public class WorkitemTester implements IntegrationalTest {
+public class WorkitemTester {
 
     @Test
     public void StoryConstructorTest() {
@@ -50,52 +50,5 @@ public class WorkitemTester implements IntegrationalTest {
         Assert.assertEquals(item1, item11.parent);
         Assert.assertTrue(item1.children.contains(item11));
         Assert.assertEquals(0, item11.children.size());
-    }
-
-    @Ignore("Intergational test")
-    @Test
-    public void testCreateChild() throws Exception {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", Task, false);
-        data.addProperty("Owners", Task, true);
-        data.addProperty("Status", Task, true);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        Workitem story = data.getWorkitemTree().get(0);
-        final Workitem test = story.createChild(Test);
-        assertTrue(story.children.contains(test));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-        final Workitem task = story.createChild(Task);
-        assertTrue(story.children.contains(task));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-
-        // Retrieve new Workitem tree
-        story = data.getWorkitemTree().get(0);
-        assertTrue(story.children.contains(test));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-        assertTrue(story.children.contains(task));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-
-        try {
-            story.createChild(Story);
-            fail("Story allow to create child story");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild(Defect);
-            fail("Story allow to create child defect");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild(Scope);
-            fail("Story allow to create child project");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
     }
 }

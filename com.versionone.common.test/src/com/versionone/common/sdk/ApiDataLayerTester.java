@@ -8,11 +8,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import static com.versionone.common.sdk.WorkitemType.Defect;
+import static com.versionone.common.sdk.WorkitemType.Scope;
+import static com.versionone.common.sdk.WorkitemType.Story;
 import static com.versionone.common.sdk.WorkitemType.Task;
+import static com.versionone.common.sdk.WorkitemType.Test;
 
 public class ApiDataLayerTester implements IntegrationalTest {
 
-    @Ignore("This test is integrational. It works with V1 server.")
+//    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testCreateAndGetWorkitem() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
@@ -64,5 +68,52 @@ public class ApiDataLayerTester implements IntegrationalTest {
 
         Workitem story2 = data.getWorkitemTree().get(0);
         assertTrue(story2.children.contains(task));
+    }
+    
+//    @Ignore("Intergational test")
+    @Test
+    public void testCreateChild() throws Exception {
+        final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", Task, false);
+        data.addProperty("Owners", Task, true);
+        data.addProperty("Status", Task, true);
+        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        Workitem story = data.getWorkitemTree().get(0);
+        final Workitem test = story.createChild(Test);
+        assertTrue(story.children.contains(test));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
+        final Workitem task = story.createChild(Task);
+        assertTrue(story.children.contains(task));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
+
+        // Retrieve new Workitem tree
+        story = data.getWorkitemTree().get(0);
+        assertTrue(story.children.contains(test));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
+        assertTrue(story.children.contains(task));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
+
+        try {
+            story.createChild(Story);
+            fail("Story allow to create child story");
+        } catch (IllegalArgumentException e) {
+            // Do nothing
+        }
+        try {
+            story.createChild(Defect);
+            fail("Story allow to create child defect");
+        } catch (IllegalArgumentException e) {
+            // Do nothing
+        }
+        try {
+            story.createChild(Scope);
+            fail("Story allow to create child project");
+        } catch (IllegalArgumentException e) {
+            // Do nothing
+        }
     }
 }

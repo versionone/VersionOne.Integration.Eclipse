@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.Activator;
 
 public class SimpleProvider extends ColumnLabelProvider {
@@ -31,16 +32,10 @@ public class SimpleProvider extends ColumnLabelProvider {
     public Image getImage(Object element) {
         Image icon = null;
         if (isShowTypeIcon) {
-            String workItemType = ((Workitem) element).getTypePrefix();
+            WorkitemType workitemType = ((Workitem) element).getType();
             ImageRegistry imageStore = Activator.getDefault().getImageRegistry();
-            if (workItemType.equals(Workitem.TASK_PREFIX)) {
-                icon = imageStore.get(Activator.TASK_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.DEFECT_PREFIX)) {
-                icon = imageStore.get(Activator.DEFECT_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.TEST_PREFIX)) {
-                icon = imageStore.get(Activator.TEST_IMAGE_ID);
-            } else if (workItemType.equals(Workitem.STORY_PREFIX)) {
-                icon = imageStore.get(Activator.STORY_IMAGE_ID);
+            if (workitemType.isWorkitem()) {
+                icon = imageStore.get(Activator.WORKITEM_IMAGE_PREFIX + workitemType);
             }
         }
         return icon;

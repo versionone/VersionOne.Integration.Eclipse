@@ -30,6 +30,8 @@ import com.versionone.common.sdk.Workitem;
 import com.versionone.common.sdk.WorkitemMock;
 import com.versionone.taskview.views.TaskView;
 
+import static com.versionone.common.sdk.WorkitemType.*;
+
 public class TestTaskView {
 
     static final String VIEW_ID = "com.versionone.taskview.views.TaskView";
@@ -70,12 +72,12 @@ public class TestTaskView {
 
     @BeforeClass
     public static void loadTestData() throws Exception {
-        story = new WorkitemMock("1", "Story");
-        storyTask = new WorkitemMock("12", "Task", story);
-        storyTest = new WorkitemMock("11", "Test", story);
-        defect = new WorkitemMock("2", "Defect");
-        defectTask = new WorkitemMock("22", "Task", defect);
-        defectTest = new WorkitemMock("21", "Test", defect);
+        story = new WorkitemMock("1", Story);
+        storyTask = new WorkitemMock(Task, "12", story);
+        storyTest = new WorkitemMock(Test, "11", story);
+        defect = new WorkitemMock("2", Defect);
+        defectTask = new WorkitemMock(Task, "22", defect);
+        defectTest = new WorkitemMock(Test, "21", defect);
         TestDataLayer.getInstance().workitemTree = Arrays.asList((Workitem)story, defect );
         setupWorkitem(story, "Bil, Tom, Administrator", "FAST LAND 1", "B-01190", "5,00", "6,00", "7,00", "8,00",
         "Done");
@@ -180,7 +182,7 @@ public class TestTaskView {
     private static void setupWorkitem(WorkitemMock item, String owners, String name, String number, String estimate,
             String done, String effort, String todo, String status) {
         final PropertyValues ownersList = createListValue(owners);
-        TestDataLayer.getInstance().setListProperty(Workitem.OWNERS_PROPERTY, item.getTypePrefix(), ownersList);
+        TestDataLayer.getInstance().setListProperty(Workitem.OWNERS_PROPERTY, item.getType(), ownersList);
         item.properties.put(Workitem.OWNERS_PROPERTY, ownersList);
         item.properties.put(Workitem.NAME_PROPERTY, name);
         item.properties.put(Workitem.ID_PROPERTY, number);

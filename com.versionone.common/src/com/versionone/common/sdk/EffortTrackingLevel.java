@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 
-public class EffortTrackingLevel {
+public final class EffortTrackingLevel {
 
     /**
      * Set of workitem's tokens to be tracked on. Token for primary workitem is
@@ -13,16 +13,14 @@ public class EffortTrackingLevel {
      * parent type prefix + dot + own type prefix, e.g. "Story.Task".
      */
     private final Set<String> tokens = new HashSet<String>(6);
-    private String[] secondaryTypes = {};
-
-    public EffortTrackingLevel(String... secondaryTypes) {
-        setSecondaryTypes(secondaryTypes);
+    
+    public EffortTrackingLevel() {
     }
 
     public boolean isTracking(Workitem item) {
-        String token = item.getTypePrefix();
+        String token = item.getType().name();
         if (item.parent != null) {
-            token = item.parent.getTypePrefix() + "." + token;
+            token = item.parent.getType() + "." + token;
         }
         return tokens.contains(token);
     }
@@ -31,28 +29,26 @@ public class EffortTrackingLevel {
         tokens.clear();
     }
 
-    public void setSecondaryTypes(String... typePrefixes) {
-        secondaryTypes = typePrefixes;
-    }
-
-    public void addPrimaryTypeLevel(String typePrefix, TrackingLevel trackingLevel) {
+    public void addPrimaryTypeLevel(WorkitemType type, TrackingLevel trackingLevel) {
         switch (trackingLevel) {
         case On:
-            tokens.add(typePrefix);
+            tokens.add(type.name());
             break;
         case Off:
-            addSecondaryTypeLevel(typePrefix);
+            addSecondaryTypeLevel(type);
             break;
         case Mix:
-            tokens.add(typePrefix);
-            addSecondaryTypeLevel(typePrefix);
+            tokens.add(type.name());
+            addSecondaryTypeLevel(type);
             break;
         }
     }
 
-    private void addSecondaryTypeLevel(String parentType) {
-        for (String type : secondaryTypes) {
-            tokens.add(parentType + "." + type);
+    private void addSecondaryTypeLevel(WorkitemType parentType) {
+        for (WorkitemType type : WorkitemType.values()) {
+            if (type.isSecondary()) {
+                tokens.add(parentType + "." + type);
+            }
         }
     }
 }

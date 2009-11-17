@@ -19,6 +19,6 @@ public class ListPropertyDescriptor extends PropertyDescriptor {
     
     @Override
     public CellEditor createPropertyEditor(Composite parent) {
-    	return new SingleValueEditor(parent, workitem.getTypePrefix(), getId().toString());
+    	return new SingleValueEditor(parent, workitem.getType(), getId().toString());
     }
 }

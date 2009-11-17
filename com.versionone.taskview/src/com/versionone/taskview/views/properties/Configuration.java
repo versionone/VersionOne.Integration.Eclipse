@@ -11,7 +11,10 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.Activator;
+
+import static com.versionone.common.sdk.WorkitemType.*;
 
 @XmlRootElement(name = "Configuration")
 public class Configuration {
@@ -79,16 +82,16 @@ public class Configuration {
         public AssetDetailSettings() {
         }
 
-        public ColumnSetting[] getColumns(String type) {
-            if (type.equals(Workitem.STORY_PREFIX)) {
+        public ColumnSetting[] getColumns(WorkitemType type) {
+            if (type.equals(Story)) {
                 return storyColumns;
-            } else if (type.equals(Workitem.TASK_PREFIX)) {
+            } else if (type.equals(Task)) {
                 return taskColumns;
-            } else if (type.equals(Workitem.DEFECT_PREFIX)) {
+            } else if (type.equals(Defect)) {
                 return defectColumns;
-            } else if (type.equals(Workitem.TEST_PREFIX)) {
+            } else if (type.equals(Test)) {
                 return testColumns;
-            } else if (type.equals(Workitem.PROJECT_PREFIX)) {
+            } else if (type.equals(Scope)) {
                 return testColumns;
             } else {
                 throw new IllegalArgumentException("Unknown type: " + type);

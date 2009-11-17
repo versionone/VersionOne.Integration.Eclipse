@@ -31,11 +31,11 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public void addProperty(String attr, String prefix, boolean isList) {
+    public void addProperty(String attr, WorkitemType type, boolean isList) {
     }
 
-    public void setListProperty(String attr, String prefix, PropertyValues values) {
-        listProperties.put(prefix + attr, values);
+    public void setListProperty(String attr, WorkitemType type, PropertyValues values) {
+        listProperties.put(type + attr, values);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class TestDataLayer extends ApiDataLayer {
 
     @Override
     public Workitem getCurrentProject() {
-        return new WorkitemMock("0", "Scope");
+        return new WorkitemMock("0", WorkitemType.Scope);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public PropertyValues getListPropertyValues(String type, String propertyName) {
+    public PropertyValues getListPropertyValues(WorkitemType type, String propertyName) {
         final PropertyValues res = listProperties.get(type + propertyName);
         return res == null ? new PropertyValuesMock("") : res;
     }

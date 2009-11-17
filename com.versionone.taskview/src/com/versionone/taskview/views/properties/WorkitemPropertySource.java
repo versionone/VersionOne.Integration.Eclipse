@@ -37,10 +37,10 @@ public class WorkitemPropertySource implements IPropertySource {
     public IPropertyDescriptor[] getPropertyDescriptors() {
         Configuration cfg = Configuration.getInstance();
         ColumnSetting[] columns;
-        if (item.getTypePrefix().equals(Workitem.PROJECT_PREFIX)) {
-            columns = cfg.projectTreeSettings.projectColumns;
+        if (item.getType().isWorkitem()) {
+            columns = cfg.assetDetailSettings.getColumns(item.getType());
         } else {
-            columns = cfg.assetDetailSettings.getColumns(item.getTypePrefix());
+            columns = cfg.projectTreeSettings.projectColumns;
         }
         ArrayList<IPropertyDescriptor> res = new ArrayList<IPropertyDescriptor>(columns.length);
         for(ColumnSetting column : columns) {
@@ -64,7 +64,7 @@ public class WorkitemPropertySource implements IPropertySource {
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else if (col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
-            desc = new MultiValueListPropertyDescriptor(col.attribute, item.getTypePrefix(), localName);
+            desc = new MultiValueListPropertyDescriptor(col.attribute, item.getType(), localName);
         } else if (col.type.equals(AssetDetailSettings.RICH_TEXT_TYPE)) {
             desc = new RichTextPropertyDescriptor(col.attribute, localName, item.getPropertyAsString(col.attribute));
         } else {

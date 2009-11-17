@@ -2,27 +2,27 @@ package com.versionone.common.sdk;
 
 public class AttributeInfo {
     public final String attr;
-    public final String prefix;
+    public final WorkitemType type;
     public final boolean isList;
 
-    public AttributeInfo(String attr, String prefix, boolean isList) {
-        if (attr == null || prefix == null) {
+    public AttributeInfo(String attr, WorkitemType type, boolean isList) {
+        if (attr == null || type == null) {
             throw new IllegalArgumentException("Parameters cannot be null.");
         }
         this.attr = attr;
-        this.prefix = prefix;
+        this.type = type;
         this.isList = isList;
     }
 
     @Override
     public String toString() {
-        return prefix + "." + attr + "(List:" + Boolean.toString(isList) + ")";
+        return type + "." + attr + "(List:" + Boolean.toString(isList) + ")";
     }
 
     @Override
     public int hashCode() {
         int result = attr.hashCode();
-        result = 31 * result + prefix.hashCode();
+        result = 31 * result + type.hashCode();
         result = 31 * result + (isList ? 1231 : 1237);
         return result;
     }
@@ -38,7 +38,7 @@ public class AttributeInfo {
         AttributeInfo other = (AttributeInfo) obj;
         if (!attr.equals(other.attr))
             return false;
-        if (!prefix.equals(other.prefix))
+        if (type != other.type)
             return false;
         if (isList != other.isList)
             return false;

@@ -11,11 +11,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 
+import static com.versionone.common.sdk.WorkitemType.*;
+
 import com.versionone.Oid;
 import com.versionone.apiclient.AndFilterTerm;
-
 import com.versionone.apiclient.APIException;
-
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.AssetState;
 import com.versionone.apiclient.Attribute;
@@ -43,17 +43,31 @@ import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 
 public class ApiDataLayer {
 
-    private static final String MetaUrlSuffix = "meta.v1/";
-    private static final String LocalizerUrlSuffix = "loc.v1/";
-    private static final String DataUrlSuffix = "rest-1.v1/";
-    private static final String ConfigUrlSuffix = "config.v1/";
+    private static final String META_SUFFIX = "meta.v1/";
+    private static final String LOCALAIZER_SUFFIX = "loc.v1/";
+    private static final String DATA_SUFFIX = "rest-1.v1/";
+    private static final String CONFIG_SUFFIX = "config.v1/";
+    
+    private static final Map<String, String> propertyAliases = new HashMap<String, String>();
+    static {
+        propertyAliases.put("DefectStatus", "StoryStatus");
+        propertyAliases.put("DefectSource", "StorySource");
+        propertyAliases.put("ScopeBuildProjects", "BuildProject");
+        propertyAliases.put("TaskOwners", "Member");
+        propertyAliases.put("StoryOwners", "Member");
+        propertyAliases.put("DefectOwners", "Member");
+        propertyAliases.put("TestOwners", "Member");
+        propertyAliases.put("TaskScope", "Scope");
+        propertyAliases.put("StoryScope", "Scope");
+        propertyAliases.put("DefectScope", "Scope");
+        propertyAliases.put("TestScope", "Scope");
+    }
 
-    private final Map<String, IAssetType> types = new HashMap<String, IAssetType>(5);
+    private final Map<WorkitemType, IAssetType> types = new HashMap<WorkitemType, IAssetType>(WorkitemType.values().length);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
     private final Set<Asset> assetsToIgnore = new HashSet<Asset>();
     private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
 
-    private IAssetType projectType;
     private IAssetType workitemType;
     private IAssetType primaryWorkitemType;
     private IAssetType effortType;
@@ -73,7 +87,7 @@ public class ApiDataLayer {
     private Map<String, PropertyValues> listPropertyValues;
 
     private boolean trackEffort;
-    public final EffortTrackingLevel trackingLevel = new EffortTrackingLevel(Workitem.TASK_PREFIX, Workitem.TEST_PREFIX);
+    public final EffortTrackingLevel trackingLevel = new EffortTrackingLevel();
 
     private IMetaModel metaModel;
     private IServices services;
@@ -100,8 +114,8 @@ public class ApiDataLayer {
             trackEffort = true;
             effortType = this.metaModel.getAssetType("Actual");
             trackingLevel.clear();
-            trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, (TrackingLevel) storyTrackingLevel);
-            trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, (TrackingLevel) defectTrackingLevel);
+            trackingLevel.addPrimaryTypeLevel(Story, (TrackingLevel) storyTrackingLevel);
+            trackingLevel.addPrimaryTypeLevel(Defect, (TrackingLevel) defectTrackingLevel);
         } else {
             trackEffort = false;
         }
@@ -142,13 +156,13 @@ public class ApiDataLayer {
             if (isUpdateData) {
                 cleanConnectionData();
 
-                V1APIConnector metaConnector = new V1APIConnector(path + MetaUrlSuffix, userName, password);
+                V1APIConnector metaConnector = new V1APIConnector(path + META_SUFFIX, userName, password);
                 metaModel = new MetaModel(metaConnector);
 
-                V1APIConnector localizerConnector = new V1APIConnector(path + LocalizerUrlSuffix, userName, password);
+                V1APIConnector localizerConnector = new V1APIConnector(path + LOCALAIZER_SUFFIX, userName, password);
                 localizer = new Localizer(localizerConnector);
 
-                V1APIConnector dataConnector = new V1APIConnector(path + DataUrlSuffix, userName, password);
+                V1APIConnector dataConnector = new V1APIConnector(path + DATA_SUFFIX, userName, password);
                 services = new Services(metaModel, dataConnector);
                 
             }
@@ -173,7 +187,7 @@ public class ApiDataLayer {
     }
 
     private void processConfig(String path) throws ConnectionException, APIException {
-        V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + ConfigUrlSuffix));
+        V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + CONFIG_SUFFIX));
 
         trackEffort = v1Config.isEffortTracking();
         if (trackEffort) {
@@ -181,25 +195,22 @@ public class ApiDataLayer {
         }
 
         trackingLevel.clear();
-        trackingLevel.addPrimaryTypeLevel(Workitem.STORY_PREFIX, v1Config.getStoryTrackingLevel());
-        trackingLevel.addPrimaryTypeLevel(Workitem.DEFECT_PREFIX, v1Config.getDefectTrackingLevel());
+        trackingLevel.addPrimaryTypeLevel(Story, v1Config.getStoryTrackingLevel());
+        trackingLevel.addPrimaryTypeLevel(Defect, v1Config.getDefectTrackingLevel());
     }
 
     private void cleanConnectionData() {
         assetsToIgnore.clear();
         efforts.clear();
         types.clear();
-        projectType = null;
         workitemType = null;
         primaryWorkitemType = null;
     }
 
     private void initTypes() {
-        projectType = getAssetType(Workitem.PROJECT_PREFIX);
-        getAssetType(Workitem.TASK_PREFIX);
-        getAssetType(Workitem.TEST_PREFIX);
-        getAssetType(Workitem.DEFECT_PREFIX);
-        getAssetType(Workitem.STORY_PREFIX);
+        for (WorkitemType type : WorkitemType.values()){
+            types.put(type, metaModel.getAssetType(type.name()));
+        }
         workitemType = metaModel.getAssetType("Workitem");
         primaryWorkitemType = metaModel.getAssetType("PrimaryWorkitem");
     }
@@ -216,15 +227,16 @@ public class ApiDataLayer {
     public List<Workitem> getProjectTree() throws DataLayerException {
         checkConnection();
         try {
-            Query scopeQuery = new Query(projectType, projectType.getAttributeDefinition("Parent"));
-            FilterTerm stateTerm = new FilterTerm(projectType.getAttributeDefinition("AssetState"));
+            final IAssetType projectType = types.get(Scope);
+            final Query scopeQuery = new Query(projectType, projectType.getAttributeDefinition("Parent"));
+            final FilterTerm stateTerm = new FilterTerm(projectType.getAttributeDefinition("AssetState"));
             stateTerm.NotEqual(AssetState.Closed);
             scopeQuery.setFilter(stateTerm);
             // clear all definitions used in previous queries
             alreadyUsedDefinition.clear();
-            addSelection(scopeQuery, Workitem.PROJECT_PREFIX);
-            QueryResult result = services.retrieve(scopeQuery);
-            List<Workitem> roots = new ArrayList<Workitem>(result.getAssets().length);
+            addSelection(scopeQuery, Scope);
+            final QueryResult result = services.retrieve(scopeQuery);
+            final List<Workitem> roots = new ArrayList<Workitem>(result.getAssets().length);
             for (Asset oneAsset : result.getAssets()) {
                 roots.add(new Workitem(oneAsset, null));
             }
@@ -232,12 +244,6 @@ public class ApiDataLayer {
         } catch (Exception ex) {
             throw warning("Can't get projects list.", ex);
         }
-    }
-
-    private IAssetType getAssetType(String token) {
-        IAssetType type = metaModel.getAssetType(token);
-        types.put(token, type);
-        return type;
     }
 
     public List<Workitem> getWorkitemTree() throws Exception {
@@ -254,10 +260,11 @@ public class ApiDataLayer {
 
                 // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
-                addSelection(query, Workitem.TASK_PREFIX);
-                addSelection(query, Workitem.STORY_PREFIX);
-                addSelection(query, Workitem.DEFECT_PREFIX);
-                addSelection(query, Workitem.TEST_PREFIX);
+                for(WorkitemType type : WorkitemType.values()){
+                    if (type.isWorkitem()){
+                        addSelection(query, type);
+                    }
+                }
 
                 query.setFilter(getScopeFilter(workitemType));
 
@@ -326,14 +333,14 @@ public class ApiDataLayer {
     public boolean checkConnection(String url, String user, String pass, boolean auth) {
         boolean result = true;
 
-        V1APIConnector metaConnector = new V1APIConnector(url.toString() + MetaUrlSuffix);
+        V1APIConnector metaConnector = new V1APIConnector(url.toString() + META_SUFFIX);
         MetaModel model = new MetaModel(metaConnector);
 
         V1APIConnector dataConnector = null;
         if (auth) {
-            dataConnector = new V1APIConnector(url.toString() + DataUrlSuffix);
+            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX);
         } else {
-            dataConnector = new V1APIConnector(url.toString() + DataUrlSuffix, user, pass);
+            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, user, pass);
         }
 
         Services v1Service = new Services(model, dataConnector);
@@ -377,11 +384,11 @@ public class ApiDataLayer {
 
     // need to make AlreadyUsedDefinition.Clear(); before first call of this
     // method
-    private void addSelection(Query query, String typePrefix) throws DataLayerException {
+    private void addSelection(Query query, WorkitemType type) throws DataLayerException {
         for (AttributeInfo attrInfo : attributesToQuery) {
-            if (attrInfo.prefix.equals(typePrefix)) {
+            if (attrInfo.type == type) {
                 try {
-                    IAttributeDefinition def = types.get(attrInfo.prefix).getAttributeDefinition(attrInfo.attr);
+                    IAttributeDefinition def = types.get(attrInfo.type).getAttributeDefinition(attrInfo.attr);
                     if (!alreadyUsedDefinition.contains(def)) {
                         query.getSelection().add(def);
                         alreadyUsedDefinition.add(def);
@@ -391,13 +398,13 @@ public class ApiDataLayer {
                 }
             }
         }
-        if (reqFileds.getFields(typePrefix) == null) {
+        if (reqFileds.getFields(type) == null) {
             return;
         }
         
-        for (RequiredFieldsDTO field : reqFileds.getFields(typePrefix)) {
+        for (RequiredFieldsDTO field : reqFileds.getFields(type)) {
             try {
-                IAttributeDefinition def = types.get(typePrefix).getAttributeDefinition(field.name);
+                IAttributeDefinition def = types.get(type).getAttributeDefinition(field.name);
                 if (!alreadyUsedDefinition.contains(def)) {
                     query.getSelection().add(def);
                     alreadyUsedDefinition.add(def);
@@ -408,15 +415,15 @@ public class ApiDataLayer {
         }
     }
 
-    private void addSelection(Query query, String typePrefix, boolean clearDefinitions) throws DataLayerException {
+    private void addSelection(Query query, WorkitemType type, boolean clearDefinitions) throws DataLayerException {
         if (clearDefinitions) {
             alreadyUsedDefinition.clear();
         }
-        addSelection(query, typePrefix);
+        addSelection(query, type);
     }
 
-    public void addProperty(String attr, String prefix, boolean isList) {
-        attributesToQuery.add(new AttributeInfo(attr, prefix, isList));
+    public void addProperty(String attr, WorkitemType type, boolean isList) {
+        attributesToQuery.add(new AttributeInfo(attr, type, isList));
     }
 
     private Map<String, PropertyValues> getListPropertyValues() throws Exception {
@@ -426,7 +433,7 @@ public class ApiDataLayer {
                 continue;
             }
 
-            String propertyAlias = attrInfo.prefix + attrInfo.attr;
+            String propertyAlias = attrInfo.type + attrInfo.attr;
             if (!res.containsKey(propertyAlias)) {
                 String propertyName = resolvePropertyKey(propertyAlias);
 
@@ -448,20 +455,6 @@ public class ApiDataLayer {
 
     static String resolvePropertyKey(String propertyAlias) {
         
-        final Map<String, String> keys = new HashMap<String, String>();
-        
-        keys.put("DefectStatus", "StoryStatus");
-        keys.put("DefectSource", "StorySource");
-        keys.put("ScopeBuildProjects", "BuildProject");
-        keys.put("TaskOwners", "Member");
-        keys.put("StoryOwners", "Member");
-        keys.put("DefectOwners", "Member");
-        keys.put("TestOwners", "Member");
-        keys.put("TaskScope", "Scope");
-        keys.put("StoryScope", "Scope");
-        keys.put("DefectScope", "Scope");
-        keys.put("TestScope", "Scope");
-        
         //if (propertyAlias.equals("DefectStatus")) {
         //    return "StoryStatus";
         //} else if (propertyAlias.equals("DefectSource")) {
@@ -475,8 +468,8 @@ public class ApiDataLayer {
         //        || propertyAlias.equals("DefectScope") || propertyAlias.equals("TestScope")) {
         //    return "Scope";
         //}
-        if (keys.containsKey(propertyAlias)) {
-            return keys.get(propertyAlias);
+        if (propertyAliases.containsKey(propertyAlias)) {
+            return propertyAliases.get(propertyAlias);
         }
 
         return propertyAlias;
@@ -513,7 +506,7 @@ public class ApiDataLayer {
         return res;
     }
 
-    public PropertyValues getListPropertyValues(String type, String propertyName) {
+    public PropertyValues getListPropertyValues(WorkitemType type, String propertyName) {
         String propertyKey = resolvePropertyKey(type + propertyName);
         return listPropertyValues.get(propertyKey);
     }
@@ -631,7 +624,7 @@ public class ApiDataLayer {
         try {
             IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
             Query query = new Query(workitem.asset.getOid().getMomentless(), false);
-            addSelection(query, workitem.getTypePrefix(), true);
+            addSelection(query, workitem.getType(), true);
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
@@ -703,7 +696,7 @@ public class ApiDataLayer {
     private String getDefaultProjectId() {
         String id = "";
 
-        Query query = new Query(projectType);
+        Query query = new Query(types.get(Scope));
 
         QueryResult result = null;
         try {
@@ -727,22 +720,15 @@ public class ApiDataLayer {
     }
 
     private boolean isProjectExist(String id) {
-        boolean isExist = true;
-
         try {
-            Query query = new Query(Oid.fromToken(id, metaModel));
+            final Query query = new Query(Oid.fromToken(id, metaModel));
             alreadyUsedDefinition.clear();
-            addSelection(query, Workitem.PROJECT_PREFIX);
-            QueryResult result = null;
-            result = services.retrieve(query);
-            if (result.getTotalAvaliable() == 0) {
-                isExist = false;
-            }
+            addSelection(query, Scope);
+            final QueryResult result = services.retrieve(query);
+            return result.getTotalAvaliable() > 0;
         } catch (Exception ex) {
-            isExist = false;
+            return false;
         }
-
-        return isExist;
     }
 
     private Workitem getProjectById(String id) throws Exception {
@@ -753,7 +739,7 @@ public class ApiDataLayer {
         Query query = new Query(Oid.fromToken(id, metaModel));
         // clear all definitions used in previous queries
         alreadyUsedDefinition.clear();
-        addSelection(query, Workitem.PROJECT_PREFIX);
+        addSelection(query, Scope);
         QueryResult result;
         try {
             result = services.retrieve(query);
@@ -776,7 +762,7 @@ public class ApiDataLayer {
 
     /**
      * 
-     * @param prefix
+     * @param type
      * @param parent
      * @return
      * @throws DataLayerException
@@ -784,22 +770,22 @@ public class ApiDataLayer {
      *             when prefix or parent inn't a Workitem, or trying to create a
      *             wrong Workitem hierarchy.
      */
-    public Workitem createWorkitem(String prefix, Workitem parent) throws DataLayerException {
+    public Workitem createWorkitem(WorkitemType type, Workitem parent) throws DataLayerException {
         try {
-            if (!types.containsKey(prefix)) {
-                throw new IllegalArgumentException("Undefined prefix: " + prefix);
+            if (!types.containsKey(type)) {
+                throw new IllegalArgumentException("Undefined prefix: " + type);
             }
-            final Asset asset = new Asset(types.get(prefix));
+            final Asset asset = new Asset(types.get(type));
             if (!isAWorkitem(asset) || !isAWorkitem(parent.asset)) {
                 throw new IllegalArgumentException("Can only create Workitems, " +
-                		"but received: " + prefix + " for parent: " + parent.getTypePrefix());
+                		"but received: " + type + " for parent: " + parent.getType());
             }
             if (isAPrimaryWorkitem(asset) == isAPrimaryWorkitem(parent.asset)) {
-                throw new IllegalArgumentException("Cannot create " + prefix + 
-                        " as children of " + parent.getTypePrefix());
+                throw new IllegalArgumentException("Cannot create " + type + 
+                        " as children of " + parent.getType());
             }
             for (AttributeInfo attrInfo : attributesToQuery) {
-                if (attrInfo.prefix == prefix) {
+                if (attrInfo.type == type) {
                     setAssetAttribute(asset, attrInfo.attr, null);
                 }
             }
@@ -815,9 +801,9 @@ public class ApiDataLayer {
             
             return item;
         } catch (MetaException e) {
-            throw new DataLayerException("Cannot create workitem: " + prefix, e);
+            throw new DataLayerException("Cannot create workitem: " + type, e);
         } catch (APIException e) {
-            throw new DataLayerException("Cannot create workitem: " + prefix, e);
+            throw new DataLayerException("Cannot create workitem: " + type, e);
         }
     }
 

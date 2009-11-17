@@ -9,7 +9,7 @@ import com.versionone.common.sdk.Workitem;
 public class WorkitemMock extends Workitem {
 
     public final String id;
-    public final String prefix;
+    public final WorkitemType type;
     public final Map<String, Object> properties = new HashMap<String, Object>();
     public boolean hasChanges;
 
@@ -17,14 +17,14 @@ public class WorkitemMock extends Workitem {
         this(null, null);
     }
 
-    public WorkitemMock(String id, String prefix) {
+    public WorkitemMock(String id, WorkitemType prefix) {
         this(prefix, id, null);
     }
 
-    public WorkitemMock(String typePrefix, String id, Workitem parent) {
+    public WorkitemMock(WorkitemType type, String id, Workitem parent) {
         super(new LinkedList<Workitem>(), parent);
-        prefix = typePrefix == null ? "" : typePrefix;
-        this.id = id == null ? "" : typePrefix;
+        this.type = type;
+        this.id = id == null ? "" : type.name();
         if (parent != null)
             parent.children.add(this);
     }
@@ -41,8 +41,8 @@ public class WorkitemMock extends Workitem {
     }
 
     @Override
-    public String getTypePrefix() {
-        return prefix;
+    public WorkitemType getType() {
+        return type;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class WorkitemMock extends Workitem {
         final int prime = 31;
         int result = (hasChanges ? 1231 : 1237);
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((prefix == null) ? 0 : prefix.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
 
@@ -75,7 +75,7 @@ public class WorkitemMock extends Workitem {
             return false;
         if (!id.equals(other.id))
             return false;
-        if (!prefix.equals(other.prefix))
+        if (!type.equals(other.type))
             return false;
         return true;
     }

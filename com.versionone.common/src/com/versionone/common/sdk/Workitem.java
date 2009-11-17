@@ -15,12 +15,6 @@ import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
 public class Workitem {
 
-    public static final String TASK_PREFIX = "Task";
-    public static final String STORY_PREFIX = "Story";
-    public static final String DEFECT_PREFIX = "Defect";
-    public static final String TEST_PREFIX = "Test";
-    public static final String PROJECT_PREFIX = "Scope";
-
     public static final String ID_PROPERTY = "Number";
     public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
     public static final String NAME_PROPERTY = "Name";
@@ -74,14 +68,14 @@ public class Workitem {
             if (dataLayer.isAssetSuspended(childAsset)) {
                 continue;
             }
-            if (getTypePrefix().equals(PROJECT_PREFIX) || dataLayer.isShowed(childAsset)) {
+            if (!getType().isWorkitem() || dataLayer.isShowed(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }
         }
     }
 
-    public String getTypePrefix() {
-        return asset.getAssetType().getToken();
+    public WorkitemType getType() {
+        return WorkitemType.valueOf(asset.getAssetType().getToken());
     }
 
     public String getId() {
@@ -108,7 +102,7 @@ public class Workitem {
     }
 
     private boolean isPropertyDefinitionReadOnly(String propertyName) {
-        final String fullName = getTypePrefix() + '.' + propertyName;
+        final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute != null)
             return attribute.getDefinition().isReadOnly();
@@ -119,7 +113,7 @@ public class Workitem {
     }
 
     private PropertyValues getPropertyValues(String propertyName) {
-        return dataLayer.getListPropertyValues(getTypePrefix(), propertyName);
+        return dataLayer.getListPropertyValues(getType(), propertyName);
     }
 
     /**
@@ -133,7 +127,7 @@ public class Workitem {
         if (propertyName.equals(EFFORT_PROPERTY)) {
             return dataLayer.getEffort(asset) != null;
         }
-        final String fullName = getTypePrefix() + '.' + propertyName;
+        final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute == null) {
             throw new IllegalArgumentException("There is no property: " + fullName);
@@ -151,7 +145,7 @@ public class Workitem {
         if (propertyName.equals(EFFORT_PROPERTY)) {
             dataLayer.setEffort(asset, null);
         }
-        final String fullName = getTypePrefix() + '.' + propertyName;
+        final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute == null) {
             throw new IllegalArgumentException("There is no property: " + fullName);
@@ -180,7 +174,7 @@ public class Workitem {
             final Double effort = dataLayer.getEffort(asset);
             return effort == null ? null : numberFormat.format(effort.doubleValue());
         }
-        final String fullName = getTypePrefix() + '.' + propertyName;
+        final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
 
         if (attribute == null) {
@@ -269,7 +263,7 @@ public class Workitem {
     }
 
     private void setPropertyInternal(String propertyName, Object newValue) throws APIException {
-        final Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        final Attribute attribute = asset.getAttributes().get(getType() + "." + propertyName);
         if (attribute == null || !areEqual(attribute.getValue(), newValue)) {
             asset.setAttributeValue(asset.getAssetType().getAttributeDefinition(propertyName), newValue);
         }
@@ -283,7 +277,7 @@ public class Workitem {
     }
 
     private void setMultiValueProperty(String propertyName, PropertyValues newValues) throws APIException {
-        final Attribute attribute = asset.getAttributes().get(getTypePrefix() + '.' + propertyName);
+        final Attribute attribute = asset.getAttributes().get(getType() + "." + propertyName);
         final Object[] oldValues = attribute.getValues();
         final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
         for (Object oldOid : oldValues) {
@@ -400,8 +394,8 @@ public class Workitem {
         dataLayer.revertAsset(asset);
     }
     
-    public Workitem createChild(String prefix) throws DataLayerException {
-        return dataLayer.createWorkitem(prefix, this);
+    public Workitem createChild(WorkitemType type) throws DataLayerException {
+        return dataLayer.createWorkitem(type, this);
     }
 
     /**

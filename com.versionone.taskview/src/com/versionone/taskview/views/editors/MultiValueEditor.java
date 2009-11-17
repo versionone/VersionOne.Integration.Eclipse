@@ -9,14 +9,15 @@ import org.eclipse.swt.widgets.Composite;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
+import com.versionone.common.sdk.WorkitemType;
 
 public class MultiValueEditor extends DialogCellEditor {
 
     private final PropertyValues allValues;
 
-    public MultiValueEditor(Composite parent, String typePrefix, String propertyName) {
+    public MultiValueEditor(Composite parent, WorkitemType type, String propertyName) {
         super(parent, SWT.NONE);
-        allValues = ApiDataLayer.getInstance().getListPropertyValues(typePrefix, propertyName);
+        allValues = ApiDataLayer.getInstance().getListPropertyValues(type, propertyName);
     }
 
     @Override

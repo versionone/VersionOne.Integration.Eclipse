@@ -33,7 +33,7 @@ public class MultiValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
-        return new MultiValueEditor(((TreeViewer) getViewer()).getTree(), workitem.getTypePrefix(), propertyName);
+        return new MultiValueEditor(((TreeViewer) getViewer()).getTree(), workitem.getType(), propertyName);
     }
 
     @Override

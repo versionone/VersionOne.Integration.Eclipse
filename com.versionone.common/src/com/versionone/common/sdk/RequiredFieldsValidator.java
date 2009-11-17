@@ -1,5 +1,6 @@
 package com.versionone.common.sdk;
 
+import static com.versionone.common.sdk.WorkitemType.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,7 +25,7 @@ class RequiredFieldsValidator {
     
     private final IMetaModel metaModel;
     private final IServices services;
-    private final Map<String, List<RequiredFieldsDTO>> requiredFieldsList = new HashMap<String, List<RequiredFieldsDTO>>();
+    private final Map<WorkitemType, List<RequiredFieldsDTO>> requiredFieldsList = new HashMap<WorkitemType, List<RequiredFieldsDTO>>(4);
     
     
     RequiredFieldsValidator(IMetaModel metaModel, IServices services) {
@@ -122,11 +123,13 @@ class RequiredFieldsValidator {
         return (attribute.getDefinition().isMultiValue() && attribute.getValues().length < 1);
     }
 
-    public Map<String, List<RequiredFieldsDTO>> init() throws DataLayerException {        
-        requiredFieldsList.put(Workitem.TASK_PREFIX, getRequiredFields(Workitem.TASK_PREFIX));
-        requiredFieldsList.put(Workitem.DEFECT_PREFIX, getRequiredFields(Workitem.DEFECT_PREFIX));
-        requiredFieldsList.put(Workitem.STORY_PREFIX, getRequiredFields(Workitem.STORY_PREFIX));
-        requiredFieldsList.put(Workitem.TEST_PREFIX, getRequiredFields(Workitem.TEST_PREFIX));
+    public Map<WorkitemType, List<RequiredFieldsDTO>> init() throws DataLayerException {
+        WorkitemType[] types = WorkitemType.values();
+        for(WorkitemType type : types){
+            if (type.isWorkitem()){
+                requiredFieldsList.put(type, getRequiredFields(type.name()));
+            }
+        }
         return requiredFieldsList;
     }
 
@@ -159,7 +162,7 @@ class RequiredFieldsValidator {
         return message.toString();
 }
 
-    public List<RequiredFieldsDTO> getFields(String typePrefix) {
-        return requiredFieldsList.get(typePrefix);
+    public List<RequiredFieldsDTO> getFields(WorkitemType type) {
+        return requiredFieldsList.get(type);
     }   
 }

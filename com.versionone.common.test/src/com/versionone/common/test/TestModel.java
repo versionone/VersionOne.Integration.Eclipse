@@ -19,6 +19,9 @@ import com.versionone.common.sdk.EffortTrackingLevel;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.WorkitemType;
+
+import static com.versionone.common.sdk.WorkitemType.*;
 
 public class TestModel {
 
@@ -27,10 +30,8 @@ public class TestModel {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        final String[] all = { Workitem.STORY_PREFIX, Workitem.DEFECT_PREFIX, Workitem.TASK_PREFIX,
-                Workitem.TEST_PREFIX };
-        setDataLayerAttribute(Workitem.STATUS_PROPERTY, true, all);
-        setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true, all);
+        setDataLayerAttribute(Workitem.STATUS_PROPERTY, true);
+        setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true);
 
         FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
         FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
@@ -41,9 +42,11 @@ public class TestModel {
         datalayer.connectFotTesting(services, metaModel, localizer, TrackingLevel.Off, TrackingLevel.On);
     }
 
-    private static void setDataLayerAttribute(String attribute, boolean isListType, String... typePrefixes) {
-        for (String prefix : typePrefixes) {
-            datalayer.addProperty(attribute, prefix, isListType);
+    private static void setDataLayerAttribute(String attribute, boolean isListType) {
+        for (WorkitemType prefix : WorkitemType.values()) {
+            if (prefix.isWorkitem()){
+                datalayer.addProperty(attribute, prefix, isListType);
+            }
         }
     }
 
@@ -71,14 +74,12 @@ public class TestModel {
         datalayer.setShowAllTasks(false);
         List<Workitem> allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(7, allWorkItem.size());
-        validateTask(allWorkItem.get(0), "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null,
-                Workitem.STORY_PREFIX);
-        validateTask(allWorkItem.get(2), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
-                Workitem.DEFECT_PREFIX);
+        validateTask(allWorkItem.get(0), "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null, Story);
+        validateTask(allWorkItem.get(2), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null, Defect);
         validateTask(allWorkItem.get(1).children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00", "",
-                "FAST LAND 2", Workitem.TEST_PREFIX);
+                "FAST LAND 2", Test);
         validateTask(allWorkItem.get(0).children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null, "9,30",
-                "In Progress", "FAST LAND 1", Workitem.TASK_PREFIX);
+                "In Progress", "FAST LAND 1", Task);
     }
 
     @Test
@@ -87,15 +88,15 @@ public class TestModel {
         List<Workitem> allWorkItem = datalayer.getWorkitemTree();
         Assert.assertEquals(11, allWorkItem.size());
         validateTask(allWorkItem.get(1).children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00",
-                "Completed", "FAST LAND 1", Workitem.TASK_PREFIX);
+                "Completed", "FAST LAND 1", Task);
         validateTask(allWorkItem.get(6), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
-                Workitem.DEFECT_PREFIX);
+                Defect);
         validateTask(allWorkItem.get(5).children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null, "0,00",
-                "Passed", "STORY33.db", Workitem.TEST_PREFIX);
+                "Passed", "STORY33.db", Test);
     }
 
     private void validateTask(Workitem task, String number, String id, String name, String estimate, String done,
-            String effort, String todo, String status, String parent, String typePrefix) throws Exception {
+            String effort, String todo, String status, String parent, WorkitemType type) throws Exception {
         Assert.assertEquals(id, task.getId());
         Assert.assertEquals(name, task.getProperty(Workitem.NAME_PROPERTY));
         Assert.assertEquals(number, task.getProperty(Workitem.ID_PROPERTY));
@@ -106,7 +107,7 @@ public class TestModel {
         Assert.assertEquals(todo, task.getProperty(Workitem.TODO_PROPERTY));
         Assert.assertEquals(status, task.getProperty(Workitem.STATUS_PROPERTY).toString());
         Assert.assertEquals(parent, task.getProperty(Workitem.PARENT_NAME_PROPERTY));
-        Assert.assertEquals(typePrefix, task.getTypePrefix());
+        Assert.assertEquals(type, task.getType());
     }
 
     @Test
@@ -194,8 +195,8 @@ public class TestModel {
     @Test
     public void testSetStatus() throws Exception {
         final Workitem defect0 = datalayer.getWorkitemTree().get(0);
-        PropertyValues statuses = datalayer.getListPropertyValues(defect0.getTypePrefix(), Workitem.STATUS_PROPERTY);
-        PropertyValues types = datalayer.getListPropertyValues(Workitem.STORY_PREFIX, Workitem.TYPE_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(defect0.getType(), Workitem.STATUS_PROPERTY);
+        PropertyValues types = datalayer.getListPropertyValues(Story, Workitem.TYPE_PROPERTY);
 
         ValueId status = statuses.getValueIdByIndex(0);
         defect0.setProperty(Workitem.STATUS_PROPERTY, status);
@@ -265,7 +266,7 @@ public class TestModel {
         Assert.assertEquals(cat.toString(), owners.toString());
         Assert.assertEquals(1, owners.size());
         Assert.assertEquals(new PropertyValues(Arrays.asList(cat)), owners);
-        PropertyValues users = datalayer.getListPropertyValues(defect0.getTypePrefix(), Workitem.OWNERS_PROPERTY);
+        PropertyValues users = datalayer.getListPropertyValues(defect0.getType(), Workitem.OWNERS_PROPERTY);
         ValueId admin = users.getValueIdByIndex(1);
         Assert.assertEquals("Administrator", admin.toString());
         owners = new PropertyValues(Arrays.asList(admin));
@@ -286,7 +287,7 @@ public class TestModel {
         PropertyValues owners = (PropertyValues) story1.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId adminForRemove = owners.getValueIdByIndex(0);
         owners.remove(adminForRemove);
-        PropertyValues users = datalayer.getListPropertyValues(story1.getTypePrefix(), Workitem.OWNERS_PROPERTY);
+        PropertyValues users = datalayer.getListPropertyValues(story1.getType(), Workitem.OWNERS_PROPERTY);
         ValueId petja = users.getValueIdByIndex(8);
         Assert.assertEquals("Petja", petja.toString());
         owners.add(petja);
@@ -378,14 +379,14 @@ public class TestModel {
 
     @Test
     public void testGetTestStatuses() throws Exception {
-        PropertyValues statuses = datalayer.getListPropertyValues(Workitem.TEST_PREFIX, Workitem.STATUS_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(Test, Workitem.STATUS_PROPERTY);
         Assert.assertNotNull(statuses);
         validatePropertyValues(statuses, "", "Failed", "Passed");
     }
 
     @Test
     public void testGetStoryStatuses() throws Exception {
-        PropertyValues statuses = datalayer.getListPropertyValues(Workitem.STORY_PREFIX, Workitem.STATUS_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(Story, Workitem.STATUS_PROPERTY);
         Assert.assertNotNull(statuses);
         validatePropertyValues(statuses, "", "Future", "In Progress", "Done", "Accepted");
     }
@@ -396,7 +397,7 @@ public class TestModel {
 
     @Test
     public void testAttributeInfo() {
-        Assert.assertEquals("Story.Status(List:true)", new AttributeInfo("Status", "Story", true).toString());
-        Assert.assertEquals("Test.Description(List:false)", new AttributeInfo("Description", "Test", false).toString());
+        Assert.assertEquals("Story.Status(List:true)", new AttributeInfo("Status", Story, true).toString());
+        Assert.assertEquals("Test.Description(List:false)", new AttributeInfo("Description", Test, false).toString());
     }
 }

@@ -33,7 +33,7 @@ public class SingleValueSupport extends EditingSupport {
     @Override
     protected CellEditor getCellEditor(Object element) {
         Workitem workitem = ((Workitem) element);
-        return new SingleValueEditor(((TreeViewer)getViewer()).getTree(), workitem.getTypePrefix(), propertyName);
+        return new SingleValueEditor(((TreeViewer)getViewer()).getTree(), workitem.getType(), propertyName);
     }
 
     @Override

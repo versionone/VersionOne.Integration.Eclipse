@@ -57,7 +57,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
         
-        statuses = dataLayer.getListPropertyValues(workitem.getTypePrefix(), Workitem.STATUS_PROPERTY);
+        statuses = dataLayer.getListPropertyValues(workitem.getType(), Workitem.STATUS_PROPERTY);
     }
 
     /**
@@ -117,7 +117,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("Close " + workitem.getTypePrefix());
+        newShell.setText("Close " + workitem.getType());
         Display display = PlatformUI.getWorkbench().getDisplay();
         Point size = newShell.computeSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         Rectangle screen = display.getMonitors()[0].getBounds();

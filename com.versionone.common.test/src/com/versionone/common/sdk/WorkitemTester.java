@@ -1,6 +1,5 @@
 package com.versionone.common.sdk;
 
-import static org.junit.Assert.*;
 
 import com.versionone.apiclient.IAssetType;
 import com.versionone.common.sdk.Workitem;
@@ -9,9 +8,13 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static com.versionone.common.sdk.WorkitemType.*;
+
+import static org.junit.Assert.*;
+
 /**
- * This is unit test and it must be run as JUnit test 
- * (NOT as JUnit Plug-in Test).
+ * This is unit test and it must be run as JUnit test (NOT as JUnit Plug-in
+ * Test).
  * 
  * @author rozhnev
  */
@@ -21,7 +24,7 @@ public class WorkitemTester implements IntegrationalTest {
     public void StoryConstructorTest() {
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.setShowAllTasks(true);
-        IAssetType storyType = new AssetTypeMock(Workitem.STORY_PREFIX);
+        IAssetType storyType = new AssetTypeMock(Story.name());
         AssetMock asset1 = new AssetMock(storyType);
         AssetMock asset11 = new AssetMock(storyType);
         asset1.children.add(asset11);
@@ -37,7 +40,7 @@ public class WorkitemTester implements IntegrationalTest {
     public void ProjectConstructorTest() {
         ApiDataLayer data = ApiDataLayer.getInstance();
         data.setShowAllTasks(false);
-        IAssetType prjType = new AssetTypeMock(Workitem.PROJECT_PREFIX);
+        IAssetType prjType = new AssetTypeMock(Scope.name());
         AssetMock asset1 = new AssetMock(prjType);
         AssetMock asset11 = new AssetMock(prjType);
         asset1.children.add(asset11);
@@ -53,21 +56,21 @@ public class WorkitemTester implements IntegrationalTest {
     @Test
     public void testCreateChild() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", "Task", false);
-        data.addProperty("Owners", "Task", true);
-        data.addProperty("Status", "Task", true);
+        data.addProperty("Name", Task, false);
+        data.addProperty("Owners", Task, true);
+        data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
         Workitem story = data.getWorkitemTree().get(0);
-        final Workitem test = story.createChild(Workitem.TEST_PREFIX);
+        final Workitem test = story.createChild(Test);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
-        final Workitem task = story.createChild(Workitem.TASK_PREFIX);
+        final Workitem task = story.createChild(Task);
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
-        
-        //Retrieve new Workitem tree
+
+        // Retrieve new Workitem tree
         story = data.getWorkitemTree().get(0);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
@@ -75,28 +78,22 @@ public class WorkitemTester implements IntegrationalTest {
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
-        
+
         try {
-            story.createChild(Workitem.STORY_PREFIX);
+            story.createChild(Story);
             fail("Story allow to create child story");
         } catch (IllegalArgumentException e) {
             // Do nothing
         }
         try {
-            story.createChild(Workitem.DEFECT_PREFIX);
+            story.createChild(Defect);
             fail("Story allow to create child defect");
         } catch (IllegalArgumentException e) {
             // Do nothing
         }
         try {
-            story.createChild(Workitem.PROJECT_PREFIX);
+            story.createChild(Scope);
             fail("Story allow to create child project");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild("Wrong");
-            fail("Story allow to call createChild with wrong type");
         } catch (IllegalArgumentException e) {
             // Do nothing
         }

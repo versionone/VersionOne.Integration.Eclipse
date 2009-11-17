@@ -13,9 +13,11 @@ import org.osgi.framework.BundleContext;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.views.properties.Configuration;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
+import static com.versionone.common.sdk.WorkitemType.*;
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -26,10 +28,6 @@ public class Activator extends AbstractUIPlugin {
 
     // Filter Image Id
     public static final String FILTER_IMAGE_ID = "image.filter";
-    public static final String TASK_IMAGE_ID = "image.task";
-    public static final String STORY_IMAGE_ID = "image.story";
-    public static final String DEFECT_IMAGE_ID = "image.defect";
-    public static final String TEST_IMAGE_ID = "image.test";
     public static final String REFRESH_IMAGE_ID = "image.refresh";
     public static final String SAVE_IMAGE_ID = "image.save";
     public static final String FILTER_WORKITEM_IMAGE_ID = "image.workitemfilter";
@@ -37,6 +35,12 @@ public class Activator extends AbstractUIPlugin {
     public static final String ADD_DEFECT_ID = "image.adddefect";
     public static final String ADD_TEST_ID = "image.addtest";
     public static final String ADD_STORY_ID = "image.addstory";
+
+    public static final String WORKITEM_IMAGE_PREFIX = "image.";
+    public static final String TASK_IMAGE_ID = "image.Task";
+    public static final String STORY_IMAGE_ID = "image.Story";
+    public static final String DEFECT_IMAGE_ID = "image.Defect";
+    public static final String TEST_IMAGE_ID = "image.Test";
 
     // The shared instance
     private static Activator plugin;
@@ -64,19 +68,17 @@ public class Activator extends AbstractUIPlugin {
 
     private void setDetailsAttributes() throws Exception {
         Configuration cfg = Configuration.getInstance();
-        setAttributes(cfg.assetDetailSettings.defectColumns, Workitem.DEFECT_PREFIX);
-        setAttributes(cfg.assetDetailSettings.storyColumns, Workitem.STORY_PREFIX);
-        setAttributes(cfg.assetDetailSettings.testColumns, Workitem.TEST_PREFIX);
-        setAttributes(cfg.assetDetailSettings.taskColumns, Workitem.TASK_PREFIX);
-        setAttributes(cfg.projectTreeSettings.projectColumns, Workitem.PROJECT_PREFIX);
+        setAttributes(cfg.assetDetailSettings.defectColumns, Defect);
+        setAttributes(cfg.assetDetailSettings.storyColumns, Story);
+        setAttributes(cfg.assetDetailSettings.testColumns, Test);
+        setAttributes(cfg.assetDetailSettings.taskColumns, Task);
+        setAttributes(cfg.projectTreeSettings.projectColumns, Scope);
     }
 
-    private static void setAttributes(ColumnSetting[] columns, String... typePrefixes) {
+    private static void setAttributes(ColumnSetting[] columns, WorkitemType type) {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         for (ColumnSetting entry : columns) {
-            for (String prefix : typePrefixes) {
-                dataLayer.addProperty(entry.attribute, prefix, isListType(entry.type));
-            }
+            dataLayer.addProperty(entry.attribute, type, isListType(entry.type));
         }
     }
 
@@ -86,8 +88,8 @@ public class Activator extends AbstractUIPlugin {
     }
 
     private void setAttributes() throws Exception {
-        ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-        Map<String, Boolean> properties = new HashMap<String, Boolean>();
+        final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+        final Map<String, Boolean> properties = new HashMap<String, Boolean>();
         properties.put(Workitem.ID_PROPERTY, false);
         properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
         properties.put(Workitem.NAME_PROPERTY, false);
@@ -103,12 +105,13 @@ public class Activator extends AbstractUIPlugin {
         properties.put("Scope.Name", false);
 
         for (Entry<String, Boolean> entry : properties.entrySet()) {
-            dataLayer.addProperty(entry.getKey(), Workitem.DEFECT_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TEST_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.STORY_PREFIX, entry.getValue());
-            dataLayer.addProperty(entry.getKey(), Workitem.TASK_PREFIX, entry.getValue());
+            for (WorkitemType type : WorkitemType.values()){
+                if (type.isWorkitem()) {
+                    dataLayer.addProperty(entry.getKey(), type, entry.getValue());
+                }
+            }
         }
-        dataLayer.addProperty(Workitem.NAME_PROPERTY, Workitem.PROJECT_PREFIX, false);
+        dataLayer.addProperty(Workitem.NAME_PROPERTY, Scope, false);
     }
 
     /*

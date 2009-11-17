@@ -9,7 +9,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.properties.Configuration.AssetDetailSettings;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;

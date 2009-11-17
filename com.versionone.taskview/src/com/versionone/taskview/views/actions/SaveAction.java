@@ -1,7 +1,5 @@
 package com.versionone.taskview.views.actions;
 
-import javax.xml.bind.ValidationException;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;

@@ -1,7 +1,7 @@
 package com.versionone.taskview.views;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
@@ -53,5 +53,18 @@ public class ErrorMessageDialog extends Dialog {
         Rectangle screen = display.getMonitors()[0].getBounds();
         newShell.setBounds((screen.width - size.x) / 2, (screen.height - size.y) / 2, size.x, size.y);
         newShell.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+    
+    protected void createButtonsForButtonBar(Composite parent) {
+        // create OK and Cancel buttons by default
+        createButton(parent, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL,
+                        true);
+    }
+
+    protected void buttonPressed(int buttonId) {
+        super.buttonPressed(buttonId);
+        if (IDialogConstants.CLOSE_ID == buttonId) {
+            cancelPressed();
+        }
     }
 }

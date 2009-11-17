@@ -423,10 +423,10 @@ public class Workitem {
             return false;
         }
         Workitem other = (Workitem) obj;
-        if (!other.asset.getOid().equals(asset.getOid())) {
-            return false;
-        }
-        return true;
+        if (isPersistent()) {
+            return other.asset.getOid().equals(asset.getOid());
+        } 
+        return asset.equals(other.asset);
     }
 
     @Override

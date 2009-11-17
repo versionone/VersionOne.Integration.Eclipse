@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class ApiDataLayerTester implements IntegrationalTest {
     
-    @Ignore("This test is integrational. It works with V1 server.")
+//    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testCreateTwoWorkitem() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
@@ -18,13 +18,31 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Owners", "Task", true);
         data.addProperty("Status", "Task", true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem story = data.getWorkitemTree().get(0);
-        final Workitem story1 = data.getWorkitemTree().get(1);
-        final Workitem task = data.createWorkitem(Workitem.TASK_PREFIX, story);
-        final Workitem task1 = data.createWorkitem(Workitem.TASK_PREFIX, story1);
+        data.setCurrentProjectId("Scope:1002");
+        Workitem story = data.getWorkitemTree().get(0);
+        Workitem story1 = data.getWorkitemTree().get(1);
+        Workitem task = data.createWorkitem(Workitem.TASK_PREFIX, story);
+        Workitem task1 = data.createWorkitem(Workitem.TASK_PREFIX, story1);
         assertEquals(story, task.parent);
         assertEquals(story1, task1.parent);
-    }
+
+        assertEquals("", task.getPropertyAsString(Workitem.NAME_PROPERTY));
+        assertEquals("", task1.getPropertyAsString(Workitem.NAME_PROPERTY));
+        task.setProperty(Workitem.NAME_PROPERTY, "Task");
+        task1.setProperty(Workitem.NAME_PROPERTY, "Task1");
+        assertEquals("Task", task.getPropertyAsString(Workitem.NAME_PROPERTY));
+        assertEquals("Task1", task1.getPropertyAsString(Workitem.NAME_PROPERTY));
+
+        story = data.getWorkitemTree().get(0);
+        assertEquals(1, story.children.size());
+        task = story.children.get(0);
+        assertEquals("Task", task.getPropertyAsString(Workitem.NAME_PROPERTY));
+
+        story1 = data.getWorkitemTree().get(1);
+        assertEquals(1, story1.children.size());
+        task1 = story1.children.get(0);
+        assertEquals("Task1", task1.getPropertyAsString(Workitem.NAME_PROPERTY));
+}
     
     @Ignore("This test is integrational. It works with V1 server.")
     @Test

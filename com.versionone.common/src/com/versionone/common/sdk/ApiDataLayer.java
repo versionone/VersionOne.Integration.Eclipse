@@ -774,30 +774,59 @@ public class ApiDataLayer {
         return localizer.resolve(key);
     }
 
+    /**
+     * 
+     * @param prefix
+     * @param parent
+     * @return
+     * @throws DataLayerException
+     * @throws IllegalArgumentException
+     *             when prefix or parent inn't a Workitem, or trying to create a
+     *             wrong Workitem hierarchy.
+     */
     public Workitem createWorkitem(String prefix, Workitem parent) throws DataLayerException {
         try {
+            if (!types.containsKey(prefix)) {
+                throw new IllegalArgumentException("Undefined prefix: " + prefix);
+            }
             final Asset asset = new Asset(types.get(prefix));
+            if (!isAWorkitem(asset) || !isAWorkitem(parent.asset)) {
+                throw new IllegalArgumentException("Can only create Workitems, " +
+                		"but received: " + prefix + " for parent: " + parent.getTypePrefix());
+            }
+            if (isAPrimaryWorkitem(asset) == isAPrimaryWorkitem(parent.asset)) {
+                throw new IllegalArgumentException("Cannot create " + prefix + 
+                        " as children of " + parent.getTypePrefix());
+            }
             for (AttributeInfo attrInfo : attributesToQuery) {
                 if (attrInfo.prefix == prefix) {
                     setAssetAttribute(asset, attrInfo.attr, null);
                 }
             }
 
-            if (prefix.equals(Workitem.TEST_PREFIX)) { 
-                // TODO if item.isSecondaryWorkitem()
-                setAssetAttribute(asset, "Parent", parent.asset.getOid());
-                parent.asset.getChildren().add(asset);
-            } else if (prefix.equals(Workitem.STORY_PREFIX)) {
-                // TODO if item.isPrimaryWorkitem()
+            final Workitem item = new Workitem(asset, parent);
+            if (isAPrimaryWorkitem(asset)) {
                 setAssetAttribute(asset, "Scope", currentProjectId);
-                //TODO add to allAssets
+                // TODO add to assetList
+            } else { // Secondary
+                setAssetAttribute(asset, "Parent", parent.asset.getOid());
+                parent.addChildren(item);
             }
-            return new VirtualWorkitem(asset, parent);
+            
+            return item;
         } catch (MetaException e) {
             throw new DataLayerException("Cannot create workitem: " + prefix, e);
         } catch (APIException e) {
             throw new DataLayerException("Cannot create workitem: " + prefix, e);
         }
+    }
+
+    boolean isAWorkitem(Asset asset) {
+        return asset.getAssetType().isA(workitemType);
+    }
+    
+    boolean isAPrimaryWorkitem(Asset asset) {
+        return asset.getAssetType().isA(primaryWorkitemType);
     }
 
     private static void setAssetAttribute(final Asset asset, final String attrName, final Object value)

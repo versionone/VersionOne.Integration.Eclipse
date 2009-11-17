@@ -5,17 +5,27 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ApiDataLayerTester {
+public class ApiDataLayerTester implements IntegrationalTest {
     
-    private static final String V1_PATH = "http://integsrv01/VersionOne/";
-    private static final String V1_USER = "admin";
-    private static final String V1_PASSWORD = "admin";
-
+    @Ignore("This test is integrational. It works with V1 server.")
+    @Test
+    public void testCreateTwoWorkitem() throws Exception {
+        final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", "Task", false);
+        data.addProperty("Owners", "Task", true);
+        data.addProperty("Status", "Task", true);
+        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        final Workitem story = data.getWorkitemTree().get(0);
+        final Workitem story1 = data.getWorkitemTree().get(1);
+        final Workitem task = data.createWorkitem(Workitem.TASK_PREFIX, story);
+        final Workitem task1 = data.createWorkitem(Workitem.TASK_PREFIX, story1);
+        assertEquals(story, task.parent);
+        assertEquals(story1, task1.parent);
+    }
+    
     @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testCreateAndGetWorkitem() throws Exception {
@@ -24,57 +34,49 @@ public class ApiDataLayerTester {
         data.addProperty("Owners", "Task", true);
         data.addProperty("Status", "Task", true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem child = data.getWorkitemTree().get(0).createChild(Workitem.TASK_PREFIX);
-        assertTrue(data.getWorkitemTree().get(0).children.contains(child));
-    }
-    
-    @Ignore("This test is integrational. It works with V1 server.")
-    @Test
-    public void testCreateWorkitem() throws DataLayerException {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", "Task", false);
-        data.addProperty("Owners", "Task", true);
-        data.addProperty("Status", "Task", true);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem test = data.createWorkitem(Workitem.TASK_PREFIX, null);
-        assertEquals(null, test.parent);
-        assertEquals(0, test.children.size());
-        assertFalse(test.canQuickClose());
-        assertFalse(test.canSignup());
+        final Workitem story = data.getWorkitemTree().get(0);
+        final Workitem task = data.createWorkitem(Workitem.TASK_PREFIX, story);
+        assertEquals(story, task.parent);
+        assertEquals(0, task.children.size());
+        assertFalse(task.canQuickClose());
+        assertFalse(task.canSignup());
         try {
-            test.close();
+            task.close();
             fail();
         } catch (UnsupportedOperationException e) {
             // Do nothing
         }
         try {
-            test.quickClose();
+            task.quickClose();
             fail();
         } catch (UnsupportedOperationException e) {
             // Do nothing
         }
         try {
-            test.signup();
+            task.signup();
             fail();
         } catch (UnsupportedOperationException e) {
             // Do nothing
         }
         try {
-            test.revertChanges();
+            task.revertChanges();
             fail();
         } catch (UnsupportedOperationException e) {
             // Do nothing
         }
-        assertEquals("NULL", test.getId());
-        assertEquals(Workitem.TASK_PREFIX, test.getTypePrefix());
-        assertTrue(test.hasChanges());
-        assertFalse(test.isMine());
-        assertFalse(test.isPropertyReadOnly(Workitem.NAME_PROPERTY));
-        assertEquals("", test.getPropertyAsString(Workitem.NAME_PROPERTY));
-        test.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
-        assertEquals("NewName53765", test.getPropertyAsString(Workitem.NAME_PROPERTY));
-        assertEquals("", test.getPropertyAsString(Workitem.STATUS_PROPERTY));
-        test.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
-        assertEquals("In Progress", test.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        assertEquals("NULL", task.getId());
+        assertEquals(Workitem.TASK_PREFIX, task.getTypePrefix());
+        assertTrue(task.hasChanges());
+        assertFalse(task.isMine());
+        assertFalse(task.isPropertyReadOnly(Workitem.NAME_PROPERTY));
+        assertEquals("", task.getPropertyAsString(Workitem.NAME_PROPERTY));
+        task.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
+        assertEquals("NewName53765", task.getPropertyAsString(Workitem.NAME_PROPERTY));
+        assertEquals("", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        task.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
+        assertEquals("In Progress", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        
+        Workitem story2 = data.getWorkitemTree().get(0);
+        assertTrue(story2.children.contains(task));
     }
 }

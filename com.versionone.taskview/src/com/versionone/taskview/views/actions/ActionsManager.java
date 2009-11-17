@@ -92,7 +92,7 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
             
             quickClose.setEnabled(item.canQuickClose());
             signUp.setEnabled(item.canSignup() && !item.isMine());
-            close.setEnabled(!item.isNew());
+            close.setEnabled(item.isPersistent());
         }
     }
      

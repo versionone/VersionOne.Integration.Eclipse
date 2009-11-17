@@ -13,7 +13,6 @@ class AddTaskAction extends Action {
 
     private final TaskView workitemView;
 
-
     AddTaskAction(TaskView workItemView) {
         this.workitemView = workItemView;
 

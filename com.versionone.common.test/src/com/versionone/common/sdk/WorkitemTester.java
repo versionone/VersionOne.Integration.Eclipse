@@ -15,7 +15,7 @@ import org.junit.Test;
  * 
  * @author rozhnev
  */
-public class WorkitemTester {
+public class WorkitemTester implements IntegrationalTest {
 
     @Test
     public void StoryConstructorTest() {
@@ -49,16 +49,29 @@ public class WorkitemTester {
         Assert.assertEquals(0, item11.children.size());
     }
 
-    @Ignore("Not yet implemented")
+    @Ignore("Intergational test")
     @Test
-    public void testVirtualStory() throws DataLayerException {
-        final IAssetType storyType = new AssetTypeMock(Workitem.STORY_PREFIX);
-        final Workitem story = new Workitem(new AssetMock(storyType), null);
+    public void testCreateChild() throws Exception {
+        final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", "Task", false);
+        data.addProperty("Owners", "Task", true);
+        data.addProperty("Status", "Task", true);
+        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        Workitem story = data.getWorkitemTree().get(0);
         final Workitem test = story.createChild(Workitem.TEST_PREFIX);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
         final Workitem task = story.createChild(Workitem.TASK_PREFIX);
+        assertTrue(story.children.contains(task));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
+        
+        //Retrieve new Workitem tree
+        story = data.getWorkitemTree().get(0);
+        assertTrue(story.children.contains(test));
+        assertEquals(story, test.parent);
+        assertEquals(0, test.children.size());
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
@@ -84,46 +97,6 @@ public class WorkitemTester {
         try {
             story.createChild("Wrong");
             fail("Story allow to call createChild with wrong type");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-    }
-    
-    @Ignore("Not yet implemented")
-    @Test
-    public void testVirtualDefect() throws DataLayerException {
-        final IAssetType storyType = new AssetTypeMock(Workitem.DEFECT_PREFIX);
-        final Workitem story = new Workitem(new AssetMock(storyType), null);
-        final Workitem test = story.createChild(Workitem.TEST_PREFIX);
-        assertTrue(story.children.contains(test));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-        final Workitem task = story.createChild(Workitem.TASK_PREFIX);
-        assertTrue(story.children.contains(task));
-        assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
-        
-        try {
-            story.createChild(Workitem.STORY_PREFIX);
-            fail("Defect allow to create child story");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild(Workitem.DEFECT_PREFIX);
-            fail("Defect allow to create child defect");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild(Workitem.PROJECT_PREFIX);
-            fail("Defect allow to create child project");
-        } catch (IllegalArgumentException e) {
-            // Do nothing
-        }
-        try {
-            story.createChild("Wrong");
-            fail("Defect allow to call createChild with wrong type");
         } catch (IllegalArgumentException e) {
             // Do nothing
         }

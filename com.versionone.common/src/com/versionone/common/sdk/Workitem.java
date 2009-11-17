@@ -321,7 +321,7 @@ public class Workitem {
 
     public boolean canQuickClose() {
         try {
-            return (Boolean) getProperty("CheckQuickClose");
+            return isPersistent() && (Boolean) getProperty("CheckQuickClose");
         } catch (IllegalArgumentException e) {
             ApiDataLayer.warning("QuickClose not supported.", e);
             return false;
@@ -337,6 +337,7 @@ public class Workitem {
      * @throws DataLayerException
      */
     public void quickClose() throws DataLayerException {
+        checkPersistance("quickClose");
         commitChanges();
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_QUICK_CLOSE));
@@ -346,9 +347,15 @@ public class Workitem {
         }
     }
 
+    private void checkPersistance(String job) {
+        if (!isPersistent()){
+            throw new UnsupportedOperationException("Cannot " + job + " non-saved workitem.");
+        }
+    }
+
     public boolean canSignup() {
         try {
-            return (Boolean) getProperty("CheckQuickSignup");
+            return isPersistent() && (Boolean) getProperty("CheckQuickSignup");
         } catch (IllegalArgumentException e) {
             ApiDataLayer.warning("QuickSignup not supported.", e);
             return false;
@@ -364,6 +371,7 @@ public class Workitem {
      * @throws DataLayerException
      */
     public void signup() throws DataLayerException {
+        checkPersistance("signup");
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_SIGNUP));
             dataLayer.refreshAsset(this);
@@ -378,6 +386,7 @@ public class Workitem {
      * @throws DataLayerException
      */
     public void close() throws DataLayerException {
+        checkPersistance("close");
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_CLOSE));
             dataLayer.addIgnoreRecursively(this);
@@ -387,6 +396,7 @@ public class Workitem {
     }
 
     public void revertChanges() {
+        checkPersistance("revertChanges");
         dataLayer.revertAsset(asset);
     }
     
@@ -395,11 +405,13 @@ public class Workitem {
     }
 
     /**
+     * Defines whether this workitem exist on server. Otherwise this workitem
+     * created on client and still not committed to server.
      * 
-     * @return always false for this object
+     * @return true if this workitem was persisted to server; false - otherwise.
      */
-    public boolean isNew() {
-        return false;
+    public boolean isPersistent() {
+        return !asset.getOid().isNull();
     }
 
     @Override
@@ -425,5 +437,10 @@ public class Workitem {
     @Override
     public String toString() {
         return getId() + (hasChanges() ? " (Changed)" : "");
+    }
+
+    public void addChildren(Workitem item) {
+        children.add(item);
+        asset.getChildren().add(item.asset);
     }
 }

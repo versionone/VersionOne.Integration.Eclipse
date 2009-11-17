@@ -138,7 +138,7 @@ class RequiredFieldsValidator {
             final String type = asset.getAssetType().getToken();
             final String assetDisplayName = apiDataLayer.localizerResolve(asset.getAssetType().getDisplayName());
             final Attribute idAttribute = asset.getAttributes().get(type + ".Number");
-            final String id = idAttribute != null ? idAttribute.getValue().toString() : "New Items";
+            final String id = idAttribute.getValue() != null ? idAttribute.getValue().toString() : "New Items";
 
             message.append("The following fields are not filled for the ").append(id).append(" ").append(assetDisplayName).append(":");
             message.append(getMessageOfUnfilledFieldsList(requiredData.get(asset), "\n\t", "\n\t")).append("\n");

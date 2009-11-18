@@ -1,6 +1,5 @@
 package com.versionone.common.sdk;
 
-import static com.versionone.common.sdk.WorkitemType.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -77,22 +76,23 @@ class RequiredFieldsValidator {
         return def.isRequired() && !def.isReadOnly();
     }
     
-    Map<Asset, List<RequiredFieldsDTO>> validateRequiredFields(List<Asset> assets) throws DataLayerException, APIException {
+    Map<Asset, List<RequiredFieldsDTO>> validate(List<Asset> assets) throws DataLayerException, APIException {
         Map<Asset, List<RequiredFieldsDTO>> requiredData = new HashMap<Asset, List<RequiredFieldsDTO>>(); 
         for (Asset asset : assets) {            
-            List<RequiredFieldsDTO> fields = getUnfilledRequiredFields(asset);
+            List<RequiredFieldsDTO> fields = validate(asset);
             
             if (fields.size()>0) {
                 requiredData.put(asset, fields);
             }
-            requiredData.putAll(validateRequiredFields(asset.getChildren()));
+            requiredData.putAll(validate(asset.getChildren()));
         }
         return requiredData;
     }
     
-    List<RequiredFieldsDTO> getUnfilledRequiredFields(Asset asset) throws DataLayerException, APIException {
+    List<RequiredFieldsDTO> validate(Asset asset) throws DataLayerException, APIException {
         List<RequiredFieldsDTO> unfilledFields = new ArrayList<RequiredFieldsDTO>();
-        final String type = asset.getAssetType().getToken();
+        final WorkitemType type = WorkitemType.valueOf(asset.getAssetType().getToken());
+        
         if (!requiredFieldsList.containsKey(type)) {
             return unfilledFields;
         }

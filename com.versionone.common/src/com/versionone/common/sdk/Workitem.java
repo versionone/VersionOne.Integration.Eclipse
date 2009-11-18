@@ -301,10 +301,26 @@ public class Workitem {
     }
 
     public void commitChanges() throws DataLayerException {
+        validateRequiredFields();
+        
         try {
             dataLayer.commitAsset(asset);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to commit changes of workitem: " + this, e);
+        }
+    }
+    
+    public void validateRequiredFields() throws DataLayerException {
+        RequiredFieldsValidator validator = dataLayer.getRequiredFieldsValidator();
+        try {
+            List<RequiredFieldsDTO> requiredData = validator.validate(asset);
+
+            if (requiredData.size() > 0) {
+                String message = validator.getMessageOfUnfilledFieldsList(requiredData, "\n", ", ");
+                throw new ValidatorException(message);
+            }
+        } catch (APIException e) {
+            throw ApiDataLayer.warning("Cannot validate required fields.", e);
         }
     }
 

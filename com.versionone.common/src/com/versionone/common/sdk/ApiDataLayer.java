@@ -93,7 +93,7 @@ public class ApiDataLayer {
     private IServices services;
     private ILocalizer localizer;
     
-    private RequiredFieldsValidator reqFileds; 
+    private RequiredFieldsValidator requiredFieldsValidator; 
 
     private String currentProjectId;
     private boolean showAllTasks = true;
@@ -124,7 +124,7 @@ public class ApiDataLayer {
         testConnection = isConnected = true;
         memberOid = this.services.getLoggedIn();
         listPropertyValues = getListPropertyValues();
-        reqFileds = new RequiredFieldsValidator(this.metaModel, this.services);
+        requiredFieldsValidator = new RequiredFieldsValidator(this.metaModel, this.services);
     }
 
     public static ApiDataLayer getInstance() {
@@ -175,8 +175,8 @@ public class ApiDataLayer {
             listPropertyValues = getListPropertyValues();
             isConnected = true;
             updateCurrentProjectId();
-            reqFileds = new RequiredFieldsValidator(metaModel, services);
-            reqFileds.init();
+            requiredFieldsValidator = new RequiredFieldsValidator(metaModel, services);
+            requiredFieldsValidator.init();
             
             return;
         } catch (MetaException e) {
@@ -398,11 +398,11 @@ public class ApiDataLayer {
                 }
             }
         }
-        if (reqFileds.getFields(type) == null) {
+        if (requiredFieldsValidator.getFields(type) == null) {
             return;
         }
         
-        for (RequiredFieldsDTO field : reqFileds.getFields(type)) {
+        for (RequiredFieldsDTO field : requiredFieldsValidator.getFields(type)) {
             try {
                 IAttributeDefinition def = types.get(type).getAttributeDefinition(field.name);
                 if (!alreadyUsedDefinition.contains(def)) {
@@ -538,7 +538,7 @@ public class ApiDataLayer {
         }
     }
 
-    void commitAsset(Asset asset) throws V1Exception {
+    void commitAsset(Asset asset) throws V1Exception, DataLayerException, ValidatorException {               
         services.save(asset);
         commitEffort(asset);
     }
@@ -564,10 +564,10 @@ public class ApiDataLayer {
         List<Asset> assets = Arrays.asList(assetList.getAssets());
         Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
         try {
-            requiredData = reqFileds.validateRequiredFields(assets);
+            requiredData = requiredFieldsValidator.validate(assets);
 
             if (requiredData.size() > 0) {
-                String message = reqFileds.createErrorMessage(requiredData);
+                String message = requiredFieldsValidator.createErrorMessage(requiredData);
                 throw new ValidatorException(message);
             }       
         } catch (APIException e) {
@@ -581,7 +581,7 @@ public class ApiDataLayer {
         }
     }
 
-    private void commitAssetsRecursively(List<Asset> assets) throws V1Exception {
+    private void commitAssetsRecursively(List<Asset> assets) throws V1Exception, DataLayerException {
         for (Asset asset : assets) {
             // do not commit assets that were closed and their children
             if (assetsToIgnore.contains(asset)) {
@@ -817,6 +817,10 @@ public class ApiDataLayer {
         } else {
             asset.ensureAttribute(def);
         }
+    }
+
+    public RequiredFieldsValidator getRequiredFieldsValidator() {
+        return requiredFieldsValidator;
     }
     
 }

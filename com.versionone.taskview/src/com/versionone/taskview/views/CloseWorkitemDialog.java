@@ -20,6 +20,7 @@ import com.versionone.taskview.Activator;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
+import com.versionone.common.sdk.ValidatorException;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Workitem;
 
@@ -144,17 +145,26 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     protected void okPressed() {
         super.okPressed();
         try {
-        	if(selectedStatusIndex >= 0) {
-        		ValueId selectedStatus = statuses.getValueIdByIndex(selectedStatusIndex);
-        		workitem.setProperty(Workitem.STATUS_PROPERTY, selectedStatus);
-        		workitem.commitChanges();
-        	}
-			workitem.close();
-			if(openingViewer != null) {
-				openingViewer.refreshViewer(null);
-			}
-		} catch (DataLayerException e) {
-			Activator.logError("Failed to close workitem", e);
-		}
+            if (selectedStatusIndex >= 0) {
+                ValueId selectedStatus = statuses.getValueIdByIndex(selectedStatusIndex);
+                workitem.setProperty(Workitem.STATUS_PROPERTY, selectedStatus);
+                workitem.commitChanges();
+            } else {
+                workitem.validateRequiredFields();
+            }
+            workitem.close();
+            if (openingViewer != null) {
+                openingViewer.refreshViewer(null);
+            }
+        } catch (ValidatorException ex) {
+            Activator.logWarning("Workitem cannot be closed because some required fields are empty:" + ex.getMessage());
+            openingViewer.showMessage("Workitem cannot be closed because some required fields are empty:" + ex.getMessage());
+            if (openingViewer != null) {
+                openingViewer.refreshViewer(null);
+            }
+        } catch (DataLayerException e) {
+            Activator.logError("Failed to close workitem", e);
+        }
+        
     }
 }

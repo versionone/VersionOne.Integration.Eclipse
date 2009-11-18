@@ -454,20 +454,6 @@ public class ApiDataLayer {
     }
 
     static String resolvePropertyKey(String propertyAlias) {
-        
-        //if (propertyAlias.equals("DefectStatus")) {
-        //    return "StoryStatus";
-        //} else if (propertyAlias.equals("DefectSource")) {
-        //    return "StorySource";
-        //} else if (propertyAlias.equals("ScopeBuildProjects")) {
-        //    return "BuildProject";
-        //} else if (propertyAlias.equals("TaskOwners") || propertyAlias.equals("StoryOwners")
-        //        || propertyAlias.equals("DefectOwners") || propertyAlias.equals("TestOwners")) {
-        //    return "Member";
-        //} else if (propertyAlias.equals("TaskScope") || propertyAlias.equals("StoryScope")
-        //        || propertyAlias.equals("DefectScope") || propertyAlias.equals("TestScope")) {
-        //    return "Scope";
-        //}
         if (propertyAliases.containsKey(propertyAlias)) {
             return propertyAliases.get(propertyAlias);
         }

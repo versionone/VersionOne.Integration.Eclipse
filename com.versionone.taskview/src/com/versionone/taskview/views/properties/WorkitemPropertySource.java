@@ -35,22 +35,15 @@ public class WorkitemPropertySource implements IPropertySource {
     }
 
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        Configuration cfg = Configuration.getInstance();
-        ColumnSetting[] columns;
-        if (item.getType().isWorkitem()) {
-            columns = cfg.assetDetailSettings.getColumns(item.getType());
-        } else {
-            columns = cfg.projectTreeSettings.projectColumns;
-        }
-        ArrayList<IPropertyDescriptor> res = new ArrayList<IPropertyDescriptor>(columns.length);
-        for(ColumnSetting column : columns) {
-            if (column.effortTracking && !ApiDataLayer.getInstance().isTrackEffortEnabled()) {
-                continue;
+        final Configuration cfg = Configuration.getInstance();
+        final ColumnSetting[] columns = cfg.getColumns(item.getType());
+        final ArrayList<IPropertyDescriptor> res = new ArrayList<IPropertyDescriptor>(columns.length);
+        for (ColumnSetting column : columns) {
+            if (!column.effortTracking || ApiDataLayer.getInstance().isTrackEffortEnabled()) {
+                res.add(createPropertyDescriptor(column));
             }
-            res.add(createPropertyDescriptor(column));
         }
-        res.trimToSize();
-        return res.toArray(new IPropertyDescriptor[0]);
+        return res.toArray(new IPropertyDescriptor[res.size()]);
     }
 
     private PropertyDescriptor createPropertyDescriptor(ColumnSetting col) {
@@ -60,7 +53,8 @@ public class WorkitemPropertySource implements IPropertySource {
             localName = localName.substring(COLUMN_TITLE_PREFIX.length());
         final PropertyDescriptor desc;
         if (col.type.equals(AssetDetailSettings.STRING_TYPE) || col.type.equals(AssetDetailSettings.EFFORT_TYPE)) {
-            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly || item.isPropertyReadOnly(col.attribute));
+            desc = new CustomTextPropertyDescriptor(col.attribute, localName, col.readOnly
+                    || item.isPropertyReadOnly(col.attribute));
         } else if (col.type.equals(AssetDetailSettings.LIST_TYPE)) {
             desc = new ListPropertyDescriptor(col.attribute, localName, item);
         } else if (col.type.equals(AssetDetailSettings.MULTI_VALUE_TYPE)) {
@@ -72,7 +66,7 @@ public class WorkitemPropertySource implements IPropertySource {
         }
         desc.setCategory(col.category);
         return desc;
-    }   
+    }
 
     public Object getPropertyValue(Object id) {
         return item.getProperty((String) id) == null ? "" : item.getProperty((String) id);

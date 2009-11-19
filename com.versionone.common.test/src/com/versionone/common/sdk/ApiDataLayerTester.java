@@ -16,7 +16,7 @@ import static com.versionone.common.sdk.WorkitemType.Test;
 
 public class ApiDataLayerTester implements IntegrationalTest {
 
-//    @Ignore("This test is integrational. It works with V1 server.")
+    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testCreateAndGetWorkitem() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
@@ -70,7 +70,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertTrue(story2.children.contains(task));
     }
     
-//    @Ignore("Intergational test")
+    @Ignore("Intergational test")
     @Test
     public void testCreateChild() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();

@@ -47,7 +47,7 @@ public class ApiDataLayer {
     private static final String LOCALAIZER_SUFFIX = "loc.v1/";
     private static final String DATA_SUFFIX = "rest-1.v1/";
     private static final String CONFIG_SUFFIX = "config.v1/";
-    
+
     private static final Map<String, String> propertyAliases = new HashMap<String, String>();
     static {
         propertyAliases.put("DefectStatus", "StoryStatus");
@@ -63,7 +63,8 @@ public class ApiDataLayer {
         propertyAliases.put("TestScope", "Scope");
     }
 
-    private final Map<WorkitemType, IAssetType> types = new HashMap<WorkitemType, IAssetType>(WorkitemType.values().length);
+    private final Map<WorkitemType, IAssetType> types = new HashMap<WorkitemType, IAssetType>(
+            WorkitemType.values().length);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
     private final Set<Asset> assetsToIgnore = new HashSet<Asset>();
     private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
@@ -92,8 +93,8 @@ public class ApiDataLayer {
     private IMetaModel metaModel;
     private IServices services;
     private ILocalizer localizer;
-    
-    private RequiredFieldsValidator requiredFieldsValidator; 
+
+    private RequiredFieldsValidator requiredFieldsValidator;
 
     private String currentProjectId;
     private boolean showAllTasks = true;
@@ -104,8 +105,8 @@ public class ApiDataLayer {
     /**
      * Special method ONLY for testing.
      */
-    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTrackingLevel, Object defectTrackingLevel)
-            throws Exception {
+    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTrackingLevel,
+            Object defectTrackingLevel) throws Exception {
         this.metaModel = (IMetaModel) metaModel;
         this.services = (IServices) services;
         this.localizer = (ILocalizer) localizer;
@@ -164,7 +165,7 @@ public class ApiDataLayer {
 
                 V1APIConnector dataConnector = new V1APIConnector(path + DATA_SUFFIX, userName, password);
                 services = new Services(metaModel, dataConnector);
-                
+
             }
             if (types.isEmpty()) {
                 initTypes();
@@ -177,7 +178,7 @@ public class ApiDataLayer {
             updateCurrentProjectId();
             requiredFieldsValidator = new RequiredFieldsValidator(metaModel, services);
             requiredFieldsValidator.init();
-            
+
             return;
         } catch (MetaException e) {
             throw warning("Cannot connect to V1 server.", e);
@@ -208,7 +209,7 @@ public class ApiDataLayer {
     }
 
     private void initTypes() {
-        for (WorkitemType type : WorkitemType.values()){
+        for (WorkitemType type : WorkitemType.values()) {
             types.put(type, metaModel.getAssetType(type.name()));
         }
         workitemType = metaModel.getAssetType("Workitem");
@@ -260,8 +261,8 @@ public class ApiDataLayer {
 
                 // clear all definitions used in previous queries
                 alreadyUsedDefinition.clear();
-                for(WorkitemType type : WorkitemType.values()){
-                    if (type.isWorkitem()){
+                for (WorkitemType type : WorkitemType.values()) {
+                    if (type.isWorkitem()) {
                         addSelection(query, type);
                     }
                 }
@@ -295,25 +296,27 @@ public class ApiDataLayer {
 
     /**
      * Sets visibility for workitems
-     * @param showAllTasks true  - all workitems can be shown
-     *                     false - only changed, new and workitem with current owner can be shown 
+     * 
+     * @param showAllTasks
+     *            true - all workitems can be shown false - only changed, new
+     *            and workitem with current owner can be shown
      */
     public void setShowAllTasks(boolean showAllTasks) {
-        this.showAllTasks = showAllTasks;         
+        this.showAllTasks = showAllTasks;
     }
 
     /**
-     * Determines whether this Asset can be showed or no. 
+     * Determines whether this Asset can be showed or no.
      * 
-     * @param asset to determine visibility status.
+     * @param asset
+     *            to determine visibility status.
      * @return true if Asset can be showed at the moment; otherwise - false.
      */
     public boolean isShowed(Asset asset) {
         if (showAllTasks || asset.hasChanged()) {
             return true;
         }
-        
-        
+
         final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
         final Object[] owners = attribute.getValues();
         for (Object oid : owners) {
@@ -401,7 +404,7 @@ public class ApiDataLayer {
         if (requiredFieldsValidator.getFields(type) == null) {
             return;
         }
-        
+
         for (RequiredFieldsDTO field : requiredFieldsValidator.getFields(type)) {
             try {
                 IAttributeDefinition def = types.get(type).getAttributeDefinition(field.name);
@@ -411,7 +414,7 @@ public class ApiDataLayer {
                 }
             } catch (MetaException e) {
                 warning("Wrong attribute: " + field.name, e);
-            }            
+            }
         }
     }
 
@@ -461,8 +464,8 @@ public class ApiDataLayer {
         return propertyAlias;
     }
 
-    PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException,
-            OidException, MetaException {
+    PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException, OidException,
+            MetaException {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
         IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NAME_PROPERTY);
@@ -524,7 +527,7 @@ public class ApiDataLayer {
         }
     }
 
-    void commitAsset(Asset asset) throws V1Exception, DataLayerException, ValidatorException {               
+    void commitAsset(Asset asset) throws V1Exception, DataLayerException, ValidatorException {
         services.save(asset);
         commitEffort(asset);
     }
@@ -546,7 +549,7 @@ public class ApiDataLayer {
 
     public void commitChanges() throws DataLayerException {
         checkConnection();
-        
+
         List<Asset> assets = Arrays.asList(assetList.getAssets());
         Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
         try {
@@ -555,11 +558,11 @@ public class ApiDataLayer {
             if (requiredData.size() > 0) {
                 String message = requiredFieldsValidator.createErrorMessage(requiredData);
                 throw new ValidatorException(message);
-            }       
+            }
         } catch (APIException e) {
             throw warning("Cannot validate required fields.", e);
-        }        
-        
+        }
+
         try {
             commitAssetsRecursively(assets);
         } catch (V1Exception e) {
@@ -759,8 +762,8 @@ public class ApiDataLayer {
     public Workitem createWorkitem(WorkitemType type, Workitem parent) throws DataLayerException {
         try {
             if (!type.isWorkitem()) {
-                throw new IllegalArgumentException("Can only create Workitems, " +
-                                "but received: " + type + " for parent: " + parent.getType());
+                throw new IllegalArgumentException("Can only create Workitems, " + "but received: " + type
+                        + " for parent: " + parent.getType());
             }
             final Asset asset = new Asset(types.get(type));
             for (AttributeInfo attrInfo : attributesToQuery) {
@@ -769,24 +772,13 @@ public class ApiDataLayer {
                 }
             }
 
-            final Workitem item = new Workitem(asset, parent);
             if (type.isPrimary()) {
-                if (parent != null){
-                    throw new IllegalArgumentException("Cannot create " + type + 
-                            " as children of " + parent.getType());
+                if (parent != null) {
+                    throw new IllegalArgumentException("Cannot create " + type + " as children of " + parent.getType());
                 }
-                setAssetAttribute(asset, "Scope", currentProjectId);
-                // TODO add to assetList
-            } else { // Secondary
-                if (parent == null || parent.getType().isSecondary()){
-                    throw new IllegalArgumentException("Cannot create " + type + 
-                            " as children of " + parent);
-                }
-                setAssetAttribute(asset, "Parent", parent.asset.getOid());
-                parent.addChildren(item);
+                return createPrimaryWorkitem(asset);
             }
-            
-            return item;
+            return createSecondaryWorkitem(asset, parent);
         } catch (MetaException e) {
             throw new DataLayerException("Cannot create workitem: " + type, e);
         } catch (APIException e) {
@@ -794,6 +786,36 @@ public class ApiDataLayer {
         }
     }
 
+    private Workitem createPrimaryWorkitem(Asset asset) throws MetaException, APIException {
+        final Workitem item = new Workitem(asset, null);
+        setAssetAttribute(asset, "Scope", currentProjectId);
+        // TODO add to assetList
+        return item;
+    }
+
+    private Workitem createSecondaryWorkitem(Asset asset, Workitem parent) throws MetaException, APIException {
+        if (parent == null || parent.getType().isSecondary()) {
+            throw new IllegalArgumentException("Cannot create " + asset.getAssetType() + " as children of " + parent);
+        }
+        setAssetAttribute(asset, "Parent", parent.asset.getOid());
+        final Workitem item = new Workitem(asset, parent);
+        parent.children.add(item);
+        parent.asset.getChildren().add(item.asset);
+        return item;
+    }
+
+    /**
+     * Set Asset attribute value.
+     * 
+     * @param asset
+     * @param attrName
+     * @param value
+     *            of the attribute; if null then attribute will be just ensured.
+     * @throws MetaException
+     *             if something wrong with attribute name.
+     * @throws APIException
+     *             if something wrong with attribute setting/ensuring.
+     */
     private static void setAssetAttribute(final Asset asset, final String attrName, final Object value)
             throws MetaException, APIException {
         final IAssetType type = asset.getAssetType();
@@ -808,5 +830,5 @@ public class ApiDataLayer {
     public RequiredFieldsValidator getRequiredFieldsValidator() {
         return requiredFieldsValidator;
     }
-    
+
 }

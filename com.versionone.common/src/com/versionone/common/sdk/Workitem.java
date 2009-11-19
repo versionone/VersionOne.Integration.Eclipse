@@ -302,14 +302,14 @@ public class Workitem {
 
     public void commitChanges() throws DataLayerException {
         validateRequiredFields();
-        
+
         try {
             dataLayer.commitAsset(asset);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to commit changes of workitem: " + this, e);
         }
     }
-    
+
     public void validateRequiredFields() throws DataLayerException {
         RequiredFieldsValidator validator = dataLayer.getRequiredFieldsValidator();
         try {
@@ -358,7 +358,7 @@ public class Workitem {
     }
 
     private void checkPersistance(String job) {
-        if (!isPersistent()){
+        if (!isPersistent()) {
             throw new UnsupportedOperationException("Cannot " + job + " non-saved workitem.");
         }
     }
@@ -409,7 +409,7 @@ public class Workitem {
         checkPersistance("revertChanges");
         dataLayer.revertAsset(asset);
     }
-    
+
     public Workitem createChild(WorkitemType type) throws DataLayerException {
         return dataLayer.createWorkitem(type, this);
     }
@@ -435,7 +435,7 @@ public class Workitem {
         Workitem other = (Workitem) obj;
         if (isPersistent()) {
             return other.asset.getOid().equals(asset.getOid());
-        } 
+        }
         return asset.equals(other.asset);
     }
 
@@ -447,10 +447,5 @@ public class Workitem {
     @Override
     public String toString() {
         return getId() + (hasChanges() ? " (Changed)" : "");
-    }
-
-    public void addChildren(Workitem item) {
-        children.add(item);
-        asset.getChildren().add(item.asset);
     }
 }

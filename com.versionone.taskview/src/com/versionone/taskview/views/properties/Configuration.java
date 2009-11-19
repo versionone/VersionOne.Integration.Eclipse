@@ -77,25 +77,6 @@ public class Configuration {
         @XmlElementWrapper(name = "DefectColumns")
         @XmlElement(name = "ColumnSetting")
         public ColumnSetting[] defectColumns;
-
-        public AssetDetailSettings() {
-        }
-
-        public ColumnSetting[] getColumns(WorkitemType type) {
-            if (type.equals(Story)) {
-                return storyColumns;
-            } else if (type.equals(Task)) {
-                return taskColumns;
-            } else if (type.equals(Defect)) {
-                return defectColumns;
-            } else if (type.equals(Test)) {
-                return testColumns;
-            } else if (type.equals(Scope)) {
-                return testColumns;
-            } else {
-                throw new IllegalArgumentException("Unknown type: " + type);
-            }
-        }
     }
 
     public static class ProjectTreeSettings {
@@ -139,6 +120,22 @@ public class Configuration {
             this.category = category;
             this.readOnly = readOnly;
             this.effortTracking = effortTracking;
+        }
+    }
+
+    public ColumnSetting[] getColumns(WorkitemType type) {
+        if (type.equals(Story)) {
+            return assetDetailSettings.storyColumns;
+        } else if (type.equals(Task)) {
+            return assetDetailSettings.taskColumns;
+        } else if (type.equals(Defect)) {
+            return assetDetailSettings.defectColumns;
+        } else if (type.equals(Test)) {
+            return assetDetailSettings.testColumns;
+        } else if (type.equals(Scope)) {
+            return projectTreeSettings.projectColumns;
+        } else {
+            throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 }

@@ -29,7 +29,7 @@ class SaveAction extends Action {
 
     @Override
     public void run() {
-        workitemView.getActionsManager().enableAction(false, false);
+        workitemView.getActionsManager().enableActions(false, false);
         if (treeViewer.isCellEditorActive()) {
             treeViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
         }
@@ -51,6 +51,6 @@ class SaveAction extends Action {
         }
 
         if (workitemView.loadDataToTable())
-            workitemView.getActionsManager().enableAction(true, true);
+            workitemView.getActionsManager().enableActions(true, true);
     }
 }

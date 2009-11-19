@@ -171,7 +171,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     public void enableTreeAndActions(boolean enabled) {
-        actionsManager.enableAction(enabled, enabled);
+        actionsManager.enableActions(enabled, enabled);
         enableTree(enabled);
     }
 
@@ -184,7 +184,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
 
     public void disableAllButRefresh() {
         viewer.getTree().setEnabled(false);
-        actionsManager.enableAction(false, true);
+        actionsManager.enableActions(false, true);
     }
     
     

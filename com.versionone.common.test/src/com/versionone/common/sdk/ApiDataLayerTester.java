@@ -18,7 +18,60 @@ public class ApiDataLayerTester implements IntegrationalTest {
 
     @Ignore("This test is integrational. It works with V1 server.")
     @Test
-    public void testCreateAndGetWorkitem() throws Exception {
+    public void testCreateAndGetDefect() throws Exception {
+        final ApiDataLayer data = ApiDataLayer.getInstance();
+        data.addProperty("Name", Task, false);
+        data.addProperty("Owners", Task, true);
+        data.addProperty("Status", Task, true);
+        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        final Workitem defect = data.createWorkitem(Defect, null);
+        assertEquals(null, defect.parent);
+        assertEquals(0, defect.children.size());
+        assertFalse(defect.canQuickClose());
+        assertFalse(defect.canSignup());
+        try {
+            defect.close();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // Do nothing
+        }
+        try {
+            defect.quickClose();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // Do nothing
+        }
+        try {
+            defect.signup();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // Do nothing
+        }
+        try {
+            defect.revertChanges();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // Do nothing
+        }
+        assertEquals("NULL", defect.getId());
+        assertEquals(Defect, defect.getType());
+        assertTrue(defect.hasChanges());
+        assertFalse(defect.isMine());
+        assertFalse(defect.isPropertyReadOnly(Workitem.NAME_PROPERTY));
+        assertEquals("", defect.getPropertyAsString(Workitem.NAME_PROPERTY));
+        defect.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
+        assertEquals("NewName53765", defect.getPropertyAsString(Workitem.NAME_PROPERTY));
+        assertEquals("", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        // defect.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
+        // assertEquals("In Progress",
+        // defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
+
+        assertTrue(data.getWorkitemTree().contains(defect));
+    }
+
+    @Ignore("This test is integrational. It works with V1 server.")
+    @Test
+    public void testCreateAndGetTask() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
         data.addProperty("Name", Task, false);
         data.addProperty("Owners", Task, true);
@@ -69,7 +122,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         Workitem story2 = data.getWorkitemTree().get(0);
         assertTrue(story2.children.contains(task));
     }
-    
+
     @Ignore("Intergational test")
     @Test
     public void testCreateChild() throws Exception {

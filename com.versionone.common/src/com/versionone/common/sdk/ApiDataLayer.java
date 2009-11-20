@@ -2,6 +2,7 @@ package com.versionone.common.sdk;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -596,40 +597,26 @@ public class ApiDataLayer {
         }
     }
 
-    // TODO refactor
     void refreshAsset(Workitem workitem) throws DataLayerException {
         try {
-            IAttributeDefinition stateDef = workitem.asset.getAssetType().getAttributeDefinition("AssetState");
-            Query query = new Query(workitem.asset.getOid().getMomentless(), false);
+            final Asset oldAsset = workitem.asset;
+            final IAttributeDefinition stateDef = oldAsset.getAssetType().getAttributeDefinition("AssetState");
+            final Query query = new Query(oldAsset.getOid().getMomentless(), false);
             addSelection(query, workitem.getType(), true);
             query.getSelection().add(stateDef);
-            QueryResult newAssets = services.retrieve(query);
+            final QueryResult queryRes = services.retrieve(query);
+            Assert.isTrue(queryRes.getTotalAvaliable() == 1, "Query should return exactly one asset.");
+            final Asset newAsset = queryRes.getAssets()[0];
 
-            Asset[] parentArray = assetList.toArray(new Asset[0]);
-            List<Asset> parentList = null;
-            if (workitem.parent != null) {
-                parentList = workitem.parent.asset.getChildren();
+            if (workitem.getType().isPrimary()) {
+                Assert.isTrue(Collections.replaceAll(assetList, oldAsset, newAsset), "assetList must contains asset:"
+                        + oldAsset);
+            } else {
+                Assert.isTrue(Collections.replaceAll(workitem.parent.asset.getChildren(), oldAsset, newAsset),
+                        "parent Asset:" + workitem.parent.asset + " must contains asset:" + oldAsset
+                                + " in its children.");
             }
-
-            Assert.isTrue(newAssets.getTotalAvaliable() == 1, "Query should return exactly one asset.");
-
-            Asset newAsset = newAssets.getAssets()[0];
-
-            // Adding new Asset to parent
-            for (int i = 0; i < parentArray.length; i++) {
-                if (parentArray[i].equals(workitem.asset)) {
-                    parentArray[i] = newAsset;
-                    break;
-                }
-            }
-
-            if (parentList != null) {
-                int index = parentList.indexOf(workitem.asset);
-                if (index != -1) {
-                    parentList.set(index, newAsset);
-                }
-            }
-            newAsset.getChildren().addAll(workitem.asset.getChildren());
+            newAsset.getChildren().addAll(oldAsset.getChildren());
         } catch (MetaException ex) {
             throw warning("Unable to get workitems.", ex);
         } catch (Exception ex) {

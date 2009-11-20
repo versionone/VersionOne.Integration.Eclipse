@@ -65,7 +65,6 @@ public class Workitem {
 
         children = new ArrayList<Workitem>(asset.getChildren().size());
         for (Asset childAsset : asset.getChildren()) {
-
             if (!getType().isWorkitem() || dataLayer.isShowed(childAsset)) {
                 children.add(new Workitem(childAsset, this));
             }

@@ -273,7 +273,7 @@ public class ApiDataLayer {
                 QueryResult result = services.retrieve(query);
                 assetList = new ArrayList<Asset>(result.getAssets().length + 20);
                 assetList.addAll(Arrays.asList(result.getAssets()));
-                
+
             } catch (MetaException ex) {
                 throw warning("Unable to get workitems.", ex);
             } catch (Exception ex) {
@@ -288,7 +288,6 @@ public class ApiDataLayer {
                 res.add(new Workitem(asset, null));
             }
         }
-        
         return res;
     }
 
@@ -548,11 +547,10 @@ public class ApiDataLayer {
     public void commitChanges() throws DataLayerException {
         checkConnection();
         Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
-        
         try {
             requiredData = requiredFieldsValidator.validate(assetList);
 
-            if (requiredData.size() > 0) {
+            if (!requiredData.isEmpty()) {
                 String message = requiredFieldsValidator.createErrorMessage(requiredData);
                 throw new ValidatorException(message);
             }
@@ -594,8 +592,8 @@ public class ApiDataLayer {
             // we are sure that asset in workitem and in assetList the same
             item.parent.asset.getChildren().remove(item.asset);
         } else {
-            assetList.remove(item.asset);            
-        }        
+            assetList.remove(item.asset);
+        }
     }
 
     // TODO refactor
@@ -753,14 +751,12 @@ public class ApiDataLayer {
             }
             final Asset asset = new Asset(types.get(type));
             for (AttributeInfo attrInfo : attributesToQuery) {
-                
                 if (attrInfo.type == type) {
                     setAssetAttribute(asset, attrInfo.attr, null);
                 }
             }
 
             if (type.isPrimary()) {
-                
                 if (parent != null) {
                     throw new IllegalArgumentException("Cannot create " + type + " as children of " + parent.getType());
                 }

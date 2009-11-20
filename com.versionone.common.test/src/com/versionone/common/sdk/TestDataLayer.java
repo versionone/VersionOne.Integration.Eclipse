@@ -27,7 +27,7 @@ public class TestDataLayer extends ApiDataLayer {
     private Map<String, PropertyValues> listProperties = new HashMap<String, PropertyValues>();
 
     @Override
-    public void addIgnoreRecursively(Workitem item) {
+    public void closeWorkitem(Workitem item) {
     }
 
     @Override

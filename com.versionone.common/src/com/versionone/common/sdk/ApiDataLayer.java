@@ -251,11 +251,9 @@ public class ApiDataLayer {
         if (currentProjectId == null) {
             currentProjectId = getDefaultProjectId();
         }
-
         if (assetList == null) {
             try {
                 IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
-
                 Query query = new Query(workitemType, parentDef);
 
                 // clear all definitions used in previous queries
@@ -267,23 +265,19 @@ public class ApiDataLayer {
                 }
 
                 query.setFilter(getScopeFilter(workitemType));
-
                 query.getOrderBy().majorSort(primaryWorkitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
                 query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
-
+                
                 QueryResult result = services.retrieve(query);
                 assetList = new ArrayList<Asset>(result.getAssets().length + 20);
                 assetList.addAll(Arrays.asList(result.getAssets()));
-
             } catch (MetaException ex) {
                 throw warning("Unable to get workitems.", ex);
             } catch (Exception ex) {
                 throw warning("Unable to get workitems.", ex);
             }
         }
-
         List<Workitem> res = new ArrayList<Workitem>(assetList.size());
-
         for (Asset asset : assetList) {
             if (isShowed(asset)) {
                 res.add(new Workitem(asset, null));
@@ -588,7 +582,7 @@ public class ApiDataLayer {
         return false;
     }
 
-    void addIgnoreRecursively(Workitem item) {
+    void closeWorkitem(Workitem item) {
         if (item.parent != null && assetList.contains(item.parent.asset)) {
             // we are sure that asset in workitem and in assetList the same
             item.parent.asset.getChildren().remove(item.asset);
@@ -760,6 +754,15 @@ public class ApiDataLayer {
     private Workitem createPrimaryWorkitem(Asset asset) throws MetaException, APIException {
         final Workitem item = new Workitem(asset, null);
         setAssetAttribute(asset, "Scope", currentProjectId);
+        //TODO need to set Timebox (sprint) or it will be created not in current sprint and will not be shown
+        //setAssetAttribute(asset, "Timebox", "ACTV");
+
+        final IAssetType type = asset.getAssetType();
+        IAttributeDefinition def = type.getAttributeDefinition("Scope.Name");
+        try {
+            asset.loadAttributeValue(def, getProjectById(currentProjectId).getProperty("Name"));
+        } catch (Exception e) {
+        }        
         assetList.add(asset);
         return item;
     }
@@ -791,10 +794,10 @@ public class ApiDataLayer {
             throws MetaException, APIException {
         final IAssetType type = asset.getAssetType();
         IAttributeDefinition def = type.getAttributeDefinition(attrName);
-        if (value != null && (value instanceof Oid && !value.equals(Oid.Null))) {
-            asset.setAttributeValue(def, value);
-        } else {
+        if (value == null || (value instanceof Oid && value.equals(Oid.Null))) {
             asset.ensureAttribute(def);
+        } else {
+            asset.setAttributeValue(def, value);
         }
     }
 

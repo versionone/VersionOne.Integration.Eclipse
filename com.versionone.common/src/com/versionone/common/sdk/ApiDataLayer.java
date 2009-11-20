@@ -66,7 +66,6 @@ public class ApiDataLayer {
     private final Map<WorkitemType, IAssetType> types = new HashMap<WorkitemType, IAssetType>(
             WorkitemType.values().length);
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
-    private final Set<Asset> assetsToIgnore = new HashSet<Asset>();
     private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
 
     private IAssetType workitemType;
@@ -83,7 +82,7 @@ public class ApiDataLayer {
     private String password;
     private boolean integrated;
 
-    private QueryResult assetList;
+    private List<Asset> assetList;
     private static Set<AttributeInfo> attributesToQuery = new HashSet<AttributeInfo>();
     private Map<String, PropertyValues> listPropertyValues;
 
@@ -201,7 +200,6 @@ public class ApiDataLayer {
     }
 
     private void cleanConnectionData() {
-        assetsToIgnore.clear();
         efforts.clear();
         types.clear();
         workitemType = null;
@@ -272,7 +270,10 @@ public class ApiDataLayer {
                 query.getOrderBy().majorSort(primaryWorkitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
                 query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
-                assetList = services.retrieve(query);
+                QueryResult result = services.retrieve(query);
+                assetList = new ArrayList<Asset>(result.getAssets().length + 20);
+                assetList.addAll(Arrays.asList(result.getAssets()));
+                
             } catch (MetaException ex) {
                 throw warning("Unable to get workitems.", ex);
             } catch (Exception ex) {
@@ -280,17 +281,14 @@ public class ApiDataLayer {
             }
         }
 
-        List<Workitem> res = new ArrayList<Workitem>(assetList.getAssets().length);
+        List<Workitem> res = new ArrayList<Workitem>(assetList.size());
 
-        for (Asset asset : assetList.getAssets()) {
-            if (isAssetSuspended(asset)) {
-                continue;
-            }
-
+        for (Asset asset : assetList) {
             if (isShowed(asset)) {
                 res.add(new Workitem(asset, null));
             }
         }
+        
         return res;
     }
 
@@ -313,7 +311,7 @@ public class ApiDataLayer {
      * @return true if Asset can be showed at the moment; otherwise - false.
      */
     public boolean isShowed(Asset asset) {
-        if (showAllTasks || asset.hasChanged()) {
+        if (showAllTasks || asset.hasChanged() || asset.getOid().isNull()) {
             return true;
         }
 
@@ -549,11 +547,10 @@ public class ApiDataLayer {
 
     public void commitChanges() throws DataLayerException {
         checkConnection();
-
-        List<Asset> assets = Arrays.asList(assetList.getAssets());
         Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
+        
         try {
-            requiredData = requiredFieldsValidator.validate(assets);
+            requiredData = requiredFieldsValidator.validate(assetList);
 
             if (requiredData.size() > 0) {
                 String message = requiredFieldsValidator.createErrorMessage(requiredData);
@@ -564,7 +561,7 @@ public class ApiDataLayer {
         }
 
         try {
-            commitAssetsRecursively(assets);
+            commitAssetsRecursively(assetList);
         } catch (V1Exception e) {
             throw warning("Cannot commit changes.", e);
         }
@@ -572,11 +569,6 @@ public class ApiDataLayer {
 
     private void commitAssetsRecursively(List<Asset> assets) throws V1Exception, DataLayerException {
         for (Asset asset : assets) {
-            // do not commit assets that were closed and their children
-            if (assetsToIgnore.contains(asset)) {
-                continue;
-            }
-
             commitAsset(asset);
             commitAssetsRecursively(asset.getChildren());
         }
@@ -590,22 +582,20 @@ public class ApiDataLayer {
         try {
             IAttributeDefinition stateDef = asset.getAssetType().getAttributeDefinition("AssetState");
             AssetState state = AssetState.valueOf((Integer) asset.getAttribute(stateDef).getValue());
-            return state == AssetState.Closed || assetsToIgnore.contains(asset.getOid().getMomentless());
+            return state == AssetState.Closed;
         } catch (MetaException e) {
         } catch (APIException e) {
         }
         return false;
     }
 
-    boolean isAssetSuspended(Asset asset) {
-        return assetsToIgnore.contains(asset);
-    }
-
     void addIgnoreRecursively(Workitem item) {
-        assetsToIgnore.add(item.asset);
-        for (Workitem child : item.children) {
-            addIgnoreRecursively(child);
-        }
+        if (item.parent != null && assetList.contains(item.parent.asset)) {
+            // we are sure that asset in workitem and in assetList the same
+            item.parent.asset.getChildren().remove(item.asset);
+        } else {
+            assetList.remove(item.asset);            
+        }        
     }
 
     // TODO refactor
@@ -617,7 +607,7 @@ public class ApiDataLayer {
             query.getSelection().add(stateDef);
             QueryResult newAssets = services.retrieve(query);
 
-            Asset[] parentArray = assetList.getAssets();
+            Asset[] parentArray = assetList.toArray(new Asset[0]);
             List<Asset> parentList = null;
             if (workitem.parent != null) {
                 parentList = workitem.parent.asset.getChildren();
@@ -626,10 +616,6 @@ public class ApiDataLayer {
             Assert.isTrue(newAssets.getTotalAvaliable() == 1, "Query should return exactly one asset.");
 
             Asset newAsset = newAssets.getAssets()[0];
-            if (isAssetClosed(newAsset)) {
-                assetsToIgnore.add(workitem.asset);
-                return;
-            }
 
             // Adding new Asset to parent
             for (int i = 0; i < parentArray.length; i++) {
@@ -767,12 +753,14 @@ public class ApiDataLayer {
             }
             final Asset asset = new Asset(types.get(type));
             for (AttributeInfo attrInfo : attributesToQuery) {
+                
                 if (attrInfo.type == type) {
                     setAssetAttribute(asset, attrInfo.attr, null);
                 }
             }
 
             if (type.isPrimary()) {
+                
                 if (parent != null) {
                     throw new IllegalArgumentException("Cannot create " + type + " as children of " + parent.getType());
                 }
@@ -789,7 +777,7 @@ public class ApiDataLayer {
     private Workitem createPrimaryWorkitem(Asset asset) throws MetaException, APIException {
         final Workitem item = new Workitem(asset, null);
         setAssetAttribute(asset, "Scope", currentProjectId);
-        // TODO add to assetList
+        assetList.add(asset);
         return item;
     }
 
@@ -820,7 +808,7 @@ public class ApiDataLayer {
             throws MetaException, APIException {
         final IAssetType type = asset.getAssetType();
         IAttributeDefinition def = type.getAttributeDefinition(attrName);
-        if (value != null) {
+        if (value != null && (value instanceof Oid && !value.equals(Oid.Null))) {
             asset.setAttributeValue(def, value);
         } else {
             asset.ensureAttribute(def);

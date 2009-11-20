@@ -93,11 +93,6 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public boolean isAssetSuspended(Asset asset) {
-        return false;
-    }
-
-    @Override
     public boolean isShowed(Asset asset) {
         return false;
     }

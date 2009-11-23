@@ -27,7 +27,7 @@ public class AddDefectAction extends Action {
     public void run() {
 
         try {
-            Workitem newItem = ApiDataLayer.getInstance().createWorkitem(WorkitemType.Defect, null);
+            Workitem newItem = ApiDataLayer.getInstance().createNewWorkitem(WorkitemType.Defect, null);
             workitemView.refreshViewer(new StructuredSelection(newItem));
         } catch (DataLayerException e) {
             Activator.logError(e);

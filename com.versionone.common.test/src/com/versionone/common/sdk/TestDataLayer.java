@@ -27,7 +27,7 @@ public class TestDataLayer extends ApiDataLayer {
     private Map<String, PropertyValues> listProperties = new HashMap<String, PropertyValues>();
 
     @Override
-    public void closeWorkitem(Workitem item) {
+    public void removeWorkitem(Workitem item) {
     }
 
     @Override

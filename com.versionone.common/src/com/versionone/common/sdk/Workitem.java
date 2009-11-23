@@ -178,14 +178,16 @@ public class Workitem {
             throw new IllegalArgumentException("There is no property: " + fullName);
         }
 
+        final PropertyValues allValues = getPropertyValues(propertyName);
         if (attribute.getDefinition().isMultiValue()) {
-            return getPropertyValues(propertyName).subset(attribute.getValues());
+            final Object[] currentValues = attribute.getValues();
+            return allValues == null ? currentValues : allValues.subset(currentValues);
         }
 
         try {
-            Object val = attribute.getValue();
+            final Object val = attribute.getValue();
             if (val instanceof Oid) {
-                return getPropertyValues(propertyName).find((Oid) val);
+                return allValues == null ? val : allValues.find((Oid) val);
             } else if (val instanceof Double) {
                 return numberFormat.format(((Double) val).doubleValue());
             }
@@ -308,9 +310,9 @@ public class Workitem {
     }
 
     public void validateRequiredFields() throws DataLayerException {
-        RequiredFieldsValidator validator = dataLayer.getRequiredFieldsValidator();
+        final RequiredFieldsValidator validator = dataLayer.requiredFieldsValidator;
         try {
-            List<RequiredFieldsDTO> requiredData = validator.validate(asset);
+            final List<RequiredFieldsDTO> requiredData = validator.validate(asset);
 
             if (requiredData.size() > 0) {
                 String message = validator.getMessageOfUnfilledFieldsList(requiredData, "\n", ", ");
@@ -348,7 +350,7 @@ public class Workitem {
         commitChanges();
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_QUICK_CLOSE));
-            dataLayer.closeWorkitem(this);
+            dataLayer.removeWorkitem(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
         }
@@ -381,7 +383,7 @@ public class Workitem {
         checkPersistance("signup");
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_SIGNUP));
-            dataLayer.refreshAsset(this);
+            dataLayer.refreshWorkitem(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
         }
@@ -396,7 +398,7 @@ public class Workitem {
         checkPersistance("close");
         try {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_CLOSE));
-            dataLayer.closeWorkitem(this);
+            dataLayer.removeWorkitem(this);
         } catch (V1Exception e) {
             throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
         }
@@ -408,7 +410,7 @@ public class Workitem {
     }
 
     public Workitem createChild(WorkitemType type) throws DataLayerException {
-        return dataLayer.createWorkitem(type, this);
+        return dataLayer.createNewWorkitem(type, this);
     }
 
     /**

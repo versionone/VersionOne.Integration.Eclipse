@@ -20,11 +20,12 @@ public class ApiDataLayerTester implements IntegrationalTest {
     @Test
     public void testCreateAndGetDefect() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", Task, false);
-        data.addProperty("Owners", Task, true);
-        data.addProperty("Status", Task, true);
+        data.addProperty("Name", Defect, false);
+        data.addProperty("Owners", Defect, true);
+        data.addProperty("Status", Defect, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem defect = data.createWorkitem(Defect, null);
+        data.getWorkitemTree();
+        final Workitem defect = data.createNewWorkitem(Defect, null);
         assertEquals(null, defect.parent);
         assertEquals(0, defect.children.size());
         assertFalse(defect.canQuickClose());
@@ -62,9 +63,8 @@ public class ApiDataLayerTester implements IntegrationalTest {
         defect.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
         assertEquals("NewName53765", defect.getPropertyAsString(Workitem.NAME_PROPERTY));
         assertEquals("", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
-        // defect.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
-        // assertEquals("In Progress",
-        // defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        defect.setProperty(Workitem.STATUS_PROPERTY, "StoryStatus:133");
+        assertEquals("Future", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
 
         assertTrue(data.getWorkitemTree().contains(defect));
     }
@@ -78,7 +78,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
         final Workitem story = data.getWorkitemTree().get(0);
-        final Workitem task = data.createWorkitem(Task, story);
+        final Workitem task = data.createNewWorkitem(Task, story);
         assertEquals(story, task.parent);
         assertEquals(0, task.children.size());
         assertFalse(task.canQuickClose());

@@ -67,7 +67,6 @@ public class ApiDataLayer {
     private final Map<EntityType, IAssetType> types = new HashMap<EntityType, IAssetType>(EntityType.values().length);
     /** All uncommitted Effort records */
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
-    private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
 
     private IAssetType workitemType;
     private IAssetType primaryWorkitemType;
@@ -240,7 +239,6 @@ public class ApiDataLayer {
             stateTerm.NotEqual(AssetState.Closed);
             scopeQuery.setFilter(stateTerm);
             // clear all definitions used in previous queries
-            alreadyUsedDefinition.clear();
             addSelection(scopeQuery, Scope);
             final QueryResult result = services.retrieve(scopeQuery);
             final List<Project> roots = new ArrayList<Project>(result.getAssets().length);
@@ -275,8 +273,6 @@ public class ApiDataLayer {
             IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
             Query query = new Query(workitemType, parentDef);
 
-            // clear all definitions used in previous queries
-            alreadyUsedDefinition.clear();
             for (EntityType type : EntityType.values()) {
                 if (type.isWorkitem()) {
                     addSelection(query, type);
@@ -390,17 +386,11 @@ public class ApiDataLayer {
     }
 
     // TODO refactor
-    // need to make AlreadyUsedDefinition.Clear(); before first call of this
-    // method
     private void addSelection(Query query, EntityType type) throws DataLayerException {
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (attrInfo.type == type) {
                 try {
-                    IAttributeDefinition def = types.get(attrInfo.type).getAttributeDefinition(attrInfo.attr);
-                    if (!alreadyUsedDefinition.contains(def)) {
-                        query.getSelection().add(def);
-                        alreadyUsedDefinition.add(def);
-                    }
+                    query.getSelection().add(types.get(attrInfo.type).getAttributeDefinition(attrInfo.attr));
                 } catch (MetaException e) {
                     warning("Wrong attribute: " + attrInfo, e);
                 }
@@ -412,22 +402,11 @@ public class ApiDataLayer {
 
         for (RequiredFieldsDTO field : requiredFieldsValidator.getFields(type)) {
             try {
-                IAttributeDefinition def = types.get(type).getAttributeDefinition(field.name);
-                if (!alreadyUsedDefinition.contains(def)) {
-                    query.getSelection().add(def);
-                    alreadyUsedDefinition.add(def);
-                }
+                query.getSelection().add(types.get(type).getAttributeDefinition(field.name));
             } catch (MetaException e) {
                 warning("Wrong attribute: " + field.name, e);
             }
         }
-    }
-
-    private void addSelection(Query query, EntityType type, boolean clearDefinitions) throws DataLayerException {
-        if (clearDefinitions) {
-            alreadyUsedDefinition.clear();
-        }
-        addSelection(query, type);
     }
 
     public void addProperty(String attr, EntityType type, boolean isList) {
@@ -608,7 +587,7 @@ public class ApiDataLayer {
             final Asset oldAsset = workitem.asset;
             final IAttributeDefinition stateDef = oldAsset.getAssetType().getAttributeDefinition("AssetState");
             final Query query = new Query(oldAsset.getOid().getMomentless(), false);
-            addSelection(query, workitem.getType(), true);
+            addSelection(query, workitem.getType());
             query.getSelection().add(stateDef);
             final QueryResult queryRes = services.retrieve(query);
             Assert.isTrue(queryRes.getTotalAvaliable() == 1, "Query should return exactly one asset.");
@@ -705,7 +684,6 @@ public class ApiDataLayer {
     private boolean isProjectExist(String id) {
         try {
             final Query query = new Query(Oid.fromToken(id, metaModel));
-            alreadyUsedDefinition.clear();
             addSelection(query, Scope);
             final QueryResult result = services.retrieve(query);
             return result.getTotalAvaliable() > 0;
@@ -719,24 +697,18 @@ public class ApiDataLayer {
             return null;
         }
 
-        QueryResult result;
         try {
-            Query query = new Query(Oid.fromToken(id, metaModel));
-            // clear all definitions used in previous queries
-            alreadyUsedDefinition.clear();
+            final Query query = new Query(Oid.fromToken(id, metaModel));
             addSelection(query, Scope);
-            result = services.retrieve(query);
+            final Asset[] result = services.retrieve(query).getAssets();
+            assert result.length == 1;
+            return new Project(this, result[0]);
         } catch (MetaException ex) {
             isConnected = false;
             throw warning("Unable to get projects", ex);
         } catch (Exception ex) {
             throw warning("Unable to get projects", ex);
         }
-
-        if (result.getTotalAvaliable() == 1) {
-            return new Project(this, result.getAssets()[0]);
-        }
-        return null;
     }
 
     public String localizerResolve(String key) {

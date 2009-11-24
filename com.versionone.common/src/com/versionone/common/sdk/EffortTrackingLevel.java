@@ -13,14 +13,14 @@ public final class EffortTrackingLevel {
      * parent type prefix + dot + own type prefix, e.g. "Story.Task".
      */
     private final Set<String> tokens = new HashSet<String>(6);
-    
+
     public EffortTrackingLevel() {
     }
 
     public boolean isTracking(Entity item) {
         String token = item.getType().name();
-        if (item.parent != null) {
-            token = item.parent.getType() + "." + token;
+        if (item instanceof SecondaryWorkitem) {
+            token = ((SecondaryWorkitem) item).parent.getType() + "." + token;
         }
         return tokens.contains(token);
     }
@@ -29,7 +29,7 @@ public final class EffortTrackingLevel {
         tokens.clear();
     }
 
-    public void addPrimaryTypeLevel(WorkitemType type, TrackingLevel trackingLevel) {
+    public void addPrimaryTypeLevel(EntityType type, TrackingLevel trackingLevel) {
         switch (trackingLevel) {
         case On:
             tokens.add(type.name());
@@ -44,8 +44,8 @@ public final class EffortTrackingLevel {
         }
     }
 
-    private void addSecondaryTypeLevel(WorkitemType parentType) {
-        for (WorkitemType type : WorkitemType.values()) {
+    private void addSecondaryTypeLevel(EntityType parentType) {
+        for (EntityType type : EntityType.values()) {
             if (type.isSecondary()) {
                 tokens.add(parentType + "." + type);
             }

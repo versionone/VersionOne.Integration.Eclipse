@@ -1,32 +1,23 @@
 package com.versionone.common.sdk;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
-import com.versionone.common.sdk.Entity;
-
-public class WorkitemMock extends Entity {
+public class PrimaryWorkitemMock extends PrimaryWorkitem {
 
     public final String id;
-    public final WorkitemType type;
+    public final EntityType type;
     public final Map<String, Object> properties = new HashMap<String, Object>();
     public boolean hasChanges;
 
-    public WorkitemMock() {
-        this(null, null);
+    public PrimaryWorkitemMock() {
+        this(null, null, null);
     }
 
-    public WorkitemMock(String id, WorkitemType prefix) {
-        this(prefix, id, null);
-    }
-
-    public WorkitemMock(WorkitemType type, String id, Entity parent) {
-        super(new LinkedList<Entity>(), parent);
+    public PrimaryWorkitemMock(ApiDataLayer dataLayer, String id, EntityType type) {
+        super(dataLayer, null);
         this.type = type;
         this.id = id == null ? "" : type.name();
-        if (parent != null)
-            parent.children.add(this);
     }
 
     @Override
@@ -41,7 +32,7 @@ public class WorkitemMock extends Entity {
     }
 
     @Override
-    public WorkitemType getType() {
+    public EntityType getType() {
         return type;
     }
 
@@ -70,7 +61,7 @@ public class WorkitemMock extends Entity {
             return true;
         if (getClass() != obj.getClass())
             return false;
-        WorkitemMock other = (WorkitemMock) obj;
+        PrimaryWorkitemMock other = (PrimaryWorkitemMock) obj;
         if (hasChanges != other.hasChanges)
             return false;
         if (!id.equals(other.id))
@@ -79,5 +70,4 @@ public class WorkitemMock extends Entity {
             return false;
         return true;
     }
-
 }

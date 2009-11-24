@@ -8,11 +8,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static com.versionone.common.sdk.WorkitemType.Defect;
-import static com.versionone.common.sdk.WorkitemType.Scope;
-import static com.versionone.common.sdk.WorkitemType.Story;
-import static com.versionone.common.sdk.WorkitemType.Task;
-import static com.versionone.common.sdk.WorkitemType.Test;
+import static com.versionone.common.sdk.EntityType.Defect;
+import static com.versionone.common.sdk.EntityType.Scope;
+import static com.versionone.common.sdk.EntityType.Story;
+import static com.versionone.common.sdk.EntityType.Task;
+import static com.versionone.common.sdk.EntityType.Test;
 
 public class ApiDataLayerTester implements IntegrationalTest {
 
@@ -25,8 +25,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Status", Defect, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
         data.getWorkitemTree();
-        final Entity defect = data.createNewWorkitem(Defect, null);
-        assertEquals(null, defect.parent);
+        final PrimaryWorkitem defect = data.createNewPrimaryWorkitem(Defect);
         assertEquals(0, defect.children.size());
         assertFalse(defect.canQuickClose());
         assertFalse(defect.canSignup());
@@ -77,10 +76,9 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Entity story = data.getWorkitemTree().get(0);
-        final Entity task = data.createNewWorkitem(Task, story);
+        final PrimaryWorkitem story = data.getWorkitemTree().get(0);
+        final SecondaryWorkitem task = data.createNewSecondaryWorkitem(Task, story);
         assertEquals(story, task.parent);
-        assertEquals(0, task.children.size());
         assertFalse(task.canQuickClose());
         assertFalse(task.canSignup());
         try {
@@ -119,7 +117,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         task.setProperty(Entity.STATUS_PROPERTY, "TaskStatus:123");
         assertEquals("In Progress", task.getPropertyAsString(Entity.STATUS_PROPERTY));
 
-        Entity story2 = data.getWorkitemTree().get(0);
+        PrimaryWorkitem story2 = data.getWorkitemTree().get(0);
         assertTrue(story2.children.contains(task));
     }
 
@@ -131,24 +129,20 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        Entity story = data.getWorkitemTree().get(0);
-        final Entity test = story.createChild(Test);
+        PrimaryWorkitem story = data.getWorkitemTree().get(0);
+        final SecondaryWorkitem test = story.createChild(Test);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
         final Entity task = story.createChild(Task);
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
 
         // Retrieve new Workitem tree
         story = data.getWorkitemTree().get(0);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
-        assertEquals(0, test.children.size());
 
         try {
             story.createChild(Story);

@@ -1,6 +1,6 @@
 package com.versionone.common.sdk;
 
-public enum WorkitemType {
+public enum EntityType {
 
     Story(true),
     Defect(true),
@@ -10,11 +10,11 @@ public enum WorkitemType {
 
     public final Boolean isPrimary;
 
-    private WorkitemType() {
+    private EntityType() {
         isPrimary = null;
     }
 
-    private WorkitemType(Boolean isPrimary) {
+    private EntityType(Boolean isPrimary) {
         this.isPrimary = isPrimary;
     }
 

@@ -7,12 +7,12 @@ import org.eclipse.swt.widgets.Composite;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValueId;
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 
 public class SingleValueEditor extends ComboBoxCellEditor {
     private final PropertyValues allValues;
 
-    public SingleValueEditor(Composite parent, WorkitemType typePrefix, String propertyName) {
+    public SingleValueEditor(Composite parent, EntityType typePrefix, String propertyName) {
         super(parent, new String[0], SWT.DROP_DOWN | SWT.READ_ONLY);
         allValues = ApiDataLayer.getInstance().getListPropertyValues(typePrefix, propertyName);
         setItems(allValues.toStringArray());

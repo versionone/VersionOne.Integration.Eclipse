@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 
-import static com.versionone.common.sdk.WorkitemType.*;
+import static com.versionone.common.sdk.EntityType.*;
 
 import com.versionone.Oid;
 import com.versionone.apiclient.AndFilterTerm;
@@ -64,8 +64,7 @@ public class ApiDataLayer {
         propertyAliases.put("TestScope", "Scope");
     }
 
-    private final Map<WorkitemType, IAssetType> types = new HashMap<WorkitemType, IAssetType>(
-            WorkitemType.values().length);
+    private final Map<EntityType, IAssetType> types = new HashMap<EntityType, IAssetType>(EntityType.values().length);
     /** All uncommitted Effort records */
     private final Map<Asset, Double> efforts = new HashMap<Asset, Double>();
     private final Set<IAttributeDefinition> alreadyUsedDefinition = new HashSet<IAttributeDefinition>();
@@ -143,18 +142,13 @@ public class ApiDataLayer {
             return;
         }
         isConnected = false;
-        boolean isUserChanged = true;
-        if ((this.userName != null || integrated) && this.path != null) {
-            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated
-                    || !this.path.equals(path);
-        }
+        final boolean isUpdateData = isUpdateData(path, userName, integrated);
 
         this.path = path;
         this.userName = userName;
         this.password = password;
         this.integrated = integrated;
         assetList = null;
-        boolean isUpdateData = isUserChanged || metaModel == null || localizer == null || services == null;
 
         try {
             if (isUpdateData) {
@@ -190,6 +184,16 @@ public class ApiDataLayer {
         }
     }
 
+    // TODO Refactor
+    private boolean isUpdateData(String path, String userName, boolean integrated) {
+        boolean isUserChanged = true;
+        if ((this.userName != null || integrated) && this.path != null) {
+            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated
+                    || !this.path.equals(path);
+        }
+        return isUserChanged || metaModel == null || localizer == null || services == null;
+    }
+
     private void processConfig(String path) throws ConnectionException, APIException {
         V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + CONFIG_SUFFIX));
 
@@ -211,7 +215,7 @@ public class ApiDataLayer {
     }
 
     private void initTypes() {
-        for (WorkitemType type : WorkitemType.values()) {
+        for (EntityType type : EntityType.values()) {
             types.put(type, metaModel.getAssetType(type.name()));
         }
         workitemType = metaModel.getAssetType("Workitem");
@@ -227,7 +231,7 @@ public class ApiDataLayer {
         connect(path, userName, password, integrated);
     }
 
-    public List<Entity> getProjectTree() throws DataLayerException {
+    public List<Project> getProjectTree() throws DataLayerException {
         checkConnection();
         try {
             final IAssetType projectType = types.get(Scope);
@@ -239,9 +243,9 @@ public class ApiDataLayer {
             alreadyUsedDefinition.clear();
             addSelection(scopeQuery, Scope);
             final QueryResult result = services.retrieve(scopeQuery);
-            final List<Entity> roots = new ArrayList<Entity>(result.getAssets().length);
+            final List<Project> roots = new ArrayList<Project>(result.getAssets().length);
             for (Asset oneAsset : result.getAssets()) {
-                roots.add(new Entity(oneAsset, null));
+                roots.add(new Project(this, oneAsset));
             }
             return roots;
         } catch (Exception ex) {
@@ -249,44 +253,49 @@ public class ApiDataLayer {
         }
     }
 
-    public List<Entity> getWorkitemTree() throws Exception {
+    public List<PrimaryWorkitem> getWorkitemTree() throws Exception {
         checkConnection();
         if (currentProjectId == null) {
             currentProjectId = getDefaultProjectId();
         }
         if (assetList == null) {
-            try {
-                IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
-                Query query = new Query(workitemType, parentDef);
-
-                // clear all definitions used in previous queries
-                alreadyUsedDefinition.clear();
-                for (WorkitemType type : WorkitemType.values()) {
-                    if (type.isWorkitem()) {
-                        addSelection(query, type);
-                    }
-                }
-
-                query.setFilter(getScopeFilter(workitemType));
-                query.getOrderBy().majorSort(primaryWorkitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
-                query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
-
-                QueryResult result = services.retrieve(query);
-                assetList = new ArrayList<Asset>(result.getAssets().length + 20);
-                assetList.addAll(Arrays.asList(result.getAssets()));
-            } catch (MetaException ex) {
-                throw warning("Unable to get workitems.", ex);
-            } catch (Exception ex) {
-                throw warning("Unable to get workitems.", ex);
-            }
+            assetList = queryWorkitemTree();
         }
-        List<Entity> res = new ArrayList<Entity>(assetList.size());
+        final List<PrimaryWorkitem> res = new ArrayList<PrimaryWorkitem>(assetList.size());
         for (Asset asset : assetList) {
             if (isShowed(asset)) {
-                res.add(new Entity(asset, null));
+                res.add(new PrimaryWorkitem(this, asset));
             }
         }
         return res;
+    }
+
+    private List<Asset> queryWorkitemTree() throws DataLayerException {
+        try {
+            IAttributeDefinition parentDef = workitemType.getAttributeDefinition("Parent");
+            Query query = new Query(workitemType, parentDef);
+
+            // clear all definitions used in previous queries
+            alreadyUsedDefinition.clear();
+            for (EntityType type : EntityType.values()) {
+                if (type.isWorkitem()) {
+                    addSelection(query, type);
+                }
+            }
+
+            query.setFilter(getScopeFilter(workitemType));
+            query.getOrderBy().majorSort(primaryWorkitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
+            query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
+
+            final Asset[] assets = services.retrieve(query).getAssets();
+            final ArrayList<Asset> list = new ArrayList<Asset>(assets.length + 20);
+            list.addAll(Arrays.asList(assets));
+            return list;
+        } catch (MetaException ex) {
+            throw warning("Unable to get workitems.", ex);
+        } catch (Exception ex) {
+            throw warning("Unable to get workitems.", ex);
+        }
     }
 
     /**
@@ -383,7 +392,7 @@ public class ApiDataLayer {
     // TODO refactor
     // need to make AlreadyUsedDefinition.Clear(); before first call of this
     // method
-    private void addSelection(Query query, WorkitemType type) throws DataLayerException {
+    private void addSelection(Query query, EntityType type) throws DataLayerException {
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (attrInfo.type == type) {
                 try {
@@ -414,14 +423,14 @@ public class ApiDataLayer {
         }
     }
 
-    private void addSelection(Query query, WorkitemType type, boolean clearDefinitions) throws DataLayerException {
+    private void addSelection(Query query, EntityType type, boolean clearDefinitions) throws DataLayerException {
         if (clearDefinitions) {
             alreadyUsedDefinition.clear();
         }
         addSelection(query, type);
     }
 
-    public void addProperty(String attr, WorkitemType type, boolean isList) {
+    public void addProperty(String attr, EntityType type, boolean isList) {
         attributesToQuery.add(new AttributeInfo(attr, type, isList));
     }
 
@@ -491,7 +500,7 @@ public class ApiDataLayer {
         return res;
     }
 
-    public PropertyValues getListPropertyValues(WorkitemType type, String propertyName) {
+    public PropertyValues getListPropertyValues(EntityType type, String propertyName) {
         String propertyKey = resolvePropertyKey(type + propertyName);
         return listPropertyValues.get(propertyKey);
     }
@@ -605,13 +614,13 @@ public class ApiDataLayer {
             Assert.isTrue(queryRes.getTotalAvaliable() == 1, "Query should return exactly one asset.");
             final Asset newAsset = queryRes.getAssets()[0];
 
-            if (workitem.getType().isPrimary()) {
+            if (workitem instanceof SecondaryWorkitem) {
+                final SecondaryWorkitem sw = (SecondaryWorkitem) workitem;
+                Assert.isTrue(Collections.replaceAll(sw.parent.asset.getChildren(), oldAsset, newAsset),
+                        "parent Asset:" + sw.parent.asset + " must contains asset:" + oldAsset + " in its children.");
+            } else {
                 Assert.isTrue(Collections.replaceAll(assetList, oldAsset, newAsset), "assetList must contains asset:"
                         + oldAsset);
-            } else {
-                Assert.isTrue(Collections.replaceAll(workitem.parent.asset.getChildren(), oldAsset, newAsset),
-                        "parent Asset:" + workitem.parent.asset + " must contains asset:" + oldAsset
-                                + " in its children.");
             }
             newAsset.getChildren().addAll(oldAsset.getChildren());
         } catch (MetaException ex) {
@@ -628,13 +637,13 @@ public class ApiDataLayer {
      * @param item
      *            to remove.
      */
-    void removeWorkitem(Entity item) {
-        if (item.getType().isPrimary()) {
-            assetList.remove(item.asset);
-        } else if (item.getType().isSecondary()) {
-            item.parent.asset.getChildren().remove(item.asset);
-        } else {
-            throw new IllegalArgumentException("Only Workitems can be removed.");
+    void removeWorkitem(Workitem item) {
+        if (item instanceof PrimaryWorkitem)
+            Assert.isTrue(assetList.remove(item.asset), "assetList must contains asset:" + item.asset);
+        else if (item instanceof SecondaryWorkitem) {
+            final SecondaryWorkitem sw = (SecondaryWorkitem) item;
+            Assert.isTrue(sw.parent.asset.getChildren().remove(item.asset), "parent Asset:" + sw.parent.asset
+                    + " must contains asset:" + item.asset + " in its children.");
         }
     }
 
@@ -651,16 +660,16 @@ public class ApiDataLayer {
         return currentProjectId;
     }
 
-    public void setCurrentProject(Entity value) {
+    public void setCurrentProject(Project value) {
         currentProjectId = value.getId();
         assetList = null;
     }
 
-    public Entity getCurrentProject() throws DataLayerException {
+    public Project getCurrentProject() throws DataLayerException {
         if (currentProjectId == null || currentProjectId.equals("")) {
             currentProjectId = getDefaultProjectId();
         }
-        return getProjectById(currentProjectId);
+        return queryProject(currentProjectId);
     }
 
     public String getCurrentMemberToken() {
@@ -705,7 +714,7 @@ public class ApiDataLayer {
         }
     }
 
-    private Entity getProjectById(String id) throws DataLayerException {
+    private Project queryProject(String id) throws DataLayerException {
         if (!isConnected || id == null || id.equals("")) {
             return null;
         }
@@ -725,7 +734,7 @@ public class ApiDataLayer {
         }
 
         if (result.getTotalAvaliable() == 1) {
-            return new Entity(result.getAssets()[0], null);
+            return new Project(this, result.getAssets()[0]);
         }
         return null;
     }
@@ -744,28 +753,21 @@ public class ApiDataLayer {
      *             when prefix or parent inn't a Workitem, or trying to create a
      *             wrong Workitem hierarchy.
      */
-    public Entity createNewWorkitem(WorkitemType type, Entity parent) throws DataLayerException {
+    public PrimaryWorkitem createNewPrimaryWorkitem(EntityType type) throws DataLayerException {
         try {
-            if (!type.isWorkitem()) {
-                throw new IllegalArgumentException("Can only create Workitems, " + "but received: " + type
-                        + " for parent: " + parent.getType());
+            if (!type.isPrimary()) {
+                throw new IllegalArgumentException("Wrong type:" + type);
             }
-            final Asset asset = new Asset(types.get(type));
-            for (AttributeInfo attrInfo : attributesToQuery) {
-                if (attrInfo.type == type) {
-                    setAssetAttribute(asset, attrInfo.attr, null);
-                }
-            }
+            final Asset asset = createNewAsset(type);
 
             loadAssetAttribute(asset, "Scope.Name", getCurrentProject().getProperty(Entity.NAME_PROPERTY));
+            loadAssetAttribute(asset, "Timebox.Name", getCurrentProject().getProperty(
+                    "Schedule.EarliestActiveTimebox.Name"));
+            setAssetAttribute(asset, "Scope", currentProjectId);
+            setAssetAttribute(asset, "Timebox", getCurrentProject().getProperty("Schedule.EarliestActiveTimebox"));
+            assetList.add(asset);
 
-            if (type.isPrimary()) {
-                if (parent != null) {
-                    throw new IllegalArgumentException("Cannot create " + type + " as children of " + parent.getType());
-                }
-                return createPrimaryWorkitem(asset);
-            }
-            return createSecondaryWorkitem(asset, parent);
+            return new PrimaryWorkitem(this, asset);
         } catch (MetaException e) {
             throw new DataLayerException("Cannot create workitem: " + type, e);
         } catch (APIException e) {
@@ -773,30 +775,44 @@ public class ApiDataLayer {
         }
     }
 
-    private Entity createPrimaryWorkitem(Asset asset) throws MetaException, APIException, DataLayerException {
-        final Entity item = new Entity(asset, null);
-        setAssetAttribute(asset, "Scope", currentProjectId);
-        setAssetAttribute(asset, "Timebox", getCurrentProject().getProperty("Schedule.EarliestActiveTimebox"));
-        loadAssetAttribute(asset, "Timebox.Name", getCurrentProject()
-                .getProperty("Schedule.EarliestActiveTimebox.Name"));
-        assetList.add(asset);
-        return item;
+    private Asset createNewAsset(EntityType type) throws APIException {
+        final Asset asset = new Asset(types.get(type));
+        for (AttributeInfo attrInfo : attributesToQuery) {
+            if (attrInfo.type == type) {
+                setAssetAttribute(asset, attrInfo.attr, null);
+            }
+        }
+        return asset;
     }
 
-    private Entity createSecondaryWorkitem(Asset asset, Entity parent) throws MetaException, APIException,
-            DataLayerException {
-        if (parent == null || parent.getType().isSecondary()) {
-            throw new IllegalArgumentException("Cannot create " + asset.getAssetType() + " as children of " + parent);
+    public SecondaryWorkitem createNewSecondaryWorkitem(EntityType type, PrimaryWorkitem parent)
+            throws DataLayerException {
+        try {
+            if (!type.isSecondary()) {
+                throw new IllegalArgumentException("Wrong type:" + type);
+            }
+            final Asset asset = createNewAsset(type);
+
+            loadAssetAttribute(asset, "Scope.Name", getCurrentProject().getProperty(Entity.NAME_PROPERTY));
+
+            if (parent == null || parent.getType().isSecondary()) {
+                throw new IllegalArgumentException("Cannot create " + asset.getAssetType() + " as children of "
+                        + parent);
+            }
+            setAssetAttribute(asset, "Parent", parent.asset.getOid());
+
+            loadAssetAttribute(asset, "Parent.Name", parent.getProperty(Entity.NAME_PROPERTY));
+            loadAssetAttribute(asset, "Timebox.Name", parent.getProperty("Timebox.Name"));
+
+            final SecondaryWorkitem item = new SecondaryWorkitem(this, asset, parent);
+            parent.children.add(item);
+            parent.asset.getChildren().add(item.asset);
+            return item;
+        } catch (MetaException e) {
+            throw new DataLayerException("Cannot create workitem: " + type, e);
+        } catch (APIException e) {
+            throw new DataLayerException("Cannot create workitem: " + type, e);
         }
-        setAssetAttribute(asset, "Parent", parent.asset.getOid());
-
-        loadAssetAttribute(asset, "Parent.Name", parent.getProperty(Entity.NAME_PROPERTY));
-        loadAssetAttribute(asset, "Timebox.Name", parent.getProperty("Timebox.Name"));
-
-        final Entity item = new Entity(asset, parent);
-        parent.children.add(item);
-        parent.asset.getChildren().add(item.asset);
-        return item;
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.versionone.taskview.views;
 
-import java.util.List;
-
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -23,6 +21,7 @@ import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Entity;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
 import com.versionone.taskview.views.actions.ActionsManager;
@@ -54,11 +53,10 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private static final String V1_COLUMN_TITLE_EFFORT = "ColumnTitle'Effort";
     private static final String V1_COLUMN_TITLE_OWNER = "ColumnTitle'Owner";
 
-
-    private ProxySelectionProvider selectionProvider;    
+    private ProxySelectionProvider selectionProvider;
     private boolean isEffortColumsShown;
     private TreeViewer viewer;
-    
+
     private ActionsManager actionsManager = new ActionsManager();
 
     public TaskView() {
@@ -108,14 +106,13 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         return !viewer.getSelection().isEmpty();
     }
 
-    public Entity getCurrentWorkitem() {
+    public Workitem getCurrentWorkitem() {
         ISelection selection = viewer.getSelection();
         if (selection != null && selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             Object element = structuredSelection.getFirstElement();
-            return element == null ? null : (Entity) element;
+            return element == null ? null : (Workitem) element;
         }
-
         return null;
     }
 
@@ -129,9 +126,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         final Menu menu = menuManager.createContextMenu(control);
         menuManager.setRemoveAllWhenShown(true);
         menuManager.addMenuListener(actionsManager);
-        control.setMenu(menu);        
+        control.setMenu(menu);
     }
-
 
     protected void updateDescription(Entity currentWorkitem, String value) {
         currentWorkitem.setProperty(Entity.DESCRIPTION_PROPERTY, value);
@@ -142,7 +138,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Refresh viewer, causing it to re-read data from model and remove possibly
      * non-relevant items.
      * 
-     * @param selection select element after refresh. null - no selection
+     * @param selection
+     *            select element after refresh. null - no selection
      */
 
     public void refreshViewer(IStructuredSelection selection) {
@@ -186,8 +183,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         viewer.getTree().setEnabled(false);
         actionsManager.enableActions(false, true);
     }
-    
-    
 
     /**
      * Configure the table
@@ -257,8 +252,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         actionsManager.addActions(bars.getToolBarManager());
     }
 
-
-
     /**
      * Set focus to the Tree.
      */
@@ -288,10 +281,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     public boolean loadDataToTable() {
         try {
-            final List<Entity> workitems = ApiDataLayer.getInstance().getWorkitemTree();
-            final Entity[] array = new Entity[workitems.size()];
-            workitems.toArray(array);
-            viewer.setInput(array);
+            viewer.setInput(ApiDataLayer.getInstance().getWorkitemTree());
             updateProperty();
             return true;
         } catch (Exception e) {
@@ -302,7 +292,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             return false;
         }
     }
-    
+
     /**
      * Returns actions manager for working with actions
      * 

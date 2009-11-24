@@ -23,6 +23,7 @@ import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValidatorException;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Entity;
+import com.versionone.common.sdk.Workitem;
 
 public class CloseWorkitemDialog extends Dialog implements SelectionListener {
 
@@ -30,12 +31,12 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     private Label toDoLabel;
     private Label statusLabel;
     private Text toDoText;
-    private Entity workitem;
+    private Workitem workitem;
     private TaskView openingViewer;
-    
+
     private PropertyValues statuses;
     private ApiDataLayer dataLayer = ApiDataLayer.getInstance();
-    
+
     private int selectedStatusIndex = -1;
 
     static int WINDOW_HEIGHT = 110;
@@ -52,12 +53,12 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public CloseWorkitemDialog(Shell parentShell, Entity workitem, TaskView viewer) {
+    public CloseWorkitemDialog(Shell parentShell, Workitem workitem, TaskView viewer) {
         super(parentShell);
         this.workitem = workitem;
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
-        
+
         statuses = dataLayer.getListPropertyValues(workitem.getType(), Entity.STATUS_PROPERTY);
     }
 
@@ -70,46 +71,46 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         GridLayout layout = new GridLayout(4, false);
         layout.horizontalSpacing = 15;
         container.setLayout(layout);
-        
+
         toDoLabel = new Label(container, SWT.NONE);
         toDoLabel.setText("To Do");
         toDoLabel.setSize(40, 30);
-        
+
         toDoText = new Text(container, SWT.BORDER);
         toDoText.setSize(40, 30);
         toDoText.setEditable(false);
         toDoText.setText(workitem.getPropertyAsString(Entity.TODO_PROPERTY));
-        
+
         statusLabel = new Label(container, SWT.NONE);
         statusLabel.setText("Status");
         statusLabel.setSize(40, 30);
-        
+
         statusCombobox = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         statusCombobox.setSize(200, 40);
         fillStatusCombobox();
         statusCombobox.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				selectedStatusIndex = ((Combo)e.widget).getSelectionIndex();
-			}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                selectedStatusIndex = ((Combo) e.widget).getSelectionIndex();
+            }
 
-			public void widgetSelected(SelectionEvent e) {
-				selectedStatusIndex = ((Combo)e.widget).getSelectionIndex();
-			}
+            public void widgetSelected(SelectionEvent e) {
+                selectedStatusIndex = ((Combo) e.widget).getSelectionIndex();
+            }
         });
-        
+
         return container;
     }
-    
+
     /*
      * Fill Status combobox.
      */
     private void fillStatusCombobox() {
-    	String[] values = statuses.toStringArray();
-    	for(String value : values) {
-    		statusCombobox.add(value);
-    	}
-    	ValueId selectedValue = (ValueId)workitem.getProperty(Entity.STATUS_PROPERTY);
-    	statusCombobox.select(statuses.getStringArrayIndex(selectedValue));
+        String[] values = statuses.toStringArray();
+        for (String value : values) {
+            statusCombobox.add(value);
+        }
+        ValueId selectedValue = (ValueId) workitem.getProperty(Entity.STATUS_PROPERTY);
+        statusCombobox.select(statuses.getStringArrayIndex(selectedValue));
     }
 
     /**
@@ -129,7 +130,8 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
     /**
      * {@link #widgetDefaultSelected(SelectionEvent)}
      */
-    public void widgetDefaultSelected(SelectionEvent e) { }
+    public void widgetDefaultSelected(SelectionEvent e) {
+    }
 
     /**
      * {@link #widgetSelected(SelectionEvent)}
@@ -158,13 +160,14 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
             }
         } catch (ValidatorException ex) {
             Activator.logWarning("Workitem cannot be closed because some required fields are empty:" + ex.getMessage());
-            openingViewer.showMessage("Workitem cannot be closed because some required fields are empty:" + ex.getMessage());
+            openingViewer.showMessage("Workitem cannot be closed because some required fields are empty:"
+                    + ex.getMessage());
             if (openingViewer != null) {
                 openingViewer.refreshViewer(null);
             }
         } catch (DataLayerException e) {
             Activator.logError("Failed to close workitem", e);
         }
-        
+
     }
 }

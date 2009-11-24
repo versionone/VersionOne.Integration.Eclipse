@@ -13,11 +13,11 @@ import org.osgi.framework.BundleContext;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Entity;
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 import com.versionone.taskview.views.properties.Configuration;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
-import static com.versionone.common.sdk.WorkitemType.*;
+import static com.versionone.common.sdk.EntityType.*;
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -75,7 +75,7 @@ public class Activator extends AbstractUIPlugin {
         setAttributes(cfg.projectTreeSettings.projectColumns, Scope);
     }
 
-    private static void setAttributes(ColumnSetting[] columns, WorkitemType type) {
+    private static void setAttributes(ColumnSetting[] columns, EntityType type) {
         ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         for (ColumnSetting entry : columns) {
             dataLayer.addProperty(entry.attribute, type, isListType(entry.type));
@@ -105,7 +105,7 @@ public class Activator extends AbstractUIPlugin {
         properties.put("Scope.Name", false);
 
         for (Entry<String, Boolean> entry : properties.entrySet()) {
-            for (WorkitemType type : WorkitemType.values()){
+            for (EntityType type : EntityType.values()){
                 if (type.isWorkitem()) {
                     dataLayer.addProperty(entry.getKey(), type, entry.getValue());
                 }

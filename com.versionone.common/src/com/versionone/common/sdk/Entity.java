@@ -2,7 +2,6 @@ package com.versionone.common.sdk;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.versionone.Oid;
@@ -13,7 +12,7 @@ import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
-public class Entity {
+public abstract class Entity {
 
     public static final String ID_PROPERTY = "Number";
     public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
@@ -41,38 +40,16 @@ public class Entity {
         numberFormat.setMaximumFractionDigits(6);
     }
 
-    protected final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
+    protected final ApiDataLayer dataLayer;
     final Asset asset;
-    public final Entity parent;
 
-    /**
-     * List of child Workitems.
-     */
-    public final List<Entity> children;
-
-    /**
-     * Constructor for testing purposes ONLY.
-     */
-    protected Entity(List<Entity> children, Entity parent) {
-        this.children = children;
-        this.parent = parent;
-        asset = null;
-    }
-
-    Entity(Asset asset, Entity parent) {
-        this.parent = parent;
+    Entity(ApiDataLayer dataLayer, Asset asset) {
         this.asset = asset;
-
-        children = new ArrayList<Entity>(asset.getChildren().size());
-        for (Asset childAsset : asset.getChildren()) {
-            if (!getType().isWorkitem() || dataLayer.isShowed(childAsset)) {
-                children.add(new Entity(childAsset, this));
-            }
-        }
+        this.dataLayer = dataLayer;
     }
 
-    public WorkitemType getType() {
-        return WorkitemType.valueOf(asset.getAssetType().getToken());
+    public EntityType getType() {
+        return EntityType.valueOf(asset.getAssetType().getToken());
     }
 
     public String getId() {
@@ -92,10 +69,10 @@ public class Entity {
         if (isEffortTrackingRelated(propertyName) && !dataLayer.trackingLevel.isTracking(this)) {
             return true;
         }
-        if (!propertyName.equals(EFFORT_PROPERTY)) {
-            return isPropertyDefinitionReadOnly(propertyName);
+        if (propertyName.equals(EFFORT_PROPERTY)) {
+            return false;
         }
-        return false;
+        return isPropertyDefinitionReadOnly(propertyName);
     }
 
     private boolean isPropertyDefinitionReadOnly(String propertyName) {
@@ -328,89 +305,15 @@ public class Entity {
         return owners.containsOid(dataLayer.memberOid);
     }
 
-    public boolean canQuickClose() {
-        try {
-            return isPersistent() && (Boolean) getProperty("CheckQuickClose");
-        } catch (IllegalArgumentException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
-            return false;
-        } catch (NullPointerException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
-            return false;
-        }
-    }
-
-    /**
-     * Performs 'QuickClose' operation.
-     * 
-     * @throws DataLayerException
-     */
-    public void quickClose() throws DataLayerException {
-        checkPersistance("quickClose");
-        commitChanges();
-        try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_QUICK_CLOSE));
-            dataLayer.removeWorkitem(this);
-        } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
-        }
-    }
-
-    private void checkPersistance(String job) {
+    protected void checkPersistance(String job) {
         if (!isPersistent()) {
             throw new UnsupportedOperationException("Cannot " + job + " non-saved workitem.");
-        }
-    }
-
-    public boolean canSignup() {
-        try {
-            return isPersistent() && (Boolean) getProperty("CheckQuickSignup");
-        } catch (IllegalArgumentException e) {
-            ApiDataLayer.warning("QuickSignup not supported.", e);
-            return false;
-        } catch (NullPointerException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
-            return false;
-        }
-    }
-
-    /**
-     * Performs 'QuickSignup' operation.
-     * 
-     * @throws DataLayerException
-     */
-    public void signup() throws DataLayerException {
-        checkPersistance("signup");
-        try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_SIGNUP));
-            dataLayer.refreshWorkitem(this);
-        } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
-        }
-    }
-
-    /**
-     * Perform 'Inactivate' operation.
-     * 
-     * @throws DataLayerException
-     */
-    public void close() throws DataLayerException {
-        checkPersistance("close");
-        try {
-            dataLayer.executeOperation(asset, asset.getAssetType().getOperation(OP_CLOSE));
-            dataLayer.removeWorkitem(this);
-        } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
         }
     }
 
     public void revertChanges() {
         checkPersistance("revertChanges");
         dataLayer.revertAsset(asset);
-    }
-
-    public Entity createChild(WorkitemType type) throws DataLayerException {
-        return dataLayer.createNewWorkitem(type, this);
     }
 
     /**

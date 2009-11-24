@@ -2,10 +2,10 @@ package com.versionone.common.sdk;
 
 public class AttributeInfo {
     public final String attr;
-    public final WorkitemType type;
+    public final EntityType type;
     public final boolean isList;
 
-    public AttributeInfo(String attr, WorkitemType type, boolean isList) {
+    public AttributeInfo(String attr, EntityType type, boolean isList) {
         if (attr == null || type == null) {
             throw new IllegalArgumentException("Parameters cannot be null.");
         }

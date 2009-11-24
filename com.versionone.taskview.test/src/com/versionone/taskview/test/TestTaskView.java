@@ -4,18 +4,10 @@ import java.util.Arrays;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerEditor;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerColumn;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -23,14 +15,15 @@ import org.junit.Test;
 
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
+import com.versionone.common.sdk.PrimaryWorkitem;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.PropertyValuesMock;
 import com.versionone.common.sdk.TestDataLayer;
 import com.versionone.common.sdk.Entity;
-import com.versionone.common.sdk.WorkitemMock;
+import com.versionone.common.sdk.PrimaryWorkitemMock;
 import com.versionone.taskview.views.TaskView;
 
-import static com.versionone.common.sdk.WorkitemType.*;
+import static com.versionone.common.sdk.EntityType.*;
 
 public class TestTaskView {
 
@@ -63,24 +56,17 @@ public class TestTaskView {
     private static TaskView testView = null;
     private static PreferencePage preference = null;
 
-    private static WorkitemMock story;
-    private static WorkitemMock storyTask;
-    private static WorkitemMock storyTest;
-    private static WorkitemMock defect;
-    private static WorkitemMock defectTask;
-    private static WorkitemMock defectTest;
+    private static PrimaryWorkitemMock story;
+    private static PrimaryWorkitemMock defect;
 
     @BeforeClass
     public static void loadTestData() throws Exception {
-        story = new WorkitemMock("1", Story);
-        storyTask = new WorkitemMock(Task, "12", story);
-        storyTest = new WorkitemMock(Test, "11", story);
-        defect = new WorkitemMock("2", Defect);
-        defectTask = new WorkitemMock(Task, "22", defect);
-        defectTest = new WorkitemMock(Test, "21", defect);
-        TestDataLayer.getInstance().workitemTree = Arrays.asList((Entity)story, defect );
+        final TestDataLayer data = TestDataLayer.getInstance();
+        story = new PrimaryWorkitemMock(data, "1", Story);
+        defect = new PrimaryWorkitemMock(data, "2", Defect);
+        data.workitemTree = Arrays.asList((PrimaryWorkitem) story, defect);
         setupWorkitem(story, "Bil, Tom, Administrator", "FAST LAND 1", "B-01190", "5,00", "6,00", "7,00", "8,00",
-        "Done");
+                "Done");
         setupWorkitem(defect, "Cat", "New Defect1", "D-01094", "1,00", "2,00", "3,00", "4,00", "Accepted");
     }
 
@@ -179,7 +165,7 @@ public class TestTaskView {
     /**
      * Setup workitemMock so it can be validated by validateRow()
      */
-    private static void setupWorkitem(WorkitemMock item, String owners, String name, String number, String estimate,
+    private static void setupWorkitem(PrimaryWorkitemMock item, String owners, String name, String number, String estimate,
             String done, String effort, String todo, String status) {
         final PropertyValues ownersList = createListValue(owners);
         TestDataLayer.getInstance().setListProperty(Entity.OWNERS_PROPERTY, item.getType(), ownersList);
@@ -201,7 +187,7 @@ public class TestTaskView {
     /**
      * Validate one row in the table
      */
-    private void validateRow(TreeItem row, WorkitemMock item, boolean checkEffort) {
+    private void validateRow(TreeItem row, PrimaryWorkitemMock item, boolean checkEffort) {
         Assert.assertEquals(item.getPropertyAsString(Entity.OWNERS_PROPERTY), row.getText(OWNER_COLUMN_INDEX));
         Assert.assertEquals(item.getPropertyAsString(Entity.NAME_PROPERTY), row.getText(NAME_COLUMN_INDEX));
         Assert.assertEquals(item.getPropertyAsString(Entity.ID_PROPERTY), row.getText(ID_COLUMN_INDEX));
@@ -211,8 +197,7 @@ public class TestTaskView {
         if (checkEffort) {
             Assert.assertEquals(item.getPropertyAsString(Entity.EFFORT_PROPERTY), row.getText(EFFORT_COLUMN_INDEX));
             Assert.assertEquals(item.getPropertyAsString(Entity.DONE_PROPERTY), row.getText(DONE_COLUMN_INDEX));
-            Assert.assertEquals(item.getPropertyAsString(Entity.TODO_PROPERTY), row
-                    .getText(TRACKED_TODO_COLUMN_INDEX));
+            Assert.assertEquals(item.getPropertyAsString(Entity.TODO_PROPERTY), row.getText(TRACKED_TODO_COLUMN_INDEX));
         } else {
             Assert.assertEquals(item.getPropertyAsString(Entity.TODO_PROPERTY), row.getText(TODO_COLUMN_INDEX));
         }

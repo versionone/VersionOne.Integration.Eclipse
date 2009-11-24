@@ -4,17 +4,17 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 import com.versionone.taskview.views.editors.MultiValueEditor;
 
 /**
  * Property descriptor providing dialog editor for multivalue properties. 
  */
 public class MultiValueListPropertyDescriptor extends PropertyDescriptor {
-    private final WorkitemType typePrefix;
+    private final EntityType typePrefix;
     private final String property;
     
-    public MultiValueListPropertyDescriptor(Object id, WorkitemType typePrefix, String propertyName) {
+    public MultiValueListPropertyDescriptor(Object id, EntityType typePrefix, String propertyName) {
         super(id, propertyName);
         this.typePrefix = typePrefix;
         this.property = (String) id;

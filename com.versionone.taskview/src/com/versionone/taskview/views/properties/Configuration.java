@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 import com.versionone.taskview.Activator;
 
-import static com.versionone.common.sdk.WorkitemType.*;
+import static com.versionone.common.sdk.EntityType.*;
 
 @XmlRootElement(name = "Configuration")
 public class Configuration {
@@ -123,7 +123,7 @@ public class Configuration {
         }
     }
 
-    public ColumnSetting[] getColumns(WorkitemType type) {
+    public ColumnSetting[] getColumns(EntityType type) {
         if (type.equals(Story)) {
             return assetDetailSettings.storyColumns;
         } else if (type.equals(Task)) {

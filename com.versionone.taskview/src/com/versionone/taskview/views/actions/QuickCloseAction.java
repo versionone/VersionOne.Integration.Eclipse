@@ -5,25 +5,25 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.ValidatorException;
-import com.versionone.common.sdk.Entity;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.TaskView;
 
 class QuickCloseAction extends Action {
 
     private final TaskView view;
-    
+
     QuickCloseAction(TaskView workItemView) {
-        this.view = workItemView; 
-        
+        this.view = workItemView;
+
         setText("Quick close");
         setToolTipText("Quick close");
     }
-    
+
     @Override
     public void run() {
         try {
-            Entity item = view.getCurrentWorkitem();
+            final Workitem item = view.getCurrentWorkitem();
             if (item != null) {
                 item.quickClose();
                 view.refreshViewer(null);

@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.versionone.common.sdk.Entity;
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 import com.versionone.taskview.Activator;
 
 public class SimpleProvider extends ColumnLabelProvider {
@@ -32,7 +32,7 @@ public class SimpleProvider extends ColumnLabelProvider {
     public Image getImage(Object element) {
         Image icon = null;
         if (isShowTypeIcon) {
-            WorkitemType workitemType = ((Entity) element).getType();
+            EntityType workitemType = ((Entity) element).getType();
             ImageRegistry imageStore = Activator.getDefault().getImageRegistry();
             if (workitemType.isWorkitem()) {
                 icon = imageStore.get(Activator.WORKITEM_IMAGE_PREFIX + workitemType);

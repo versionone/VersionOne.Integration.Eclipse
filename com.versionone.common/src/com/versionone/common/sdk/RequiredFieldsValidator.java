@@ -24,7 +24,7 @@ class RequiredFieldsValidator {
     
     private final IMetaModel metaModel;
     private final IServices services;
-    private final Map<WorkitemType, List<RequiredFieldsDTO>> requiredFieldsList = new HashMap<WorkitemType, List<RequiredFieldsDTO>>(4);
+    private final Map<EntityType, List<RequiredFieldsDTO>> requiredFieldsList = new HashMap<EntityType, List<RequiredFieldsDTO>>(4);
     
     
     RequiredFieldsValidator(IMetaModel metaModel, IServices services) {
@@ -91,7 +91,7 @@ class RequiredFieldsValidator {
     
     List<RequiredFieldsDTO> validate(Asset asset) throws DataLayerException, APIException {
         List<RequiredFieldsDTO> unfilledFields = new ArrayList<RequiredFieldsDTO>();
-        final WorkitemType type = WorkitemType.valueOf(asset.getAssetType().getToken());
+        final EntityType type = EntityType.valueOf(asset.getAssetType().getToken());
         
         if (!requiredFieldsList.containsKey(type)) {
             return unfilledFields;
@@ -123,9 +123,9 @@ class RequiredFieldsValidator {
         return (attribute.getDefinition().isMultiValue() && attribute.getValues().length < 1);
     }
 
-    public Map<WorkitemType, List<RequiredFieldsDTO>> init() throws DataLayerException {
-        WorkitemType[] types = WorkitemType.values();
-        for(WorkitemType type : types){
+    public Map<EntityType, List<RequiredFieldsDTO>> init() throws DataLayerException {
+        EntityType[] types = EntityType.values();
+        for(EntityType type : types){
             if (type.isWorkitem()){
                 requiredFieldsList.put(type, getRequiredFields(type.name()));
             }
@@ -162,7 +162,7 @@ class RequiredFieldsValidator {
         return message.toString();
 }
 
-    public List<RequiredFieldsDTO> getFields(WorkitemType type) {
+    public List<RequiredFieldsDTO> getFields(EntityType type) {
         return requiredFieldsList.get(type);
     }   
 }

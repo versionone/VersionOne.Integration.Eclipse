@@ -3,6 +3,7 @@ package com.versionone.taskview.views;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -18,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Entity;
+import com.versionone.common.sdk.Project;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.taskview.views.providers.SimpleProvider;
@@ -31,9 +33,9 @@ import com.versionone.taskview.views.providers.SimpleProvider;
  */
 public class ProjectSelectDialog extends Dialog {
 
-    private TreeViewer viewer = null; 
-    private List<Entity> v1Roots;
-    private Entity selectedProjectTreeNode;
+    private final List<Project> v1Roots;
+    private final Project selectedProjectTreeNode;
+    private TreeViewer viewer = null;
 
     static int WINDOW_HEIGHT = 200;
     static int WINDOW_WIDTH = 200;
@@ -42,26 +44,20 @@ public class ProjectSelectDialog extends Dialog {
      * Create
      * 
      * @param parentShell
-     *            - @see Dialog
      * @param projectTree
-     *            - root node of tree to display
+     *            root node of tree to display
      * @param defaultSelected
-     *            - node of project to select by default, if null, the root is
+     *            node of project to select by default, if null, the root is
      *            selected
+     * @see org.eclipse.jface.dialogs.Dialog
      */
-    public ProjectSelectDialog(Shell parentShell, List<Entity> projectTree, Entity defaultSelected) {
+    public ProjectSelectDialog(Shell parentShell, List<Project> projectTree, Project defaultSelected) {
         super(parentShell);
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
         v1Roots = projectTree;
-        selectedProjectTreeNode = defaultSelected;
-        if (selectedProjectTreeNode == null) {
-            selectedProjectTreeNode = v1Roots.get(0);
-        }
+        selectedProjectTreeNode = defaultSelected == null ? v1Roots.get(0) : defaultSelected;
     }
 
-    /**
-     * {@link #createDialogArea(Composite)}
-     */
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
@@ -71,13 +67,10 @@ public class ProjectSelectDialog extends Dialog {
         viewer.setContentProvider(new ViewContentProvider());
         viewer.setInput(v1Roots.toArray(new Entity[1]));
         viewer.setLabelProvider(new SimpleProvider(Entity.NAME_PROPERTY, false));
-        
+
         return container;
     }
 
-    /**
-     * {@link #configureShell(Shell)}
-     */
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -89,17 +82,15 @@ public class ProjectSelectDialog extends Dialog {
         newShell.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
-
-    /**
-     * {@link #okPressed()}
-     */
     @Override
     protected void okPressed() {
-        Entity selectedItem = (Entity)((IStructuredSelection)viewer.getSelection()).getFirstElement();
-        super.okPressed();
-        PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN,
-                selectedItem.getId());
-        ApiDataLayer.getInstance().setCurrentProject(selectedItem);
+        final ISelection selection = viewer.getSelection();
+        if (selection instanceof StructuredSelection) {
+            final Project selectedItem = (Project) ((IStructuredSelection) selection).getFirstElement();
+            super.okPressed();
+            PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN, selectedItem.getId());
+            ApiDataLayer.getInstance().setCurrentProject(selectedItem);
+        }
     }
 
     public TreeViewer getTreeViewer() {
@@ -108,6 +99,6 @@ public class ProjectSelectDialog extends Dialog {
 
     public void setCurrentProject() {
         viewer.expandAll();
-        viewer.setSelection(new StructuredSelection(selectedProjectTreeNode), true);        
+        viewer.setSelection(new StructuredSelection(selectedProjectTreeNode), true);
     }
 }

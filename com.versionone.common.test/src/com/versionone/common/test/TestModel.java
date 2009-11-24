@@ -16,12 +16,15 @@ import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.AttributeInfo;
 import com.versionone.common.sdk.EffortTrackingLevel;
+import com.versionone.common.sdk.PrimaryWorkitem;
+import com.versionone.common.sdk.Project;
 import com.versionone.common.sdk.PropertyValues;
+import com.versionone.common.sdk.SecondaryWorkitem;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Entity;
-import com.versionone.common.sdk.WorkitemType;
+import com.versionone.common.sdk.EntityType;
 
-import static com.versionone.common.sdk.WorkitemType.*;
+import static com.versionone.common.sdk.EntityType.*;
 
 public class TestModel {
 
@@ -43,8 +46,8 @@ public class TestModel {
     }
 
     private static void setDataLayerAttribute(String attribute, boolean isListType) {
-        for (WorkitemType prefix : WorkitemType.values()) {
-            if (prefix.isWorkitem()){
+        for (EntityType prefix : EntityType.values()) {
+            if (prefix.isWorkitem()) {
                 datalayer.addProperty(attribute, prefix, isListType);
             }
         }
@@ -57,11 +60,11 @@ public class TestModel {
 
     @Test
     public void testGetProject() throws Exception {
-        List<Entity> projectNode = datalayer.getProjectTree();
+        List<Project> projectNode = datalayer.getProjectTree();
         Assert.assertNotNull(projectNode);
-        List<Entity> children = projectNode.get(0).children;
+        List<Project> children = projectNode.get(0).children;
         Assert.assertEquals(1, projectNode.size());
-        Entity companyNode = projectNode.get(0);
+        Project companyNode = projectNode.get(0);
         Assert.assertEquals("Company", companyNode.getProperty(Entity.NAME_PROPERTY));
 
         Assert.assertEquals(3, companyNode.children.size());
@@ -72,31 +75,33 @@ public class TestModel {
     @Test
     public void testGetUsersTask() throws Exception {
         datalayer.setShowAllTasks(false);
-        List<Entity> allWorkItem = datalayer.getWorkitemTree();
-        Assert.assertEquals(7, allWorkItem.size());
-        validateTask(allWorkItem.get(0), "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null, Story);
-        validateTask(allWorkItem.get(2), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null, Defect);
-        validateTask(allWorkItem.get(1).children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00", "",
-                "FAST LAND 2", Test);
-        validateTask(allWorkItem.get(0).children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null, "9,30",
-                "In Progress", "FAST LAND 1", Task);
+        List<PrimaryWorkitem> primaryItems = datalayer.getWorkitemTree();
+        Assert.assertEquals(7, primaryItems.size());
+        validateTask(primaryItems.get(0), "B-01190", "Story:2265", "FAST LAND 1", null, null, null, null, "Done", null,
+                Story);
+        validateTask(primaryItems.get(2), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done",
+                null, Defect);
+        validateTask(primaryItems.get(1).children.get(0), "AT-01010", "Test:2273", "AT4", "13,00", null, null, "18,00",
+                "", "FAST LAND 2", Test);
+        validateTask(primaryItems.get(0).children.get(1), "TK-01031", "Task:2269", "task2", "9,30", "5,00", null,
+                "9,30", "In Progress", "FAST LAND 1", Task);
     }
 
     @Test
     public void testGetAllTasks() throws Exception {
         datalayer.setShowAllTasks(true);
-        List<Entity> allWorkItem = datalayer.getWorkitemTree();
-        Assert.assertEquals(11, allWorkItem.size());
-        validateTask(allWorkItem.get(1).children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null, "0,00",
-                "Completed", "FAST LAND 1", Task);
-        validateTask(allWorkItem.get(6), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done", null,
-                Defect);
-        validateTask(allWorkItem.get(5).children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null, "0,00",
-                "Passed", "STORY33.db", Test);
+        List<PrimaryWorkitem> primaryItems = datalayer.getWorkitemTree();
+        Assert.assertEquals(11, primaryItems.size());
+        validateTask(primaryItems.get(1).children.get(1), "TK-01030", "Task:2268", "task1", "10,00", "5,00", null,
+                "0,00", "Completed", "FAST LAND 1", Task);
+        validateTask(primaryItems.get(6), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done",
+                null, Defect);
+        validateTask(primaryItems.get(5).children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null,
+                "0,00", "Passed", "STORY33.db", Test);
     }
 
     private void validateTask(Entity task, String number, String id, String name, String estimate, String done,
-            String effort, String todo, String status, String parent, WorkitemType type) throws Exception {
+            String effort, String todo, String status, String parent, EntityType type) throws Exception {
         Assert.assertEquals(id, task.getId());
         Assert.assertEquals(name, task.getProperty(Entity.NAME_PROPERTY));
         Assert.assertEquals(number, task.getProperty(Entity.ID_PROPERTY));
@@ -236,7 +241,7 @@ public class TestModel {
         Assert.assertTrue(defect0.hasChanges());
         defect0.revertChanges();
         Assert.assertFalse(defect0.hasChanges());
-}
+    }
 
     @Test
     public void testSetName() throws Exception {
@@ -298,13 +303,13 @@ public class TestModel {
 
     @Test
     public void testReadonlyProperties() throws Exception {
-        final List<Entity> workitems = datalayer.getWorkitemTree();
-        Entity story1 = workitems.get(1);
-        Entity s1Test0 = story1.children.get(0);
-        Entity s1Task1 = story1.children.get(1);
-        Entity defect9 = workitems.get(9);
-        Entity d9Task0 = defect9.children.get(0);
-        Entity d9Test2 = defect9.children.get(2);
+        final List<PrimaryWorkitem> workitems = datalayer.getWorkitemTree();
+        PrimaryWorkitem story1 = workitems.get(1);
+        SecondaryWorkitem s1Test0 = story1.children.get(0);
+        SecondaryWorkitem s1Task1 = story1.children.get(1);
+        PrimaryWorkitem defect9 = workitems.get(9);
+        SecondaryWorkitem d9Task0 = defect9.children.get(0);
+        SecondaryWorkitem d9Test2 = defect9.children.get(2);
 
         Assert.assertTrue(story1.isPropertyReadOnly(Entity.ID_PROPERTY));
         Assert.assertFalse(story1.isPropertyReadOnly(Entity.NAME_PROPERTY));
@@ -321,13 +326,13 @@ public class TestModel {
     @Test
     public void testTrackingLevel() throws Exception {
         final EffortTrackingLevel tracking = datalayer.trackingLevel;
-        final List<Entity> workitems = datalayer.getWorkitemTree();
-        Entity story1 = workitems.get(1);
-        Entity s1Test0 = story1.children.get(0);
-        Entity s1Task1 = story1.children.get(1);
-        Entity defect9 = workitems.get(9);
-        Entity d9Task0 = defect9.children.get(0);
-        Entity d9Test2 = defect9.children.get(2);
+        final List<PrimaryWorkitem> workitems = datalayer.getWorkitemTree();
+        PrimaryWorkitem story1 = workitems.get(1);
+        SecondaryWorkitem s1Test0 = story1.children.get(0);
+        SecondaryWorkitem s1Task1 = story1.children.get(1);
+        PrimaryWorkitem defect9 = workitems.get(9);
+        SecondaryWorkitem d9Task0 = defect9.children.get(0);
+        SecondaryWorkitem d9Test2 = defect9.children.get(2);
 
         Assert.assertTrue(tracking.isTracking(defect9));
         Assert.assertFalse(tracking.isTracking(story1));
@@ -339,14 +344,14 @@ public class TestModel {
 
     @Test
     public void testWorkitemIsMine() throws Exception {
-        final List<Entity> workitems = datalayer.getWorkitemTree();
-        Entity defect0 = workitems.get(0);
-        Entity story1 = workitems.get(1);
-        Entity s1Test0 = story1.children.get(0);
-        Entity s1Task1 = story1.children.get(1);
-        Entity defect9 = workitems.get(9);
-        Entity d9Task0 = defect9.children.get(0);
-        Entity d9Test2 = defect9.children.get(2);
+        final List<PrimaryWorkitem> workitems = datalayer.getWorkitemTree();
+        PrimaryWorkitem defect0 = workitems.get(0);
+        PrimaryWorkitem story1 = workitems.get(1);
+        SecondaryWorkitem s1Test0 = story1.children.get(0);
+        SecondaryWorkitem s1Task1 = story1.children.get(1);
+        PrimaryWorkitem defect9 = workitems.get(9);
+        SecondaryWorkitem d9Task0 = defect9.children.get(0);
+        SecondaryWorkitem d9Test2 = defect9.children.get(2);
 
         Assert.assertTrue(defect0.isMine());
         Assert.assertFalse(story1.isMine());
@@ -359,14 +364,14 @@ public class TestModel {
 
     @Test
     public void testWorkitemCanSignup() throws Exception {
-        final List<Entity> workitems = datalayer.getWorkitemTree();
-        Entity defect0 = workitems.get(0);
-        Entity story1 = workitems.get(1);
-        Entity s1Test0 = story1.children.get(0);
-        Entity s1Task1 = story1.children.get(1);
-        Entity defect9 = workitems.get(9);
-        Entity d9Task0 = defect9.children.get(0);
-        Entity d9Test2 = defect9.children.get(2);
+        final List<PrimaryWorkitem> workitems = datalayer.getWorkitemTree();
+        PrimaryWorkitem defect0 = workitems.get(0);
+        PrimaryWorkitem story1 = workitems.get(1);
+        SecondaryWorkitem s1Test0 = story1.children.get(0);
+        SecondaryWorkitem s1Task1 = story1.children.get(1);
+        PrimaryWorkitem defect9 = workitems.get(9);
+        SecondaryWorkitem d9Task0 = defect9.children.get(0);
+        SecondaryWorkitem d9Test2 = defect9.children.get(2);
 
         Assert.assertTrue(defect0.canSignup());
         Assert.assertTrue(story1.canSignup());

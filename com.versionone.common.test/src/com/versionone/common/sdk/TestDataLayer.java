@@ -10,7 +10,6 @@ import com.versionone.apiclient.Asset;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
-import com.versionone.common.sdk.Entity;
 
 public class TestDataLayer extends ApiDataLayer {
 
@@ -22,19 +21,19 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     public boolean isEffortTracking;
-    public List<Entity> workitemTree = new LinkedList<Entity>();
+    public List<PrimaryWorkitem> workitemTree = new LinkedList<PrimaryWorkitem>();
 
     private Map<String, PropertyValues> listProperties = new HashMap<String, PropertyValues>();
 
     @Override
-    public void removeWorkitem(Entity item) {
+    public void removeWorkitem(Workitem item) {
     }
 
     @Override
-    public void addProperty(String attr, WorkitemType type, boolean isList) {
+    public void addProperty(String attr, EntityType type, boolean isList) {
     }
 
-    public void setListProperty(String attr, WorkitemType type, PropertyValues values) {
+    public void setListProperty(String attr, EntityType type, PropertyValues values) {
         listProperties.put(type + attr, values);
     }
 
@@ -62,8 +61,8 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public Entity getCurrentProject() {
-        return new WorkitemMock("0", WorkitemType.Scope);
+    public Project getCurrentProject() {
+        return null;
     }
 
     @Override
@@ -72,18 +71,18 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public PropertyValues getListPropertyValues(WorkitemType type, String propertyName) {
+    public PropertyValues getListPropertyValues(EntityType type, String propertyName) {
         final PropertyValues res = listProperties.get(type + propertyName);
         return res == null ? new PropertyValuesMock("") : res;
     }
 
     @Override
-    public List<Entity> getProjectTree() throws DataLayerException {
+    public List<Project> getProjectTree() throws DataLayerException {
         return Arrays.asList(getCurrentProject());
     }
 
     @Override
-    public List<Entity> getWorkitemTree() throws Exception {
+    public List<PrimaryWorkitem> getWorkitemTree() throws Exception {
         return workitemTree;
     }
 
@@ -120,7 +119,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public void setCurrentProject(Entity value) {
+    public void setCurrentProject(Project value) {
     }
 
     @Override

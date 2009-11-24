@@ -17,7 +17,7 @@ public final class EffortTrackingLevel {
     public EffortTrackingLevel() {
     }
 
-    public boolean isTracking(Workitem item) {
+    public boolean isTracking(Entity item) {
         String token = item.getType().name();
         if (item.parent != null) {
             token = item.parent.getType() + "." + token;

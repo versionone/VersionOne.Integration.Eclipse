@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.ProjectSelectDialog;
 import com.versionone.taskview.views.ProxySelectionProvider;
@@ -37,7 +37,7 @@ class ProjectAction extends Action {
         if (!isEnabled()) {
             return;
         }
-        List<Workitem> projectList;
+        List<Entity> projectList;
         try {
             projectList = ApiDataLayer.getInstance().getProjectTree();
         } catch (Exception ex) {
@@ -56,7 +56,7 @@ class ProjectAction extends Action {
         workitemView.enableTreeAndActions(true);
     }
 
-    private void openDialog(List<Workitem> projectList, List<ISelectionChangedListener> listeners) {
+    private void openDialog(List<Entity> projectList, List<ISelectionChangedListener> listeners) {
         try {
             ProjectSelectDialog projectSelectDialog = new ProjectSelectDialog(treeViewer.getControl().getShell(),
                     projectList, ApiDataLayer.getInstance().getCurrentProject());

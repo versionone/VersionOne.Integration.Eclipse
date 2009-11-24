@@ -6,7 +6,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.TaskView;
@@ -27,7 +27,7 @@ public class AddDefectAction extends Action {
     public void run() {
 
         try {
-            Workitem newItem = ApiDataLayer.getInstance().createNewWorkitem(WorkitemType.Defect, null);
+            Entity newItem = ApiDataLayer.getInstance().createNewWorkitem(WorkitemType.Defect, null);
             workitemView.refreshViewer(new StructuredSelection(newItem));
         } catch (DataLayerException e) {
             Activator.logError(e);

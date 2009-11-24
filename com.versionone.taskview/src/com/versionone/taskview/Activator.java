@@ -12,7 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.views.properties.Configuration;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
@@ -90,18 +90,18 @@ public class Activator extends AbstractUIPlugin {
     private void setAttributes() throws Exception {
         final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         final Map<String, Boolean> properties = new HashMap<String, Boolean>();
-        properties.put(Workitem.ID_PROPERTY, false);
-        properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
-        properties.put(Workitem.NAME_PROPERTY, false);
-        properties.put(Workitem.STATUS_PROPERTY, true);
-        properties.put(Workitem.EFFORT_PROPERTY, false);
-        properties.put(Workitem.DONE_PROPERTY, false);
-        properties.put(Workitem.DESCRIPTION_PROPERTY, false);
+        properties.put(Entity.ID_PROPERTY, false);
+        properties.put(Entity.DETAIL_ESTIMATE_PROPERTY, false);
+        properties.put(Entity.NAME_PROPERTY, false);
+        properties.put(Entity.STATUS_PROPERTY, true);
+        properties.put(Entity.EFFORT_PROPERTY, false);
+        properties.put(Entity.DONE_PROPERTY, false);
+        properties.put(Entity.DESCRIPTION_PROPERTY, false);
         // properties.put(Workitem.ScheduleNameProperty, false);
-        properties.put(Workitem.OWNERS_PROPERTY, true);
-        properties.put(Workitem.TODO_PROPERTY, false);
-        properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
-        properties.put(Workitem.CHECK_QUICK_SIGNUP_PROPERTY, false);
+        properties.put(Entity.OWNERS_PROPERTY, true);
+        properties.put(Entity.TODO_PROPERTY, false);
+        properties.put(Entity.CHECK_QUICK_CLOSE_PROPERTY, false);
+        properties.put(Entity.CHECK_QUICK_SIGNUP_PROPERTY, false);
         properties.put("Scope.Name", false);
 
         for (Entry<String, Boolean> entry : properties.entrySet()) {
@@ -111,7 +111,7 @@ public class Activator extends AbstractUIPlugin {
                 }
             }
         }
-        dataLayer.addProperty(Workitem.NAME_PROPERTY, Scope, false);
+        dataLayer.addProperty(Entity.NAME_PROPERTY, Scope, false);
     }
 
     /*

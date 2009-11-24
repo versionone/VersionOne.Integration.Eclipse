@@ -3,7 +3,7 @@ package com.versionone.taskview.views;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 
 /**
  * ContentProvider for VersionOne Task
@@ -13,20 +13,20 @@ import com.versionone.common.sdk.Workitem;
 class ViewContentProvider implements ITreeContentProvider {   
     public Object[] getChildren(Object parentElement) {
 
-        return ((Workitem) parentElement).children.toArray();
+        return ((Entity) parentElement).children.toArray();
     }
 
     public Object getParent(Object element) {
-        return ((Workitem) element).parent;
+        return ((Entity) element).parent;
     }
 
     public boolean hasChildren(Object element) {
-        Workitem workitem = ((Workitem) element);
+        Entity workitem = ((Entity) element);
         return workitem.children != null && workitem.children.size() > 0;
     }
 
     public Object[] getElements(Object inputElement) {
-        if (inputElement instanceof Workitem[]) {
+        if (inputElement instanceof Entity[]) {
             return (Object[]) inputElement;
         } else {
             return new Object[] {};

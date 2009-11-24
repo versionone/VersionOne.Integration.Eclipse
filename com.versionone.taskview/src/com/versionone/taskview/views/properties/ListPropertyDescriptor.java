@@ -5,13 +5,13 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.views.editors.SingleValueEditor;
 
 public class ListPropertyDescriptor extends PropertyDescriptor {
-    private final Workitem workitem;
+    private final Entity workitem;
 	
-    public ListPropertyDescriptor(Object id, String propertyName, Workitem workitem) {
+    public ListPropertyDescriptor(Object id, String propertyName, Entity workitem) {
         super(id, propertyName);
         Assert.isNotNull(workitem);
         this.workitem = workitem;

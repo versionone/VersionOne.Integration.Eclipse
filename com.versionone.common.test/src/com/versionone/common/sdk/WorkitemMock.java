@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 
-public class WorkitemMock extends Workitem {
+public class WorkitemMock extends Entity {
 
     public final String id;
     public final WorkitemType type;
@@ -21,8 +21,8 @@ public class WorkitemMock extends Workitem {
         this(prefix, id, null);
     }
 
-    public WorkitemMock(WorkitemType type, String id, Workitem parent) {
-        super(new LinkedList<Workitem>(), parent);
+    public WorkitemMock(WorkitemType type, String id, Entity parent) {
+        super(new LinkedList<Entity>(), parent);
         this.type = type;
         this.id = id == null ? "" : type.name();
         if (parent != null)

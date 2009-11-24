@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
 public class ProxySelectionProvider implements ISelectionProvider {
@@ -60,8 +60,8 @@ public class ProxySelectionProvider implements ISelectionProvider {
             IStructuredSelection sSel = (IStructuredSelection) sel;
             final Object element = sSel.getFirstElement();
             Object res = null;
-            if (element instanceof Workitem) {
-                res = new WorkitemPropertySource((Workitem) element, proxy);
+            if (element instanceof Entity) {
+                res = new WorkitemPropertySource((Entity) element, proxy);
             } else if (element instanceof WorkitemPropertySource) {
                 res = ((WorkitemPropertySource) element).getItem();
             }

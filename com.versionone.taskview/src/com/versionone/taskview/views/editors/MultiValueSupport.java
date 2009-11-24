@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.PropertyValues;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
@@ -32,14 +32,14 @@ public class MultiValueSupport extends EditingSupport {
 
     @Override
     protected CellEditor getCellEditor(Object element) {
-        Workitem workitem = ((Workitem) element);
+        Entity workitem = ((Entity) element);
         return new MultiValueEditor(((TreeViewer) getViewer()).getTree(), workitem.getType(), propertyName);
     }
 
     @Override
     protected Object getValue(Object element) {
         try {
-            Workitem workitem = ((Workitem) element);
+            Entity workitem = ((Entity) element);
             return currentValue = (PropertyValues) workitem.getProperty(propertyName);
         } catch (Exception e) {
             Activator.logError(e);
@@ -49,7 +49,7 @@ public class MultiValueSupport extends EditingSupport {
 
     @Override
     protected void setValue(Object element, Object value) {
-        Workitem workitem = ((Workitem) element);
+        Entity workitem = ((Entity) element);
         PropertyValues newValue = (PropertyValues) value;
 
         if (currentValue == null || !currentValue.equals(newValue)) {

@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.views.TaskView;
 
 public class ActionsManager implements ISelectionChangedListener, IMenuListener {
@@ -72,11 +72,11 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
 
     public void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
-        Workitem element = null;
+        Entity element = null;
         
         if (selection != null && selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-            element = (Workitem) structuredSelection.getFirstElement();
+            element = (Entity) structuredSelection.getFirstElement();
         }
         
         isTaskCanBeAdded = element != null;        
@@ -85,7 +85,7 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
     
     
     public void menuAboutToShow(IMenuManager manager) {
-        Workitem item = taskView.getCurrentWorkitem();
+        Entity item = taskView.getCurrentWorkitem();
         createContextMenu(manager);
         if (item != null && taskView.validRowSelected()) {
             quickClose.setEnabled(item.canQuickClose());

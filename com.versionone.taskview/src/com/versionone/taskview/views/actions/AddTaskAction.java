@@ -5,7 +5,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 
 import com.versionone.common.sdk.DataLayerException;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.WorkitemType;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.TaskView;
@@ -24,10 +24,10 @@ class AddTaskAction extends Action {
     
     @Override
     public void run() {
-        Workitem item = workitemView.getCurrentWorkitem();        
+        Entity item = workitemView.getCurrentWorkitem();        
         item = item.parent != null ? item.parent : item;        
         try {
-            Workitem newItem = item.createChild(WorkitemType.Task);
+            Entity newItem = item.createChild(WorkitemType.Task);
             workitemView.refreshViewer(new StructuredSelection(newItem));
         } catch (DataLayerException e) {
             Activator.logError(e);

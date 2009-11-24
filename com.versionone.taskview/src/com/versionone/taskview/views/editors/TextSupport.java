@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
@@ -47,7 +47,7 @@ public class TextSupport extends EditingSupport {
         return new TextCellEditor(viewer.getTree());
     }
     
-    private boolean isEditable(Workitem workitem) {
+    private boolean isEditable(Entity workitem) {
         return !workitem.isPropertyReadOnly(property);
     }
 
@@ -58,7 +58,7 @@ public class TextSupport extends EditingSupport {
 
     @Override
     protected CellEditor getCellEditor(Object element) {        
-        if (isEditable((Workitem) element)) { 
+        if (isEditable((Entity) element)) { 
             return editor;
         } else {
             return non_edit_editor;
@@ -67,17 +67,17 @@ public class TextSupport extends EditingSupport {
 
     @Override
     protected void setValue(Object element, Object value) {
-        if (!isEditable((Workitem) element)) {
+        if (!isEditable((Entity) element)) {
             return;
         }
         
         try {
             if (!oldValue.equals(value)) {
-                ((Workitem) element).setProperty(property, value);
+                ((Entity) element).setProperty(property, value);
             }
             getViewer().update(element, null);
 
-            selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource((Workitem) element, getViewer())));
+            selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource((Entity) element, getViewer())));
         } catch (IllegalArgumentException e) {
             editor.setValue(""); // prevents two error dialogs
             Activator.logError(e);
@@ -93,7 +93,7 @@ public class TextSupport extends EditingSupport {
     @Override
     protected Object getValue(Object element) {
         try {
-            return oldValue = ((Workitem) element).getPropertyAsString(property);
+            return oldValue = ((Entity) element).getPropertyAsString(property);
         } catch (Exception e) {
             Activator.logError(e);
             return ERROR_VALUE;

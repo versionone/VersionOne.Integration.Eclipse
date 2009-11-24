@@ -9,7 +9,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.views.properties.Configuration.AssetDetailSettings;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
@@ -17,10 +17,10 @@ public class WorkitemPropertySource implements IPropertySource {
 
     public static final String COLUMN_TITLE_PREFIX = "ColumnTitle'";
 
-    private final Workitem item;
+    private final Entity item;
     private final ISelectionProvider proxy;
 
-    public WorkitemPropertySource(Workitem item, ISelectionProvider proxy) {
+    public WorkitemPropertySource(Entity item, ISelectionProvider proxy) {
         this.item = item;
         this.proxy = proxy;
     }
@@ -30,7 +30,7 @@ public class WorkitemPropertySource implements IPropertySource {
         return null;
     }
 
-    public Workitem getItem() {
+    public Entity getItem() {
         return item;
     }
 

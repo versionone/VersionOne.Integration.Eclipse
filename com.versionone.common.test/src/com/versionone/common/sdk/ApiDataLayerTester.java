@@ -25,7 +25,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Status", Defect, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
         data.getWorkitemTree();
-        final Workitem defect = data.createNewWorkitem(Defect, null);
+        final Entity defect = data.createNewWorkitem(Defect, null);
         assertEquals(null, defect.parent);
         assertEquals(0, defect.children.size());
         assertFalse(defect.canQuickClose());
@@ -58,13 +58,13 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertEquals(Defect, defect.getType());
         assertTrue(defect.hasChanges());
         assertFalse(defect.isMine());
-        assertFalse(defect.isPropertyReadOnly(Workitem.NAME_PROPERTY));
-        assertEquals("", defect.getPropertyAsString(Workitem.NAME_PROPERTY));
-        defect.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
-        assertEquals("NewName53765", defect.getPropertyAsString(Workitem.NAME_PROPERTY));
-        assertEquals("", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
-        defect.setProperty(Workitem.STATUS_PROPERTY, "StoryStatus:133");
-        assertEquals("Future", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        assertFalse(defect.isPropertyReadOnly(Entity.NAME_PROPERTY));
+        assertEquals("", defect.getPropertyAsString(Entity.NAME_PROPERTY));
+        defect.setProperty(Entity.NAME_PROPERTY, "NewName53765");
+        assertEquals("NewName53765", defect.getPropertyAsString(Entity.NAME_PROPERTY));
+        assertEquals("", defect.getPropertyAsString(Entity.STATUS_PROPERTY));
+        defect.setProperty(Entity.STATUS_PROPERTY, "StoryStatus:133");
+        assertEquals("Future", defect.getPropertyAsString(Entity.STATUS_PROPERTY));
 
         assertTrue(data.getWorkitemTree().contains(defect));
     }
@@ -77,8 +77,8 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        final Workitem story = data.getWorkitemTree().get(0);
-        final Workitem task = data.createNewWorkitem(Task, story);
+        final Entity story = data.getWorkitemTree().get(0);
+        final Entity task = data.createNewWorkitem(Task, story);
         assertEquals(story, task.parent);
         assertEquals(0, task.children.size());
         assertFalse(task.canQuickClose());
@@ -111,15 +111,15 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertEquals(Task, task.getType());
         assertTrue(task.hasChanges());
         assertFalse(task.isMine());
-        assertFalse(task.isPropertyReadOnly(Workitem.NAME_PROPERTY));
-        assertEquals("", task.getPropertyAsString(Workitem.NAME_PROPERTY));
-        task.setProperty(Workitem.NAME_PROPERTY, "NewName53765");
-        assertEquals("NewName53765", task.getPropertyAsString(Workitem.NAME_PROPERTY));
-        assertEquals("", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
-        task.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
-        assertEquals("In Progress", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        assertFalse(task.isPropertyReadOnly(Entity.NAME_PROPERTY));
+        assertEquals("", task.getPropertyAsString(Entity.NAME_PROPERTY));
+        task.setProperty(Entity.NAME_PROPERTY, "NewName53765");
+        assertEquals("NewName53765", task.getPropertyAsString(Entity.NAME_PROPERTY));
+        assertEquals("", task.getPropertyAsString(Entity.STATUS_PROPERTY));
+        task.setProperty(Entity.STATUS_PROPERTY, "TaskStatus:123");
+        assertEquals("In Progress", task.getPropertyAsString(Entity.STATUS_PROPERTY));
 
-        Workitem story2 = data.getWorkitemTree().get(0);
+        Entity story2 = data.getWorkitemTree().get(0);
         assertTrue(story2.children.contains(task));
     }
 
@@ -131,12 +131,12 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
         data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
-        Workitem story = data.getWorkitemTree().get(0);
-        final Workitem test = story.createChild(Test);
+        Entity story = data.getWorkitemTree().get(0);
+        final Entity test = story.createChild(Test);
         assertTrue(story.children.contains(test));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());
-        final Workitem task = story.createChild(Task);
+        final Entity task = story.createChild(Task);
         assertTrue(story.children.contains(task));
         assertEquals(story, test.parent);
         assertEquals(0, test.children.size());

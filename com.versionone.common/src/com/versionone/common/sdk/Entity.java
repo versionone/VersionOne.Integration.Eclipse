@@ -13,7 +13,7 @@ import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
-public class Workitem {
+public class Entity {
 
     public static final String ID_PROPERTY = "Number";
     public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
@@ -43,30 +43,30 @@ public class Workitem {
 
     protected final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
     final Asset asset;
-    public final Workitem parent;
+    public final Entity parent;
 
     /**
      * List of child Workitems.
      */
-    public final List<Workitem> children;
+    public final List<Entity> children;
 
     /**
      * Constructor for testing purposes ONLY.
      */
-    protected Workitem(List<Workitem> children, Workitem parent) {
+    protected Entity(List<Entity> children, Entity parent) {
         this.children = children;
         this.parent = parent;
         asset = null;
     }
 
-    Workitem(Asset asset, Workitem parent) {
+    Entity(Asset asset, Entity parent) {
         this.parent = parent;
         this.asset = asset;
 
-        children = new ArrayList<Workitem>(asset.getChildren().size());
+        children = new ArrayList<Entity>(asset.getChildren().size());
         for (Asset childAsset : asset.getChildren()) {
             if (!getType().isWorkitem() || dataLayer.isShowed(childAsset)) {
-                children.add(new Workitem(childAsset, this));
+                children.add(new Entity(childAsset, this));
             }
         }
     }
@@ -409,7 +409,7 @@ public class Workitem {
         dataLayer.revertAsset(asset);
     }
 
-    public Workitem createChild(WorkitemType type) throws DataLayerException {
+    public Entity createChild(WorkitemType type) throws DataLayerException {
         return dataLayer.createNewWorkitem(type, this);
     }
 
@@ -428,10 +428,10 @@ public class Workitem {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Workitem)) {
+        if (!(obj instanceof Entity)) {
             return false;
         }
-        Workitem other = (Workitem) obj;
+        Entity other = (Entity) obj;
         if (isPersistent()) {
             return other.asset.getOid().equals(asset.getOid());
         }

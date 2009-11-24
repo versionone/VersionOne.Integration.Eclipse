@@ -2,7 +2,7 @@ package com.versionone.common.sdk;
 
 
 import com.versionone.apiclient.IAssetType;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -28,8 +28,8 @@ public class WorkitemTester {
         AssetMock asset1 = new AssetMock(storyType);
         AssetMock asset11 = new AssetMock(storyType);
         asset1.children.add(asset11);
-        Workitem item1 = new Workitem(asset1, null);
-        Workitem item11 = new Workitem(asset11, item1);
+        Entity item1 = new Entity(asset1, null);
+        Entity item11 = new Entity(asset11, item1);
         Assert.assertEquals(null, item1.parent);
         Assert.assertEquals(item1, item11.parent);
         Assert.assertTrue(item1.children.contains(item11));
@@ -44,8 +44,8 @@ public class WorkitemTester {
         AssetMock asset1 = new AssetMock(prjType);
         AssetMock asset11 = new AssetMock(prjType);
         asset1.children.add(asset11);
-        Workitem item1 = new Workitem(asset1, null);
-        Workitem item11 = new Workitem(asset11, item1);
+        Entity item1 = new Entity(asset1, null);
+        Entity item11 = new Entity(asset11, item1);
         Assert.assertEquals(null, item1.parent);
         Assert.assertEquals(item1, item11.parent);
         Assert.assertTrue(item1.children.contains(item11));

@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.taskview.views.providers.SimpleProvider;
@@ -32,8 +32,8 @@ import com.versionone.taskview.views.providers.SimpleProvider;
 public class ProjectSelectDialog extends Dialog {
 
     private TreeViewer viewer = null; 
-    private List<Workitem> v1Roots;
-    private Workitem selectedProjectTreeNode;
+    private List<Entity> v1Roots;
+    private Entity selectedProjectTreeNode;
 
     static int WINDOW_HEIGHT = 200;
     static int WINDOW_WIDTH = 200;
@@ -49,7 +49,7 @@ public class ProjectSelectDialog extends Dialog {
      *            - node of project to select by default, if null, the root is
      *            selected
      */
-    public ProjectSelectDialog(Shell parentShell, List<Workitem> projectTree, Workitem defaultSelected) {
+    public ProjectSelectDialog(Shell parentShell, List<Entity> projectTree, Entity defaultSelected) {
         super(parentShell);
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
         v1Roots = projectTree;
@@ -69,8 +69,8 @@ public class ProjectSelectDialog extends Dialog {
         viewer = new TreeViewer(container, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
         viewer.setContentProvider(new ViewContentProvider());
-        viewer.setInput(v1Roots.toArray(new Workitem[1]));
-        viewer.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
+        viewer.setInput(v1Roots.toArray(new Entity[1]));
+        viewer.setLabelProvider(new SimpleProvider(Entity.NAME_PROPERTY, false));
         
         return container;
     }
@@ -95,7 +95,7 @@ public class ProjectSelectDialog extends Dialog {
      */
     @Override
     protected void okPressed() {
-        Workitem selectedItem = (Workitem)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+        Entity selectedItem = (Entity)((IStructuredSelection)viewer.getSelection()).getFirstElement();
         super.okPressed();
         PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN,
                 selectedItem.getId());

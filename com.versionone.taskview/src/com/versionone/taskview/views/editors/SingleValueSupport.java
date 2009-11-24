@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.versionone.common.sdk.ValueId;
-import com.versionone.common.sdk.Workitem;
+import com.versionone.common.sdk.Entity;
 import com.versionone.taskview.Activator;
 import com.versionone.taskview.views.properties.WorkitemPropertySource;
 
@@ -32,14 +32,14 @@ public class SingleValueSupport extends EditingSupport {
 
     @Override
     protected CellEditor getCellEditor(Object element) {
-        Workitem workitem = ((Workitem) element);
+        Entity workitem = ((Entity) element);
         return new SingleValueEditor(((TreeViewer)getViewer()).getTree(), workitem.getType(), propertyName);
     }
 
     @Override
     protected Object getValue(Object element) {
         try {            
-            ValueId value = (ValueId)((Workitem) element).getProperty(propertyName);
+            ValueId value = (ValueId)((Entity) element).getProperty(propertyName);
             currentValue = value;
             return currentValue;
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class SingleValueSupport extends EditingSupport {
 
     @Override
     protected void setValue(Object element, Object value) {
-        final Workitem workitem = ((Workitem) element);
+        final Entity workitem = ((Entity) element);
         final ValueId newValue = (ValueId) value;
         workitem.setProperty(propertyName, newValue);
         

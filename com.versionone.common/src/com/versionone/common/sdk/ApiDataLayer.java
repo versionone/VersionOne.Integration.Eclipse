@@ -227,7 +227,7 @@ public class ApiDataLayer {
         connect(path, userName, password, integrated);
     }
 
-    public List<Workitem> getProjectTree() throws DataLayerException {
+    public List<Entity> getProjectTree() throws DataLayerException {
         checkConnection();
         try {
             final IAssetType projectType = types.get(Scope);
@@ -239,9 +239,9 @@ public class ApiDataLayer {
             alreadyUsedDefinition.clear();
             addSelection(scopeQuery, Scope);
             final QueryResult result = services.retrieve(scopeQuery);
-            final List<Workitem> roots = new ArrayList<Workitem>(result.getAssets().length);
+            final List<Entity> roots = new ArrayList<Entity>(result.getAssets().length);
             for (Asset oneAsset : result.getAssets()) {
-                roots.add(new Workitem(oneAsset, null));
+                roots.add(new Entity(oneAsset, null));
             }
             return roots;
         } catch (Exception ex) {
@@ -249,7 +249,7 @@ public class ApiDataLayer {
         }
     }
 
-    public List<Workitem> getWorkitemTree() throws Exception {
+    public List<Entity> getWorkitemTree() throws Exception {
         checkConnection();
         if (currentProjectId == null) {
             currentProjectId = getDefaultProjectId();
@@ -280,10 +280,10 @@ public class ApiDataLayer {
                 throw warning("Unable to get workitems.", ex);
             }
         }
-        List<Workitem> res = new ArrayList<Workitem>(assetList.size());
+        List<Entity> res = new ArrayList<Entity>(assetList.size());
         for (Asset asset : assetList) {
             if (isShowed(asset)) {
-                res.add(new Workitem(asset, null));
+                res.add(new Entity(asset, null));
             }
         }
         return res;
@@ -312,7 +312,7 @@ public class ApiDataLayer {
             return true;
         }
 
-        final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
+        final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Entity.OWNERS_PROPERTY));
         final Object[] owners = attribute.getValues();
         for (Object oid : owners) {
             if (memberOid.equals(oid)) {
@@ -464,7 +464,7 @@ public class ApiDataLayer {
             MetaException {
         PropertyValues res = new PropertyValues();
         IAssetType assetType = metaModel.getAssetType(propertyName);
-        IAttributeDefinition nameDef = assetType.getAttributeDefinition(Workitem.NAME_PROPERTY);
+        IAttributeDefinition nameDef = assetType.getAttributeDefinition(Entity.NAME_PROPERTY);
         IAttributeDefinition inactiveDef = null;
 
         Query query = new Query(assetType);
@@ -594,7 +594,7 @@ public class ApiDataLayer {
      *            to update
      * @throws DataLayerException
      */
-    void refreshWorkitem(Workitem workitem) throws DataLayerException {
+    void refreshWorkitem(Entity workitem) throws DataLayerException {
         try {
             final Asset oldAsset = workitem.asset;
             final IAttributeDefinition stateDef = oldAsset.getAssetType().getAttributeDefinition("AssetState");
@@ -628,7 +628,7 @@ public class ApiDataLayer {
      * @param item
      *            to remove.
      */
-    void removeWorkitem(Workitem item) {
+    void removeWorkitem(Entity item) {
         if (item.getType().isPrimary()) {
             assetList.remove(item.asset);
         } else if (item.getType().isSecondary()) {
@@ -651,12 +651,12 @@ public class ApiDataLayer {
         return currentProjectId;
     }
 
-    public void setCurrentProject(Workitem value) {
+    public void setCurrentProject(Entity value) {
         currentProjectId = value.getId();
         assetList = null;
     }
 
-    public Workitem getCurrentProject() throws DataLayerException {
+    public Entity getCurrentProject() throws DataLayerException {
         if (currentProjectId == null || currentProjectId.equals("")) {
             currentProjectId = getDefaultProjectId();
         }
@@ -705,7 +705,7 @@ public class ApiDataLayer {
         }
     }
 
-    private Workitem getProjectById(String id) throws DataLayerException {
+    private Entity getProjectById(String id) throws DataLayerException {
         if (!isConnected || id == null || id.equals("")) {
             return null;
         }
@@ -725,7 +725,7 @@ public class ApiDataLayer {
         }
 
         if (result.getTotalAvaliable() == 1) {
-            return new Workitem(result.getAssets()[0], null);
+            return new Entity(result.getAssets()[0], null);
         }
         return null;
     }
@@ -744,7 +744,7 @@ public class ApiDataLayer {
      *             when prefix or parent inn't a Workitem, or trying to create a
      *             wrong Workitem hierarchy.
      */
-    public Workitem createNewWorkitem(WorkitemType type, Workitem parent) throws DataLayerException {
+    public Entity createNewWorkitem(WorkitemType type, Entity parent) throws DataLayerException {
         try {
             if (!type.isWorkitem()) {
                 throw new IllegalArgumentException("Can only create Workitems, " + "but received: " + type
@@ -757,7 +757,7 @@ public class ApiDataLayer {
                 }
             }
 
-            loadAssetAttribute(asset, "Scope.Name", getCurrentProject().getProperty(Workitem.NAME_PROPERTY));
+            loadAssetAttribute(asset, "Scope.Name", getCurrentProject().getProperty(Entity.NAME_PROPERTY));
 
             if (type.isPrimary()) {
                 if (parent != null) {
@@ -773,8 +773,8 @@ public class ApiDataLayer {
         }
     }
 
-    private Workitem createPrimaryWorkitem(Asset asset) throws MetaException, APIException, DataLayerException {
-        final Workitem item = new Workitem(asset, null);
+    private Entity createPrimaryWorkitem(Asset asset) throws MetaException, APIException, DataLayerException {
+        final Entity item = new Entity(asset, null);
         setAssetAttribute(asset, "Scope", currentProjectId);
         setAssetAttribute(asset, "Timebox", getCurrentProject().getProperty("Schedule.EarliestActiveTimebox"));
         loadAssetAttribute(asset, "Timebox.Name", getCurrentProject()
@@ -783,17 +783,17 @@ public class ApiDataLayer {
         return item;
     }
 
-    private Workitem createSecondaryWorkitem(Asset asset, Workitem parent) throws MetaException, APIException,
+    private Entity createSecondaryWorkitem(Asset asset, Entity parent) throws MetaException, APIException,
             DataLayerException {
         if (parent == null || parent.getType().isSecondary()) {
             throw new IllegalArgumentException("Cannot create " + asset.getAssetType() + " as children of " + parent);
         }
         setAssetAttribute(asset, "Parent", parent.asset.getOid());
 
-        loadAssetAttribute(asset, "Parent.Name", parent.getProperty(Workitem.NAME_PROPERTY));
+        loadAssetAttribute(asset, "Parent.Name", parent.getProperty(Entity.NAME_PROPERTY));
         loadAssetAttribute(asset, "Timebox.Name", parent.getProperty("Timebox.Name"));
 
-        final Workitem item = new Workitem(asset, parent);
+        final Entity item = new Entity(asset, parent);
         parent.children.add(item);
         parent.asset.getChildren().add(item.asset);
         return item;

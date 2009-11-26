@@ -82,7 +82,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public List<PrimaryWorkitem> getWorkitemTree() throws Exception {
+    public List<PrimaryWorkitem> getWorkitemTree() throws DataLayerException {
         return workitemTree;
     }
 

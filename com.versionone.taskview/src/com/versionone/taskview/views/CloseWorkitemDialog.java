@@ -22,7 +22,6 @@ import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
 import com.versionone.common.sdk.ValidatorException;
 import com.versionone.common.sdk.ValueId;
-import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.Workitem;
 
 public class CloseWorkitemDialog extends Dialog implements SelectionListener {
@@ -59,7 +58,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         this.openingViewer = viewer;
         setShellStyle(this.getShellStyle() | SWT.RESIZE);
 
-        statuses = dataLayer.getListPropertyValues(workitem.getType(), Entity.STATUS_PROPERTY);
+        statuses = dataLayer.getListPropertyValues(workitem.getType(), Workitem.STATUS_PROPERTY);
     }
 
     /**
@@ -79,7 +78,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         toDoText = new Text(container, SWT.BORDER);
         toDoText.setSize(40, 30);
         toDoText.setEditable(false);
-        toDoText.setText(workitem.getPropertyAsString(Entity.TODO_PROPERTY));
+        toDoText.setText(workitem.getPropertyAsString(Workitem.TODO_PROPERTY));
 
         statusLabel = new Label(container, SWT.NONE);
         statusLabel.setText("Status");
@@ -109,7 +108,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         for (String value : values) {
             statusCombobox.add(value);
         }
-        ValueId selectedValue = (ValueId) workitem.getProperty(Entity.STATUS_PROPERTY);
+        ValueId selectedValue = (ValueId) workitem.getProperty(Workitem.STATUS_PROPERTY);
         statusCombobox.select(statuses.getStringArrayIndex(selectedValue));
     }
 
@@ -149,7 +148,7 @@ public class CloseWorkitemDialog extends Dialog implements SelectionListener {
         try {
             if (selectedStatusIndex >= 0) {
                 ValueId selectedStatus = statuses.getValueIdByIndex(selectedStatusIndex);
-                workitem.setProperty(Entity.STATUS_PROPERTY, selectedStatus);
+                workitem.setProperty(Workitem.STATUS_PROPERTY, selectedStatus);
                 workitem.commitChanges();
             } else {
                 workitem.validateRequiredFields();

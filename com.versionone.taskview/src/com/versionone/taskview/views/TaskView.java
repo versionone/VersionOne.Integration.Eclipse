@@ -20,7 +20,6 @@ import org.eclipse.ui.part.ViewPart;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
-import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.Activator;
 
@@ -129,8 +128,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
         control.setMenu(menu);
     }
 
-    protected void updateDescription(Entity currentWorkitem, String value) {
-        currentWorkitem.setProperty(Entity.DESCRIPTION_PROPERTY, value);
+    protected void updateDescription(Workitem currentWorkitem, String value) {
+        currentWorkitem.setProperty(Workitem.DESCRIPTION_PROPERTY, value);
 
     }
 
@@ -189,28 +188,28 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void createColumns() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_ID, 120, SWT.LEFT, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.ID_PROPERTY, true));
-        column.setEditingSupport(new TextSupport(Entity.ID_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.ID_PROPERTY, true));
+        column.setEditingSupport(new TextSupport(Workitem.ID_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TITLE, 150, SWT.LEFT, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.NAME_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Entity.NAME_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.NAME_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.NAME_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_OWNER, 150, SWT.LEFT, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.OWNERS_PROPERTY, false));
-        column.setEditingSupport(new MultiValueSupport(Entity.OWNERS_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.OWNERS_PROPERTY, false));
+        column.setEditingSupport(new MultiValueSupport(Workitem.OWNERS_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_STATUS, 100, SWT.LEFT, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.STATUS_PROPERTY, false));
-        column.setEditingSupport(new SingleValueSupport(Entity.STATUS_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.STATUS_PROPERTY, false));
+        column.setEditingSupport(new SingleValueSupport(Workitem.STATUS_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_DETAIL_ESTIMATE, 100, SWT.CENTER, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.DETAIL_ESTIMATE_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Entity.DETAIL_ESTIMATE_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.DETAIL_ESTIMATE_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.DETAIL_ESTIMATE_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_TO_DO, 50, SWT.CENTER, -1);
-        column.setLabelProvider(new SimpleProvider(Entity.TODO_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Entity.TODO_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.TODO_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.TODO_PROPERTY, viewer, selectionProvider));
 
         if (ApiDataLayer.getInstance().isTrackEffortEnabled()) {
             addEffortColumns();
@@ -222,12 +221,12 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void addEffortColumns() {
         TreeViewerColumn column = createTableViewerColumn(V1_COLUMN_TITLE_DONE, 50, SWT.CENTER, 5);
-        column.setLabelProvider(new SimpleProvider(Entity.DONE_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Entity.DONE_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.DONE_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.DONE_PROPERTY, viewer, selectionProvider));
 
         column = createTableViewerColumn(V1_COLUMN_TITLE_EFFORT, 50, SWT.CENTER, 6);
-        column.setLabelProvider(new SimpleProvider(Entity.EFFORT_PROPERTY, false));
-        column.setEditingSupport(new TextSupport(Entity.EFFORT_PROPERTY, viewer, selectionProvider));
+        column.setLabelProvider(new SimpleProvider(Workitem.EFFORT_PROPERTY, false));
+        column.setEditingSupport(new TextSupport(Workitem.EFFORT_PROPERTY, viewer, selectionProvider));
 
         isEffortColumsShown = true;
     }
@@ -354,7 +353,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     }
 
     private void updateProperty() {
-        Entity workitem = getCurrentWorkitem();
+        Workitem workitem = getCurrentWorkitem();
         if (workitem != null) {
             selectionProvider.setSelection(new StructuredSelection(new WorkitemPropertySource(workitem, getViewer())));
         }

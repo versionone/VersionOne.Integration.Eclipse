@@ -21,6 +21,7 @@ import com.versionone.common.sdk.PropertyValuesMock;
 import com.versionone.common.sdk.TestDataLayer;
 import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.PrimaryWorkitemMock;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.TaskView;
 
 import static com.versionone.common.sdk.EntityType.*;
@@ -168,15 +169,15 @@ public class TestTaskView {
     private static void setupWorkitem(PrimaryWorkitemMock item, String owners, String name, String number, String estimate,
             String done, String effort, String todo, String status) {
         final PropertyValues ownersList = createListValue(owners);
-        TestDataLayer.getInstance().setListProperty(Entity.OWNERS_PROPERTY, item.getType(), ownersList);
-        item.properties.put(Entity.OWNERS_PROPERTY, ownersList);
+        TestDataLayer.getInstance().setListProperty(Workitem.OWNERS_PROPERTY, item.getType(), ownersList);
+        item.properties.put(Workitem.OWNERS_PROPERTY, ownersList);
         item.properties.put(Entity.NAME_PROPERTY, name);
         item.properties.put(Entity.ID_PROPERTY, number);
-        item.properties.put(Entity.DETAIL_ESTIMATE_PROPERTY, estimate);
-        item.properties.put(Entity.DONE_PROPERTY, done);
-        item.properties.put(Entity.EFFORT_PROPERTY, effort);
-        item.properties.put(Entity.TODO_PROPERTY, todo);
-        item.properties.put(Entity.STATUS_PROPERTY, createListValue(status));
+        item.properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, estimate);
+        item.properties.put(Workitem.DONE_PROPERTY, done);
+        item.properties.put(Workitem.EFFORT_PROPERTY, effort);
+        item.properties.put(Workitem.TODO_PROPERTY, todo);
+        item.properties.put(Workitem.STATUS_PROPERTY, createListValue(status));
     }
 
     private static PropertyValues createListValue(String ownersString) {
@@ -188,18 +189,18 @@ public class TestTaskView {
      * Validate one row in the table
      */
     private void validateRow(TreeItem row, PrimaryWorkitemMock item, boolean checkEffort) {
-        Assert.assertEquals(item.getPropertyAsString(Entity.OWNERS_PROPERTY), row.getText(OWNER_COLUMN_INDEX));
+        Assert.assertEquals(item.getPropertyAsString(Workitem.OWNERS_PROPERTY), row.getText(OWNER_COLUMN_INDEX));
         Assert.assertEquals(item.getPropertyAsString(Entity.NAME_PROPERTY), row.getText(NAME_COLUMN_INDEX));
         Assert.assertEquals(item.getPropertyAsString(Entity.ID_PROPERTY), row.getText(ID_COLUMN_INDEX));
-        Assert.assertEquals(item.getPropertyAsString(Entity.STATUS_PROPERTY), row.getText(STATUS_COLUMN_INDEX));
-        Assert.assertEquals(item.getPropertyAsString(Entity.DETAIL_ESTIMATE_PROPERTY), row
+        Assert.assertEquals(item.getPropertyAsString(Workitem.STATUS_PROPERTY), row.getText(STATUS_COLUMN_INDEX));
+        Assert.assertEquals(item.getPropertyAsString(Workitem.DETAIL_ESTIMATE_PROPERTY), row
                 .getText(DETAIL_ESTIMATE_COLUMN_INDEX));
         if (checkEffort) {
-            Assert.assertEquals(item.getPropertyAsString(Entity.EFFORT_PROPERTY), row.getText(EFFORT_COLUMN_INDEX));
-            Assert.assertEquals(item.getPropertyAsString(Entity.DONE_PROPERTY), row.getText(DONE_COLUMN_INDEX));
-            Assert.assertEquals(item.getPropertyAsString(Entity.TODO_PROPERTY), row.getText(TRACKED_TODO_COLUMN_INDEX));
+            Assert.assertEquals(item.getPropertyAsString(Workitem.EFFORT_PROPERTY), row.getText(EFFORT_COLUMN_INDEX));
+            Assert.assertEquals(item.getPropertyAsString(Workitem.DONE_PROPERTY), row.getText(DONE_COLUMN_INDEX));
+            Assert.assertEquals(item.getPropertyAsString(Workitem.TODO_PROPERTY), row.getText(TRACKED_TODO_COLUMN_INDEX));
         } else {
-            Assert.assertEquals(item.getPropertyAsString(Entity.TODO_PROPERTY), row.getText(TODO_COLUMN_INDEX));
+            Assert.assertEquals(item.getPropertyAsString(Workitem.TODO_PROPERTY), row.getText(TODO_COLUMN_INDEX));
         }
     }
 

@@ -9,30 +9,14 @@ import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.Attribute;
 import com.versionone.apiclient.IAttributeDefinition;
+import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IAttributeDefinition.AttributeType;
 
 public abstract class Entity {
 
     public static final String ID_PROPERTY = "Number";
-    public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
     public static final String NAME_PROPERTY = "Name";
-    public static final String STATUS_PROPERTY = "Status";
-    public static final String TYPE_PROPERTY = "Category";
-    public static final String EFFORT_PROPERTY = "Actuals";
-    public static final String DONE_PROPERTY = "Actuals.Value.@Sum";
-    public static final String SCHEDULE_NAME_PROPERTY = "Schedule.Name";
-    public static final String OWNERS_PROPERTY = "Owners";
-    public static final String TODO_PROPERTY = "ToDo";
-    public static final String ESTIMATE_PROPERTY = "Estimate";
-    public static final String DESCRIPTION_PROPERTY = "Description";
-    public static final String PARENT_NAME_PROPERTY = "Parent.Name";
-    public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";
-    public static final String CHECK_QUICK_SIGNUP_PROPERTY = "CheckQuickSignup";
-
-    public static final String OP_SIGNUP = "QuickSignup";
-    public static final String OP_CLOSE = "Inactivate";
-    public static final String OP_QUICK_CLOSE = "QuickClose";
 
     public static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     static {
@@ -60,22 +44,7 @@ public abstract class Entity {
         return asset.hasChanged();
     }
 
-    private boolean isEffortTrackingRelated(String property) {
-        return property.startsWith("Actuals") || property.equals(DETAIL_ESTIMATE_PROPERTY)
-                || property.equals(TODO_PROPERTY);
-    }
-
     public boolean isPropertyReadOnly(String propertyName) {
-        if (isEffortTrackingRelated(propertyName) && !dataLayer.trackingLevel.isTracking(this)) {
-            return true;
-        }
-        if (propertyName.equals(EFFORT_PROPERTY)) {
-            return false;
-        }
-        return isPropertyDefinitionReadOnly(propertyName);
-    }
-
-    private boolean isPropertyDefinitionReadOnly(String propertyName) {
         final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute != null)
@@ -98,9 +67,6 @@ public abstract class Entity {
      * @return true if property has changed; false - otherwise.
      */
     public boolean isPropertyChanged(String propertyName) throws IllegalArgumentException {
-        if (propertyName.equals(EFFORT_PROPERTY)) {
-            return dataLayer.getEffort(asset) != null;
-        }
         final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute == null) {
@@ -116,9 +82,6 @@ public abstract class Entity {
      *            Name of the property to get, e.g. "Status"
      */
     public void resetProperty(String propertyName) throws IllegalArgumentException {
-        if (propertyName.equals(EFFORT_PROPERTY)) {
-            dataLayer.setEffort(asset, null);
-        }
         final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
         if (attribute == null) {
@@ -136,18 +99,13 @@ public abstract class Entity {
      * @throws IllegalArgumentException
      *             If property cannot be got or there is no such one.
      * @see #NAME_PROPERTY
-     * @see #STATUS_PROPERTY
-     * @see #EFFORT_PROPERTY
-     * @see #DONE_PROPERTY
-     * @see #SCHEDULE_NAME_PROPERTY
-     * @see #OWNERS_PROPERTY
-     * @see #TODO_PROPERTY
+     * @see Workitem#STATUS_PROPERTY
+     * @see Workitem#DONE_PROPERTY
+     * @see Workitem#SCHEDULE_NAME_PROPERTY
+     * @see Workitem#OWNERS_PROPERTY
+     * @see Workitem#TODO_PROPERTY
      */
     public Object getProperty(String propertyName) throws IllegalArgumentException {
-        if (propertyName.equals(EFFORT_PROPERTY)) {
-            final Double effort = dataLayer.getEffort(asset);
-            return effort == null ? null : numberFormat.format(effort.doubleValue());
-        }
         final String fullName = getType() + "." + propertyName;
         Attribute attribute = asset.getAttributes().get(fullName);
 
@@ -188,15 +146,14 @@ public abstract class Entity {
      *            String, Double, null, ValueId, PropertyValues accepted.
      */
     public void setProperty(String propertyName, Object newValue) {
-        final boolean isEffort = propertyName.equals(EFFORT_PROPERTY);
         try {
             if ("".equals(newValue)) {
                 newValue = null;
             }
 
-            if ((isEffort || isNumeric(propertyName))) {
+            if (isNumeric(propertyName)) {
                 setNumericProperty(propertyName, newValue);
-            } else if (isMultiValue(propertyName)) {
+            } else if (isMultivalue(propertyName)) {
                 setMultiValueProperty(propertyName, (PropertyValues) newValue);
             } else {// List & String types
                 if (newValue instanceof ValueId) {
@@ -204,55 +161,62 @@ public abstract class Entity {
                 }
                 setPropertyInternal(propertyName, newValue);
             }
-
-        } catch (Exception ex) {
+        } catch (APIException ex) {
+            ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
+        } catch (ParseException ex) {
             ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
         }
     }
 
-    private boolean isMultiValue(String propertyName) {
-        final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
-        return attrDef.isMultiValue();
+    protected boolean isMultivalue(String propertyName) {
+        try {
+            final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+            return attrDef.isMultiValue();
+        } catch (MetaException e) {
+            return false;
+        }
     }
 
-    private boolean isNumeric(String propertyName) {
-        final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
-        return attrDef.getAttributeType() == AttributeType.Numeric;
+    protected boolean isNumeric(String propertyName) {
+        try {
+            final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
+            return attrDef.getAttributeType() == AttributeType.Numeric;
+        } catch (MetaException e) {
+            return false;
+        }
     }
 
-    private void setNumericProperty(String propertyName, Object newValue) throws APIException, ParseException {
-        Double doubleValue = null;
+    protected void setNumericProperty(String propertyName, Object newValue) throws APIException, ParseException {
+        final Double doubleValue;
         if (newValue instanceof String) {
             doubleValue = numberFormat.parse((String) newValue).doubleValue();
         } else if (newValue instanceof Double) {
             doubleValue = (Double) newValue;
+        } else {
+            throw new ParseException("Wrong newValue:" + newValue, -1);
         }
 
-        if (propertyName.equals(EFFORT_PROPERTY)) {
-            dataLayer.setEffort(asset, doubleValue);
-        } else {
-            if (doubleValue != null && doubleValue < 0) {
-                throw new IllegalArgumentException("The field cannot be negative");
-            }
-            setPropertyInternal(propertyName, doubleValue);
+        if (doubleValue != null && doubleValue < 0) {
+            throw new ParseException("The field cannot be negative", -1);
         }
+        setPropertyInternal(propertyName, doubleValue);
     }
 
-    private void setPropertyInternal(String propertyName, Object newValue) throws APIException {
+    protected void setPropertyInternal(String propertyName, Object newValue) throws APIException {
         final Attribute attribute = asset.getAttributes().get(getType() + "." + propertyName);
         if (attribute == null || !areEqual(attribute.getValue(), newValue)) {
             asset.setAttributeValue(asset.getAssetType().getAttributeDefinition(propertyName), newValue);
         }
     }
 
-    private static boolean areEqual(Object o1, Object o2) {
+    protected static boolean areEqual(Object o1, Object o2) {
         if (o1 == null) {
             return o2 == null;
         }
         return o1.equals(o2);
     }
 
-    private void setMultiValueProperty(String propertyName, PropertyValues newValues) throws APIException {
+    protected void setMultiValueProperty(String propertyName, PropertyValues newValues) throws APIException {
         final Attribute attribute = asset.getAttributes().get(getType() + "." + propertyName);
         final Object[] oldValues = attribute.getValues();
         final IAttributeDefinition attrDef = asset.getAssetType().getAttributeDefinition(propertyName);
@@ -262,13 +226,13 @@ public abstract class Entity {
             }
         }
         for (ValueId newValue : newValues) {
-            if (!checkContains(oldValues, newValue.oid)) {
+            if (!checkContains(oldValues, newValue.oid) && !newValue.oid.isNull()) {
                 asset.addAttributeValue(attrDef, newValue.oid);
             }
         }
     }
 
-    private boolean checkContains(Object[] array, Object value) {
+    protected boolean checkContains(Object[] array, Object value) {
         for (Object item : array) {
             if (item.equals(value))
                 return true;
@@ -298,11 +262,6 @@ public abstract class Entity {
         } catch (APIException e) {
             throw ApiDataLayer.warning("Cannot validate required fields.", e);
         }
-    }
-
-    public boolean isMine() {
-        PropertyValues owners = (PropertyValues) getProperty(OWNERS_PROPERTY);
-        return owners.containsOid(dataLayer.memberOid);
     }
 
     protected void checkPersistance(String job) {
@@ -348,6 +307,6 @@ public abstract class Entity {
 
     @Override
     public String toString() {
-        return getId() + (hasChanges() ? " (Changed)" : "");
+        return (isPersistent() ? getId() : getType()) + (hasChanges() ? " (Changed)" : "");
     }
 }

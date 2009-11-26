@@ -14,10 +14,13 @@ import org.osgi.framework.BundleContext;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.EntityType;
+import com.versionone.common.sdk.Project;
+import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.properties.Configuration;
 import com.versionone.taskview.views.properties.Configuration.ColumnSetting;
 
 import static com.versionone.common.sdk.EntityType.*;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -91,27 +94,27 @@ public class Activator extends AbstractUIPlugin {
         final ApiDataLayer dataLayer = ApiDataLayer.getInstance();
         final Map<String, Boolean> properties = new HashMap<String, Boolean>();
         properties.put(Entity.ID_PROPERTY, false);
-        properties.put(Entity.DETAIL_ESTIMATE_PROPERTY, false);
         properties.put(Entity.NAME_PROPERTY, false);
-        properties.put(Entity.STATUS_PROPERTY, true);
-        properties.put(Entity.EFFORT_PROPERTY, false);
-        properties.put(Entity.DONE_PROPERTY, false);
-        properties.put(Entity.DESCRIPTION_PROPERTY, false);
+        properties.put(Workitem.DETAIL_ESTIMATE_PROPERTY, false);
+        properties.put(Workitem.STATUS_PROPERTY, true);
+        properties.put(Workitem.EFFORT_PROPERTY, false);
+        properties.put(Workitem.DONE_PROPERTY, false);
+        properties.put(Workitem.DESCRIPTION_PROPERTY, false);
         // properties.put(Workitem.ScheduleNameProperty, false);
-        properties.put(Entity.OWNERS_PROPERTY, true);
-        properties.put(Entity.TODO_PROPERTY, false);
-        properties.put(Entity.CHECK_QUICK_CLOSE_PROPERTY, false);
-        properties.put(Entity.CHECK_QUICK_SIGNUP_PROPERTY, false);
-        properties.put("Scope.Name", false);
+        properties.put(Workitem.OWNERS_PROPERTY, true);
+        properties.put(Workitem.TODO_PROPERTY, false);
+        properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
+        properties.put(Workitem.CHECK_SIGNUP_PROPERTY, false);
+        properties.put(Workitem.SCOPE_NAME_PROPERTY, false);
 
         for (Entry<String, Boolean> entry : properties.entrySet()) {
-            for (EntityType type : EntityType.values()){
+            for (EntityType type : EntityType.values()) {
                 if (type.isWorkitem()) {
                     dataLayer.addProperty(entry.getKey(), type, entry.getValue());
                 }
             }
         }
-        dataLayer.addProperty(Entity.NAME_PROPERTY, Scope, false);
+        dataLayer.addProperty(Project.NAME_PROPERTY, Scope, false);
     }
 
     /*
@@ -162,9 +165,13 @@ public class Activator extends AbstractUIPlugin {
     public static void logInfo(String message) {
         log(IStatus.INFO, IStatus.OK, message, null);
     }
-    
+
     public static void logWarning(String message) {
         log(IStatus.WARNING, IStatus.OK, message, null);
+    }
+
+    public static void logWarning(String message, Throwable t) {
+        log(IStatus.WARNING, IStatus.OK, message, t);
     }
 
     private static void log(int severity, int code, String message, Throwable t) {

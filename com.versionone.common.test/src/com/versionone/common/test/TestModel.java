@@ -23,6 +23,7 @@ import com.versionone.common.sdk.SecondaryWorkitem;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.EntityType;
+import com.versionone.common.sdk.Workitem;
 
 import static com.versionone.common.sdk.EntityType.*;
 
@@ -33,8 +34,8 @@ public class TestModel {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        setDataLayerAttribute(Entity.STATUS_PROPERTY, true);
-        setDataLayerAttribute(Entity.OWNERS_PROPERTY, true);
+        setDataLayerAttribute(Workitem.STATUS_PROPERTY, true);
+        setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true);
 
         FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
         FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
@@ -106,12 +107,12 @@ public class TestModel {
         Assert.assertEquals(name, task.getProperty(Entity.NAME_PROPERTY));
         Assert.assertEquals(number, task.getProperty(Entity.ID_PROPERTY));
 
-        Assert.assertEquals(estimate, task.getProperty(Entity.DETAIL_ESTIMATE_PROPERTY));
-        Assert.assertEquals(done, task.getProperty(Entity.DONE_PROPERTY));
-        Assert.assertEquals(effort, task.getProperty(Entity.EFFORT_PROPERTY));
-        Assert.assertEquals(todo, task.getProperty(Entity.TODO_PROPERTY));
-        Assert.assertEquals(status, task.getProperty(Entity.STATUS_PROPERTY).toString());
-        Assert.assertEquals(parent, task.getProperty(Entity.PARENT_NAME_PROPERTY));
+        Assert.assertEquals(estimate, task.getProperty(Workitem.DETAIL_ESTIMATE_PROPERTY));
+        Assert.assertEquals(done, task.getProperty(Workitem.DONE_PROPERTY));
+        Assert.assertEquals(effort, task.getProperty(Workitem.EFFORT_PROPERTY));
+        Assert.assertEquals(todo, task.getProperty(Workitem.TODO_PROPERTY));
+        Assert.assertEquals(status, task.getProperty(Workitem.STATUS_PROPERTY).toString());
+        Assert.assertEquals(parent, task.getProperty(Workitem.PARENT_NAME_PROPERTY));
         Assert.assertEquals(type, task.getType());
     }
 
@@ -119,14 +120,14 @@ public class TestModel {
     public void testSetDescription() throws Exception {
         final Entity defect0 = datalayer.getWorkitemTree().get(0);
 
-        defect0.setProperty(Entity.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
-        Assert.assertEquals("<br>test <b>new test</b>", defect0.getProperty(Entity.DESCRIPTION_PROPERTY));
+        defect0.setProperty(Workitem.DESCRIPTION_PROPERTY, "<br>test <b>new test</b>");
+        Assert.assertEquals("<br>test <b>new test</b>", defect0.getProperty(Workitem.DESCRIPTION_PROPERTY));
 
-        defect0.setProperty(Entity.DESCRIPTION_PROPERTY, "--");
-        Assert.assertEquals("--", defect0.getProperty(Entity.DESCRIPTION_PROPERTY));
+        defect0.setProperty(Workitem.DESCRIPTION_PROPERTY, "--");
+        Assert.assertEquals("--", defect0.getProperty(Workitem.DESCRIPTION_PROPERTY));
 
-        defect0.setProperty(Entity.DESCRIPTION_PROPERTY, "");
-        Assert.assertEquals(null, defect0.getProperty(Entity.DESCRIPTION_PROPERTY));
+        defect0.setProperty(Workitem.DESCRIPTION_PROPERTY, "");
+        Assert.assertEquals(null, defect0.getProperty(Workitem.DESCRIPTION_PROPERTY));
     }
 
     /**
@@ -134,7 +135,7 @@ public class TestModel {
      */
     @Test
     public void testSetToDo() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree().get(0), Entity.TODO_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(0), Workitem.TODO_PROPERTY);
     }
 
     /**
@@ -142,7 +143,7 @@ public class TestModel {
      */
     @Test
     public void testSetEstimate() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree().get(1), Entity.ESTIMATE_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(1), Workitem.ESTIMATE_PROPERTY);
     }
 
     /**
@@ -150,7 +151,7 @@ public class TestModel {
      */
     @Test
     public void testSetDetailEstimate() throws Exception {
-        validateNumberProperty(datalayer.getWorkitemTree().get(0), Entity.DETAIL_ESTIMATE_PROPERTY);
+        validateNumberProperty(datalayer.getWorkitemTree().get(0), Workitem.DETAIL_ESTIMATE_PROPERTY);
     }
 
     /**
@@ -159,7 +160,7 @@ public class TestModel {
     @Test
     public void testSetEffort() throws Exception {
         Entity workitem = datalayer.getWorkitemTree().get(0);
-        String property = Entity.EFFORT_PROPERTY;
+        String property = Workitem.EFFORT_PROPERTY;
         workitem.setProperty(property, "0");
         Assert.assertEquals(null, workitem.getProperty(property));
 
@@ -200,44 +201,44 @@ public class TestModel {
     @Test
     public void testSetStatus() throws Exception {
         final Entity defect0 = datalayer.getWorkitemTree().get(0);
-        PropertyValues statuses = datalayer.getListPropertyValues(defect0.getType(), Entity.STATUS_PROPERTY);
-        PropertyValues types = datalayer.getListPropertyValues(Story, Entity.TYPE_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(defect0.getType(), Workitem.STATUS_PROPERTY);
+        PropertyValues types = datalayer.getListPropertyValues(Story, Workitem.TYPE_PROPERTY);
 
         ValueId status = statuses.getValueIdByIndex(0);
-        defect0.setProperty(Entity.STATUS_PROPERTY, status);
-        Assert.assertEquals(status, defect0.getProperty(Entity.STATUS_PROPERTY));
+        defect0.setProperty(Workitem.STATUS_PROPERTY, status);
+        Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
 
         status = statuses.getValueIdByIndex(1);
-        defect0.setProperty(Entity.STATUS_PROPERTY, status);
-        Assert.assertEquals(status, defect0.getProperty(Entity.STATUS_PROPERTY));
+        defect0.setProperty(Workitem.STATUS_PROPERTY, status);
+        Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
 
         try {
-            defect0.setProperty(Entity.STATUS_PROPERTY, "On Hold4");
+            defect0.setProperty(Workitem.STATUS_PROPERTY, "On Hold4");
         } catch (Exception e) {
             // Do nothing
         }
-        Assert.assertEquals(status, defect0.getProperty(Entity.STATUS_PROPERTY));
+        Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
 
         try {
-            defect0.setProperty(Entity.STATUS_PROPERTY, "Task:123");
+            defect0.setProperty(Workitem.STATUS_PROPERTY, "Task:123");
         } catch (Exception e) {
             // Do nothing
         }
-        Assert.assertEquals(status, defect0.getProperty(Entity.STATUS_PROPERTY));
+        Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
 
         try {
-            defect0.setProperty(Entity.STATUS_PROPERTY, types.getValueIdByIndex(1));
+            defect0.setProperty(Workitem.STATUS_PROPERTY, types.getValueIdByIndex(1));
         } catch (Exception e) {
             // Do nothing
         }
-        Assert.assertEquals(status, defect0.getProperty(Entity.STATUS_PROPERTY));
+        Assert.assertEquals(status, defect0.getProperty(Workitem.STATUS_PROPERTY));
 
-        Assert.assertTrue(defect0.isPropertyChanged(Entity.STATUS_PROPERTY));
-        defect0.resetProperty(Entity.STATUS_PROPERTY);
-        Assert.assertFalse(defect0.isPropertyChanged(Entity.STATUS_PROPERTY));
-        Assert.assertEquals("Accepted", defect0.getPropertyAsString(Entity.STATUS_PROPERTY));
+        Assert.assertTrue(defect0.isPropertyChanged(Workitem.STATUS_PROPERTY));
+        defect0.resetProperty(Workitem.STATUS_PROPERTY);
+        Assert.assertFalse(defect0.isPropertyChanged(Workitem.STATUS_PROPERTY));
+        Assert.assertEquals("Accepted", defect0.getPropertyAsString(Workitem.STATUS_PROPERTY));
 
-        defect0.setProperty(Entity.STATUS_PROPERTY, statuses.getValueIdByIndex(0));
+        defect0.setProperty(Workitem.STATUS_PROPERTY, statuses.getValueIdByIndex(0));
         Assert.assertTrue(defect0.hasChanges());
         defect0.revertChanges();
         Assert.assertFalse(defect0.hasChanges());
@@ -264,41 +265,41 @@ public class TestModel {
     public void testSetStoryOwner() throws Exception {
         final Entity defect0 = datalayer.getWorkitemTree().get(0);
 
-        PropertyValues owners = (PropertyValues) defect0.getProperty(Entity.OWNERS_PROPERTY);
+        PropertyValues owners = (PropertyValues) defect0.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId cat = owners.getValueIdByIndex(0);
         Assert.assertEquals("Cat", cat.toString());
-        Assert.assertEquals(cat.toString(), defect0.getPropertyAsString(Entity.OWNERS_PROPERTY));
+        Assert.assertEquals(cat.toString(), defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         Assert.assertEquals(cat.toString(), owners.toString());
         Assert.assertEquals(1, owners.size());
         Assert.assertEquals(new PropertyValues(Arrays.asList(cat)), owners);
-        PropertyValues users = datalayer.getListPropertyValues(defect0.getType(), Entity.OWNERS_PROPERTY);
+        PropertyValues users = datalayer.getListPropertyValues(defect0.getType(), Workitem.OWNERS_PROPERTY);
         ValueId admin = users.getValueIdByIndex(1);
         Assert.assertEquals("Administrator", admin.toString());
         owners = new PropertyValues(Arrays.asList(admin));
-        defect0.setProperty(Entity.OWNERS_PROPERTY, owners);
-        Assert.assertEquals(admin.toString(), defect0.getPropertyAsString(Entity.OWNERS_PROPERTY));
+        defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals(admin.toString(), defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         owners = new PropertyValues();
-        defect0.setProperty(Entity.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("", defect0.getPropertyAsString(Entity.OWNERS_PROPERTY));
+        defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("", defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         owners = new PropertyValues(Arrays.asList(admin, cat));
-        defect0.setProperty(Entity.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Administrator, Cat", defect0.getPropertyAsString(Entity.OWNERS_PROPERTY));
+        defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("Administrator, Cat", defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
 
     @Test
     public void testSetDefectOwner() throws Exception {
         final Entity story1 = datalayer.getWorkitemTree().get(1);
 
-        PropertyValues owners = (PropertyValues) story1.getProperty(Entity.OWNERS_PROPERTY);
+        PropertyValues owners = (PropertyValues) story1.getProperty(Workitem.OWNERS_PROPERTY);
         final ValueId adminForRemove = owners.getValueIdByIndex(0);
         owners.remove(adminForRemove);
-        PropertyValues users = datalayer.getListPropertyValues(story1.getType(), Entity.OWNERS_PROPERTY);
+        PropertyValues users = datalayer.getListPropertyValues(story1.getType(), Workitem.OWNERS_PROPERTY);
         ValueId petja = users.getValueIdByIndex(8);
         Assert.assertEquals("Petja", petja.toString());
         owners.add(petja);
         Assert.assertEquals(3, owners.size());
-        story1.setProperty(Entity.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Petja, Bil, Tom", story1.getPropertyAsString(Entity.OWNERS_PROPERTY));
+        story1.setProperty(Workitem.OWNERS_PROPERTY, owners);
+        Assert.assertEquals("Petja, Bil, Tom", story1.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }
 
     @Test
@@ -313,14 +314,14 @@ public class TestModel {
 
         Assert.assertTrue(story1.isPropertyReadOnly(Entity.ID_PROPERTY));
         Assert.assertFalse(story1.isPropertyReadOnly(Entity.NAME_PROPERTY));
-        Assert.assertFalse(story1.isPropertyReadOnly(Entity.OWNERS_PROPERTY));
+        Assert.assertFalse(story1.isPropertyReadOnly(Workitem.OWNERS_PROPERTY));
 
-        Assert.assertTrue(story1.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
-        Assert.assertFalse(s1Task1.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
-        Assert.assertFalse(s1Test0.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
-        Assert.assertFalse(defect9.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
-        Assert.assertTrue(d9Task0.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
-        Assert.assertTrue(d9Test2.isPropertyReadOnly(Entity.EFFORT_PROPERTY));
+        Assert.assertTrue(story1.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(s1Task1.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(s1Test0.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertFalse(defect9.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertTrue(d9Task0.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
+        Assert.assertTrue(d9Test2.isPropertyReadOnly(Workitem.EFFORT_PROPERTY));
     }
 
     @Test
@@ -384,14 +385,14 @@ public class TestModel {
 
     @Test
     public void testGetTestStatuses() throws Exception {
-        PropertyValues statuses = datalayer.getListPropertyValues(Test, Entity.STATUS_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(Test, Workitem.STATUS_PROPERTY);
         Assert.assertNotNull(statuses);
         validatePropertyValues(statuses, "", "Failed", "Passed");
     }
 
     @Test
     public void testGetStoryStatuses() throws Exception {
-        PropertyValues statuses = datalayer.getListPropertyValues(Story, Entity.STATUS_PROPERTY);
+        PropertyValues statuses = datalayer.getListPropertyValues(Story, Workitem.STATUS_PROPERTY);
         Assert.assertNotNull(statuses);
         validatePropertyValues(statuses, "", "Future", "In Progress", "Done", "Accepted");
     }

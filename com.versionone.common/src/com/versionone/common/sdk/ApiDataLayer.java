@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
-
-import static com.versionone.common.sdk.EntityType.*;
-
 import com.versionone.Oid;
 import com.versionone.apiclient.AndFilterTerm;
 import com.versionone.apiclient.APIException;
@@ -41,6 +37,8 @@ import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
 import com.versionone.apiclient.IV1Configuration.TrackingLevel;
+
+import static com.versionone.common.sdk.EntityType.*;
 
 public class ApiDataLayer {
 
@@ -251,7 +249,7 @@ public class ApiDataLayer {
         }
     }
 
-    public List<PrimaryWorkitem> getWorkitemTree() throws Exception {
+    public List<PrimaryWorkitem> getWorkitemTree() throws DataLayerException {
         checkConnection();
         if (currentProjectId == null) {
             currentProjectId = getDefaultProjectId();
@@ -312,12 +310,12 @@ public class ApiDataLayer {
      *            to determine visibility status.
      * @return true if Asset can be showed at the moment; otherwise - false.
      */
-    public boolean isShowed(Asset asset) {
+    boolean isShowed(Asset asset) {
         if (showAllTasks || asset.hasChanged() || asset.getOid().isNull()) {
             return true;
         }
 
-        final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Entity.OWNERS_PROPERTY));
+        final Attribute attribute = asset.getAttribute(workitemType.getAttributeDefinition(Workitem.OWNERS_PROPERTY));
         final Object[] owners = attribute.getValues();
         for (Object oid : owners) {
             if (memberOid.equals(oid)) {
@@ -511,7 +509,7 @@ public class ApiDataLayer {
         }
     }
 
-    void commitAsset(Asset asset) throws V1Exception, DataLayerException, ValidatorException {
+    void commitAsset(Asset asset) throws V1Exception {
         services.save(asset);
         commitEffort(asset);
     }
@@ -533,29 +531,15 @@ public class ApiDataLayer {
 
     public void commitChanges() throws DataLayerException {
         checkConnection();
-        Map<Asset, List<RequiredFieldsDTO>> requiredData = null;
-        try {
-            requiredData = requiredFieldsValidator.validate(assetList);
-
-            if (!requiredData.isEmpty()) {
-                String message = requiredFieldsValidator.createErrorMessage(requiredData);
-                throw new ValidatorException(message);
-            }
-        } catch (APIException e) {
-            throw warning("Cannot validate required fields.", e);
-        }
-
-        try {
-            commitAssetsRecursively(assetList);
-        } catch (V1Exception e) {
-            throw warning("Cannot commit changes.", e);
-        }
+        commitWorkitemTree(getWorkitemTree());
     }
 
-    private void commitAssetsRecursively(List<Asset> assets) throws V1Exception, DataLayerException {
-        for (Asset asset : assets) {
-            commitAsset(asset);
-            commitAssetsRecursively(asset.getChildren());
+    private void commitWorkitemTree(List<PrimaryWorkitem> list) throws DataLayerException {
+        for (PrimaryWorkitem item : list) {
+            item.commitChanges();
+            for (SecondaryWorkitem secondary : item.children) {
+                secondary.commitChanges();
+            }
         }
     }
 
@@ -580,28 +564,28 @@ public class ApiDataLayer {
      * 
      * @param workitem
      *            to update
+     * @return updated Asset of this Workitem.
      * @throws DataLayerException
      */
-    void refreshWorkitem(Entity workitem) throws DataLayerException {
+    Asset refreshWorkitem(Entity workitem) throws DataLayerException {
         try {
             final Asset oldAsset = workitem.asset;
             final IAttributeDefinition stateDef = oldAsset.getAssetType().getAttributeDefinition("AssetState");
             final Query query = new Query(oldAsset.getOid().getMomentless(), false);
             addSelection(query, workitem.getType());
             query.getSelection().add(stateDef);
-            final QueryResult queryRes = services.retrieve(query);
-            Assert.isTrue(queryRes.getTotalAvaliable() == 1, "Query should return exactly one asset.");
-            final Asset newAsset = queryRes.getAssets()[0];
+            final Asset[] queryRes = services.retrieve(query).getAssets();
+            assert queryRes.length == 1;
+            final Asset newAsset = queryRes[0];
 
             if (workitem instanceof SecondaryWorkitem) {
                 final SecondaryWorkitem sw = (SecondaryWorkitem) workitem;
-                Assert.isTrue(Collections.replaceAll(sw.parent.asset.getChildren(), oldAsset, newAsset),
-                        "parent Asset:" + sw.parent.asset + " must contains asset:" + oldAsset + " in its children.");
+                Collections.replaceAll(sw.parent.asset.getChildren(), oldAsset, newAsset);
             } else {
-                Assert.isTrue(Collections.replaceAll(assetList, oldAsset, newAsset), "assetList must contains asset:"
-                        + oldAsset);
+                Collections.replaceAll(assetList, oldAsset, newAsset);
+                newAsset.getChildren().addAll(oldAsset.getChildren());
             }
-            newAsset.getChildren().addAll(oldAsset.getChildren());
+            return newAsset;
         } catch (MetaException ex) {
             throw warning("Unable to get workitems.", ex);
         } catch (Exception ex) {
@@ -617,12 +601,11 @@ public class ApiDataLayer {
      *            to remove.
      */
     void removeWorkitem(Workitem item) {
-        if (item instanceof PrimaryWorkitem)
-            Assert.isTrue(assetList.remove(item.asset), "assetList must contains asset:" + item.asset);
-        else if (item instanceof SecondaryWorkitem) {
+        if (item instanceof SecondaryWorkitem) {
             final SecondaryWorkitem sw = (SecondaryWorkitem) item;
-            Assert.isTrue(sw.parent.asset.getChildren().remove(item.asset), "parent Asset:" + sw.parent.asset
-                    + " must contains asset:" + item.asset + " in its children.");
+            sw.parent.asset.getChildren().remove(item.asset);
+        } else {
+            assetList.remove(item.asset);
         }
     }
 
@@ -798,8 +781,8 @@ public class ApiDataLayer {
      * @throws APIException
      *             if something wrong with attribute setting/ensuring.
      */
-    private static void setAssetAttribute(final Asset asset, final String attrName, final Object value)
-            throws MetaException, APIException {
+    static void setAssetAttribute(final Asset asset, final String attrName, final Object value) throws MetaException,
+            APIException {
         final IAssetType type = asset.getAssetType();
         IAttributeDefinition def = type.getAttributeDefinition(attrName);
         if (value == null || (value instanceof Oid && ((Oid) value).isNull())) {

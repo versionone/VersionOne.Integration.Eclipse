@@ -61,9 +61,9 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertEquals("", defect.getPropertyAsString(Entity.NAME_PROPERTY));
         defect.setProperty(Entity.NAME_PROPERTY, "NewName53765");
         assertEquals("NewName53765", defect.getPropertyAsString(Entity.NAME_PROPERTY));
-        assertEquals("", defect.getPropertyAsString(Entity.STATUS_PROPERTY));
-        defect.setProperty(Entity.STATUS_PROPERTY, "StoryStatus:133");
-        assertEquals("Future", defect.getPropertyAsString(Entity.STATUS_PROPERTY));
+        assertEquals("", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        defect.setProperty(Workitem.STATUS_PROPERTY, "StoryStatus:133");
+        assertEquals("Future", defect.getPropertyAsString(Workitem.STATUS_PROPERTY));
 
         assertTrue(data.getWorkitemTree().contains(defect));
     }
@@ -113,9 +113,9 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertEquals("", task.getPropertyAsString(Entity.NAME_PROPERTY));
         task.setProperty(Entity.NAME_PROPERTY, "NewName53765");
         assertEquals("NewName53765", task.getPropertyAsString(Entity.NAME_PROPERTY));
-        assertEquals("", task.getPropertyAsString(Entity.STATUS_PROPERTY));
-        task.setProperty(Entity.STATUS_PROPERTY, "TaskStatus:123");
-        assertEquals("In Progress", task.getPropertyAsString(Entity.STATUS_PROPERTY));
+        assertEquals("", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
+        task.setProperty(Workitem.STATUS_PROPERTY, "TaskStatus:123");
+        assertEquals("In Progress", task.getPropertyAsString(Workitem.STATUS_PROPERTY));
 
         PrimaryWorkitem story2 = data.getWorkitemTree().get(0);
         assertTrue(story2.children.contains(task));

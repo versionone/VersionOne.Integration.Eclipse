@@ -28,15 +28,15 @@ class AddTaskAction extends Action {
     public void run() {
         try {
             final Workitem currentItem = workitemView.getCurrentWorkitem();
-            final SecondaryWorkitem newItem;
+            final PrimaryWorkitem parent;
             if (currentItem instanceof SecondaryWorkitem) {
-                newItem = ((SecondaryWorkitem) currentItem).parent.createChild(EntityType.Task);
+                parent = ((SecondaryWorkitem) currentItem).parent;
             } else if (currentItem instanceof PrimaryWorkitem) {
-                newItem = ((PrimaryWorkitem) currentItem).createChild(EntityType.Task);
+                parent = (PrimaryWorkitem) currentItem;
             } else {
                 throw new IllegalStateException("Wrong current Workitem:" + currentItem);
             }
-            workitemView.refreshViewer(new StructuredSelection(newItem));
+            workitemView.refreshViewer(new StructuredSelection(parent.createChild(EntityType.Task)));
         } catch (DataLayerException e) {
             Activator.logError(e);
             MessageDialog.openError(workitemView.getViewer().getControl().getShell(), "Task View Error",

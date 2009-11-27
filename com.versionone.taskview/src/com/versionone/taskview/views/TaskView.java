@@ -56,7 +56,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private boolean isEffortColumsShown;
     private TreeViewer viewer;
 
-    private ActionsManager actionsManager = new ActionsManager();
+    private final ActionsManager actionsManager = new ActionsManager(this, getSite());
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -244,8 +244,6 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create the action menus and add them to Action bars and pull down menu.
      */
     private void createActions() {
-        actionsManager.init(this, getSite());
-
         IActionBars bars = getViewSite().getActionBars();
         actionsManager.addActions(bars.getMenuManager());
         actionsManager.addActions(bars.getToolBarManager());

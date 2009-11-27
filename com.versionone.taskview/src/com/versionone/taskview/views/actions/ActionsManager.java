@@ -16,20 +16,34 @@ import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.TaskView;
 
 public class ActionsManager implements ISelectionChangedListener, IMenuListener {
+
     // Actions list
-    private Action selectProjectAction;
-    private Action refreshAction;
-    private Action saveAction;
-    private Action filterAction;
-    private Action addTask;
-    private Action addDefect;
-    // actins only for context menu
-    private Action close;
-    private Action quickClose;
-    private Action signUp;
+    private final Action selectProjectAction;
+    private final Action refreshAction;
+    private final Action saveAction;
+    private final Action filterAction;
+    private final Action addTask;
+    private final Action addDefect;
+    // Actions only for context menu
+    private final Action close;
+    private final Action quickClose;
+    private final Action signUp;
 
     private boolean isTaskCanBeAdded = false;
-    private TaskView taskView;
+    private final TaskView taskView;
+
+    public ActionsManager(TaskView taskView, IWorkbenchPartSite site) {
+        this.taskView = taskView;
+        selectProjectAction = new ProjectAction(taskView, site);
+        refreshAction = new RefreshAction(taskView);
+        saveAction = new SaveAction(taskView);
+        filterAction = new FilterAction(taskView);
+        addTask = new AddTaskAction(taskView);
+        addDefect = new AddDefectAction(taskView);
+        close = new CloseAction(taskView);
+        quickClose = new QuickCloseAction(taskView);
+        signUp = new SignUpAction(taskView);
+    }
 
     public void addActions(IContributionManager manager) {
         manager.add(addTask);
@@ -40,19 +54,6 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
         manager.add(new Separator());
         manager.add(refreshAction);
         manager.add(saveAction);
-    }
-
-    public void init(TaskView taskView, IWorkbenchPartSite site) {
-        this.selectProjectAction = new ProjectAction(taskView, site);
-        this.refreshAction = new RefreshAction(taskView);
-        this.saveAction = new SaveAction(taskView);
-        this.filterAction = new FilterAction(taskView);
-        this.addTask = new AddTaskAction(taskView);
-        this.addDefect = new AddDefectAction(taskView);
-        this.close = new CloseAction(taskView);
-        this.quickClose = new QuickCloseAction(taskView);
-        this.signUp = new SignUpAction(taskView);
-        this.taskView = taskView;
     }
 
     /**

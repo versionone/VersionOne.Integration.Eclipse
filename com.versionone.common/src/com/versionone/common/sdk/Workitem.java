@@ -111,10 +111,10 @@ public abstract class Workitem extends Entity {
         try {
             return isPersistent() && (Boolean) getProperty(CHECK_QUICK_CLOSE_PROPERTY);
         } catch (IllegalArgumentException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
+            ApiDataLayer.createAndLogException("QuickClose not supported.", e);
             return false;
         } catch (NullPointerException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
+            ApiDataLayer.createAndLogException("QuickClose not supported.", e);
             return false;
         }
     }
@@ -131,7 +131,7 @@ public abstract class Workitem extends Entity {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(Workitem.OP_QUICK_CLOSE));
             dataLayer.removeWorkitem(this);
         } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to QuickClose workitem: " + this, e);
+            throw ApiDataLayer.createAndLogException("Failed to QuickClose workitem: " + this, e);
         }
     }
 
@@ -139,10 +139,10 @@ public abstract class Workitem extends Entity {
         try {
             return isPersistent() && (Boolean) getProperty(CHECK_SIGNUP_PROPERTY);
         } catch (IllegalArgumentException e) {
-            ApiDataLayer.warning("QuickSignup not supported.", e);
+            ApiDataLayer.createAndLogException("QuickSignup not supported.", e);
             return false;
         } catch (NullPointerException e) {
-            ApiDataLayer.warning("QuickClose not supported.", e);
+            ApiDataLayer.createAndLogException("QuickClose not supported.", e);
             return false;
         }
     }
@@ -158,7 +158,7 @@ public abstract class Workitem extends Entity {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(Workitem.OP_SIGNUP));
             dataLayer.refreshWorkitem(this);
         } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to QuickSignup workitem: " + this, e);
+            throw ApiDataLayer.createAndLogException("Failed to QuickSignup workitem: " + this, e);
         }
     }
 
@@ -173,7 +173,7 @@ public abstract class Workitem extends Entity {
             dataLayer.executeOperation(asset, asset.getAssetType().getOperation(Workitem.OP_CLOSE));
             dataLayer.removeWorkitem(this);
         } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to Close workitem: " + this, e);
+            throw ApiDataLayer.createAndLogException("Failed to Close workitem: " + this, e);
         }
     }
 

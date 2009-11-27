@@ -50,7 +50,7 @@ public abstract class Entity {
         if (attribute != null)
             return attribute.getDefinition().isReadOnly();
         else {
-            ApiDataLayer.warning("Cannot get property: " + fullName);
+            ApiDataLayer.createAndLogException("Cannot get property: " + fullName);
             return true;
         }
     }
@@ -162,9 +162,9 @@ public abstract class Entity {
                 setPropertyInternal(propertyName, newValue);
             }
         } catch (APIException ex) {
-            ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
+            ApiDataLayer.createAndLogException("Cannot set property " + propertyName + " of " + this, ex);
         } catch (ParseException ex) {
-            ApiDataLayer.warning("Cannot set property " + propertyName + " of " + this, ex);
+            ApiDataLayer.createAndLogException("Cannot set property " + propertyName + " of " + this, ex);
         }
     }
 
@@ -246,7 +246,7 @@ public abstract class Entity {
         try {
             dataLayer.commitAsset(asset);
         } catch (V1Exception e) {
-            throw ApiDataLayer.warning("Failed to commit changes of workitem: " + this, e);
+            throw ApiDataLayer.createAndLogException("Failed to commit changes of workitem: " + this, e);
         }
     }
 
@@ -260,7 +260,7 @@ public abstract class Entity {
                 throw new ValidatorException(message);
             }
         } catch (APIException e) {
-            throw ApiDataLayer.warning("Cannot validate required fields.", e);
+            throw ApiDataLayer.createAndLogException("Cannot validate required fields.", e);
         }
     }
 

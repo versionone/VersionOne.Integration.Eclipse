@@ -27,7 +27,6 @@ import com.versionone.apiclient.IServices;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
-import com.versionone.apiclient.OidException;
 import com.versionone.apiclient.OrderBy;
 import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
@@ -175,13 +174,13 @@ public class ApiDataLayer {
 
             return;
         } catch (MetaException e) {
-            throw warning("Cannot connect to V1 server.", e);
-        } catch (Exception e) {
-            throw warning("Cannot connect to V1 server.", e);
+            throw createAndLogException("Cannot connect to V1 server.", e);
+        } catch (V1Exception e) {
+            throw createAndLogException("Cannot connect to V1 server.", e);
         }
     }
 
-    // TODO Refactor
+    // TODO Need refactor by Mikhail
     private boolean isUpdateData(String path, String userName, boolean integrated) {
         boolean isUserChanged = true;
         if ((this.userName != null || integrated) && this.path != null) {
@@ -245,7 +244,7 @@ public class ApiDataLayer {
             }
             return roots;
         } catch (Exception ex) {
-            throw warning("Can't get projects list.", ex);
+            throw createAndLogException("Can't get projects list.", ex);
         }
     }
 
@@ -286,9 +285,9 @@ public class ApiDataLayer {
             list.addAll(Arrays.asList(assets));
             return list;
         } catch (MetaException ex) {
-            throw warning("Unable to get workitems.", ex);
+            throw createAndLogException("Unable to get workitems.", ex);
         } catch (Exception ex) {
-            throw warning("Unable to get workitems.", ex);
+            throw createAndLogException("Unable to get workitems.", ex);
         }
     }
 
@@ -361,7 +360,7 @@ public class ApiDataLayer {
         if (!isConnected) {
             reconnect();
             if (!isConnected) {
-                throw warning("Connection is not set.");
+                throw createAndLogException("Connection is not set.");
             }
         }
     }
@@ -390,7 +389,7 @@ public class ApiDataLayer {
                 try {
                     query.getSelection().add(types.get(attrInfo.type).getAttributeDefinition(attrInfo.attr));
                 } catch (MetaException e) {
-                    warning("Wrong attribute: " + attrInfo, e);
+                    createAndLogException("Wrong attribute: " + attrInfo, e);
                 }
             }
         }
@@ -402,7 +401,7 @@ public class ApiDataLayer {
             try {
                 query.getSelection().add(types.get(type).getAttributeDefinition(field.name));
             } catch (MetaException e) {
-                warning("Wrong attribute: " + field.name, e);
+                createAndLogException("Wrong attribute: " + field.name, e);
             }
         }
     }
@@ -411,7 +410,7 @@ public class ApiDataLayer {
         attributesToQuery.add(new AttributeInfo(attr, type, isList));
     }
 
-    private Map<String, PropertyValues> getListPropertyValues() throws Exception {
+    private Map<String, PropertyValues> getListPropertyValues() throws V1Exception, MetaException {
         Map<String, PropertyValues> res = new HashMap<String, PropertyValues>(attributesToQuery.size());
         for (AttributeInfo attrInfo : attributesToQuery) {
             if (!attrInfo.isList) {
@@ -446,9 +445,7 @@ public class ApiDataLayer {
         return propertyAlias;
     }
 
-    PropertyValues queryPropertyValues(String propertyName) throws ConnectionException, APIException, OidException,
-            MetaException {
-        PropertyValues res = new PropertyValues();
+    PropertyValues queryPropertyValues(String propertyName) throws V1Exception, MetaException {
         IAssetType assetType = metaModel.getAssetType(propertyName);
         IAttributeDefinition nameDef = assetType.getAttributeDefinition(Entity.NAME_PROPERTY);
         IAttributeDefinition inactiveDef = null;
@@ -458,8 +455,7 @@ public class ApiDataLayer {
 
         try {// Some properties may not have INACTIVE attribute
             inactiveDef = assetType.getAttributeDefinition("Inactive");
-        } catch (Exception ex) {
-            // do nothing
+        } catch (MetaException ignore) {
         }
         if (inactiveDef != null) {
             FilterTerm filter = new FilterTerm(inactiveDef);
@@ -469,10 +465,11 @@ public class ApiDataLayer {
 
         query.getOrderBy().majorSort(assetType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
-        res.addInternal(new ValueId());
+        final PropertyValues res = new PropertyValues();
+        res.add(new ValueId());
         for (Asset asset : services.retrieve(query).getAssets()) {
             String name = (String) asset.getAttribute(nameDef).getValue();
-            res.addInternal(new ValueId(asset.getOid(), name));
+            res.add(new ValueId(asset.getOid(), name));
         }
         return res;
     }
@@ -482,13 +479,13 @@ public class ApiDataLayer {
         return listPropertyValues.get(propertyKey);
     }
 
-    static DataLayerException warning(String string, Exception ex) {
+    static DataLayerException createAndLogException(String string, Exception ex) {
         System.out.println(string);
         ex.printStackTrace();
         return new DataLayerException(string, ex);
     }
 
-    static DataLayerException warning(String string) {
+    static DataLayerException createAndLogException(String string) {
         System.out.println(string);
         return new DataLayerException(string);
     }
@@ -587,9 +584,9 @@ public class ApiDataLayer {
             }
             return newAsset;
         } catch (MetaException ex) {
-            throw warning("Unable to get workitems.", ex);
+            throw createAndLogException("Unable to get workitems.", ex);
         } catch (Exception ex) {
-            throw warning("Unable to get workitems.", ex);
+            throw createAndLogException("Unable to get workitems.", ex);
         }
     }
 
@@ -688,9 +685,9 @@ public class ApiDataLayer {
             return new Project(this, result[0]);
         } catch (MetaException ex) {
             isConnected = false;
-            throw warning("Unable to get projects", ex);
+            throw createAndLogException("Unable to get projects", ex);
         } catch (Exception ex) {
-            throw warning("Unable to get projects", ex);
+            throw createAndLogException("Unable to get projects", ex);
         }
     }
 

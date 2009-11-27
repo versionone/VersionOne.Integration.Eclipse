@@ -1,7 +1,6 @@
 package com.versionone.common.test;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -271,17 +270,17 @@ public class TestModel {
         Assert.assertEquals(cat.toString(), defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         Assert.assertEquals(cat.toString(), owners.toString());
         Assert.assertEquals(1, owners.size());
-        Assert.assertEquals(new PropertyValues(Arrays.asList(cat)), owners);
+        Assert.assertEquals(new PropertyValues(cat), owners);
         PropertyValues users = datalayer.getListPropertyValues(defect0.getType(), Workitem.OWNERS_PROPERTY);
         ValueId admin = users.getValueIdByIndex(1);
         Assert.assertEquals("Administrator", admin.toString());
-        owners = new PropertyValues(Arrays.asList(admin));
+        owners = new PropertyValues(admin);
         defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals(admin.toString(), defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
         owners = new PropertyValues();
         defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals("", defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
-        owners = new PropertyValues(Arrays.asList(admin, cat));
+        owners = new PropertyValues(admin, cat);
         defect0.setProperty(Workitem.OWNERS_PROPERTY, owners);
         Assert.assertEquals("Administrator, Cat", defect0.getPropertyAsString(Workitem.OWNERS_PROPERTY));
     }

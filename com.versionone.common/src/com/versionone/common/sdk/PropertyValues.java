@@ -1,7 +1,7 @@
 package com.versionone.common.sdk;
 
 import java.util.AbstractCollection;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,10 +16,8 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     private final Map<Oid, Integer> index = new HashMap<Oid, Integer>();
     private int currentIndex = 0;
 
-    public PropertyValues(Collection<ValueId> valueIds) {
-        for (ValueId id : valueIds) {
-            addInternal(id);
-        }
+    public PropertyValues(ValueId... valueIds) {
+        addAll(Arrays.asList(valueIds));
     }
 
     public PropertyValues() {
@@ -52,7 +50,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     ValueId find(Oid oid) {
         return dictionary.get(oid.getMomentless());
     }
-   
+
     boolean containsOid(Oid value) {
         return dictionary.containsKey(value.getMomentless());
     }
@@ -68,16 +66,15 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     }
 
     public boolean add(ValueId value) {
-    	addInternal(value);
-    	return true;
+        final ValueId prev = dictionary.put(value.oid, value);
+        if (prev == null || !prev.equals(value)) {
+            index.put(value.oid, currentIndex);
+            currentIndex++;
+            return true;
+        }
+        return false;
     }
-    
-    void addInternal(ValueId value) {
-        dictionary.put(value.oid, value);
-        index.put(value.oid, currentIndex);
-        currentIndex++;
-    }
-       
+
     PropertyValues subset(Object[] oids) {
         PropertyValues result = new PropertyValues();
         for (Object oid : oids) {
@@ -85,9 +82,9 @@ public class PropertyValues extends AbstractCollection<ValueId> {
         }
         return result;
     }
-    
+
     public String[] toStringArray() {
-        String[] values = new String[size()];       
+        String[] values = new String[size()];
         for (ValueId data : dictionary.values()) {
             values[index.get(data.oid)] = data.toString();
         }
@@ -96,7 +93,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
 
     public int getStringArrayIndex(ValueId value) {
         return value == null ? -1 : index.get(value.oid);
-    }    
+    }
 
     public ValueId getValueIdByIndex(int value) {
         int i = 0;
@@ -106,7 +103,7 @@ public class PropertyValues extends AbstractCollection<ValueId> {
             }
             i++;
         }
-        
+
         return null;
     }
 
@@ -119,11 +116,11 @@ public class PropertyValues extends AbstractCollection<ValueId> {
             return false;
         }
         PropertyValues other = (PropertyValues) obj;
-        if (size() != other.size()){
+        if (size() != other.size()) {
             return false;
         }
-        for (ValueId id : this){
-            if (!other.contains(id)){
+        for (ValueId id : this) {
+            if (!other.contains(id)) {
                 return false;
             }
         }
@@ -133,11 +130,9 @@ public class PropertyValues extends AbstractCollection<ValueId> {
     @Override
     public int hashCode() {
         int res = 0;
-        for (ValueId id : this){
+        for (ValueId id : this) {
             res = res * 31 + id.hashCode();
         }
         return res;
     }
-    
-    
 }

@@ -50,7 +50,7 @@ class RequiredFieldsValidator {
         try {
             result = services.retrieve(query);
         } catch (Exception e) {
-            throw ApiDataLayer.warning("Cannot get meta data for " + assetType, e);
+            throw ApiDataLayer.createAndLogException("Cannot get meta data for " + assetType, e);
         }
 
         for (Asset asset : result.getAssets()) {
@@ -64,7 +64,7 @@ class RequiredFieldsValidator {
                     fields.add(reqFieldData);
                 }
             } catch (Exception e) {
-                throw ApiDataLayer.warning("Cannot get meta data for " + assetType, e);
+                throw ApiDataLayer.createAndLogException("Cannot get meta data for " + assetType, e);
             }
         }
 
@@ -102,7 +102,7 @@ class RequiredFieldsValidator {
             Attribute attribute = asset.getAttributes().get(fullName);
                             
             if (attribute == null) {
-                throw ApiDataLayer.warning("Incorrect attribute:" + fullName);                    
+                throw ApiDataLayer.createAndLogException("Incorrect attribute:" + fullName);                    
             }
 
             if (isMultiValueAndUnfilled(attribute) || isSingleValueAndUnfilled(attribute)) {

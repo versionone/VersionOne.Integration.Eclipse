@@ -16,8 +16,8 @@ public class AddTestAction extends Action {
 
     private final TaskView workitemView;
 
-    AddTestAction(TaskView workItemView) {
-        this.workitemView = workItemView;
+    AddTestAction(TaskView workitemView) {
+        this.workitemView = workitemView;
 
         setText("Add new test");
         setToolTipText("Add new test");

@@ -2,7 +2,9 @@ package com.versionone.common.sdk;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.versionone.Oid;
 import com.versionone.apiclient.APIException;
@@ -240,28 +242,22 @@ public abstract class Entity {
         return false;
     }
 
-    public void commitChanges() throws DataLayerException {
-        validateRequiredFields();
-
+    public void commitChanges() throws DataLayerException, ValidatorException {
         try {
+            final List<RequiredFieldsDTO> req = validateRequiredFields();
+            if (!req.isEmpty()) {
+                Map<Asset, List<RequiredFieldsDTO>> requiredData = new HashMap<Asset, List<RequiredFieldsDTO>>();
+                requiredData.put(asset, req);
+                throw new ValidatorException(requiredData, dataLayer);
+            }
             dataLayer.commitAsset(asset);
         } catch (V1Exception e) {
             throw ApiDataLayer.createAndLogException("Failed to commit changes of workitem: " + this, e);
         }
     }
 
-    public void validateRequiredFields() throws DataLayerException {
-        final RequiredFieldsValidator validator = dataLayer.requiredFieldsValidator;
-        try {
-            final List<RequiredFieldsDTO> requiredData = validator.validate(asset);
-
-            if (requiredData.size() > 0) {
-                String message = validator.getMessageOfUnfilledFieldsList(requiredData, "\n", ", ");
-                throw new ValidatorException(message);
-            }
-        } catch (APIException e) {
-            throw ApiDataLayer.createAndLogException("Cannot validate required fields.", e);
-        }
+    public List<RequiredFieldsDTO> validateRequiredFields() throws DataLayerException {
+        return dataLayer.requiredFieldsValidator.validate(asset);
     }
 
     protected void checkPersistance(String job) {

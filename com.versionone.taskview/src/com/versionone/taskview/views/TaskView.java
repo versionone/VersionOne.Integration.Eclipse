@@ -56,7 +56,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     private boolean isEffortColumsShown;
     private TreeViewer viewer;
 
-    private final ActionsManager actionsManager = new ActionsManager(this, getSite());
+    private ActionsManager actionsManager;
 
     public TaskView() {
         PreferencePage.getPreferences().addPropertyChangeListener(this);
@@ -66,6 +66,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      * Create tree viewer and initialize it.
      */
     public void createPartControl(Composite parent) {
+        actionsManager = new ActionsManager(this, getSite());
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
         viewer.setContentProvider(new ViewContentProvider());
         viewer.addSelectionChangedListener(actionsManager);
@@ -245,8 +246,8 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
      */
     private void createActions() {
         IActionBars bars = getViewSite().getActionBars();
-        actionsManager.addActions(bars.getMenuManager());
-        actionsManager.addActions(bars.getToolBarManager());
+        actionsManager.createToolbar(bars.getMenuManager());
+        actionsManager.createToolbar(bars.getToolBarManager());
     }
 
     /**

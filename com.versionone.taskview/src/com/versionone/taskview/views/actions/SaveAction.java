@@ -16,11 +16,9 @@ class SaveAction extends Action {
     private static final ApiDataLayer DATA = ApiDataLayer.getInstance();
 
     private final TaskView workitemView;
-    private final TreeViewer treeViewer;
 
-    public SaveAction(TaskView workItemView) {
-        this.workitemView = workItemView;
-        this.treeViewer = workItemView.getViewer();
+    public SaveAction(TaskView workitemView) {
+        this.workitemView = workitemView;
 
         setText("Save");
         setToolTipText("Save");
@@ -29,6 +27,7 @@ class SaveAction extends Action {
 
     @Override
     public void run() {
+        final TreeViewer treeViewer = workitemView.getViewer();
         workitemView.getActionsManager().enableActions(false, false);
         if (treeViewer.isCellEditorActive()) {
             treeViewer.getTree().getShell().traverse(SWT.TRAVERSE_TAB_NEXT);
@@ -41,16 +40,13 @@ class SaveAction extends Action {
             Activator.logWarning(e.getMessage());
             ErrorMessageDialog errorMessage = new ErrorMessageDialog(treeViewer.getTree().getShell(), e.getMessage());
             errorMessage.setBlockOnOpen(true);
-            errorMessage.open();             
-        } catch(DataLayerException e) {            
-            Activator.logError(e);
-            workitemView.showMessage("Error saving task. Check Error log for more information.");
-        } catch (Exception e) {
+            errorMessage.open();
+        } catch (DataLayerException e) {
             Activator.logError(e);
             workitemView.showMessage("Error saving task. Check Error log for more information.");
         }
 
-        if (workitemView.loadDataToTable())
-            workitemView.getActionsManager().enableActions(true, true);
+        final boolean loaded = workitemView.loadDataToTable();
+        workitemView.getActionsManager().enableActions(loaded, true);
     }
 }

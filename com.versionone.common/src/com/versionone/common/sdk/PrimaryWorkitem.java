@@ -28,7 +28,7 @@ public class PrimaryWorkitem extends Workitem {
     }
 
     @Override
-    public void commitChanges() throws DataLayerException {
+    public void commitChanges() throws DataLayerException, ValidatorException {
         final boolean persistent = isPersistent();
         super.commitChanges();
         if (!persistent && !children.isEmpty()) {

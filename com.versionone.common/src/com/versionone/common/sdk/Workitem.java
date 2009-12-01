@@ -124,7 +124,7 @@ public abstract class Workitem extends Entity {
      * 
      * @throws DataLayerException
      */
-    public void quickClose() throws DataLayerException {
+    public void quickClose() throws DataLayerException, ValidatorException {
         checkPersistance("quickClose");
         commitChanges();
         try {

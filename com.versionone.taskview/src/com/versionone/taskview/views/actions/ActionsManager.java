@@ -11,26 +11,26 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.Workitem;
 import com.versionone.taskview.views.TaskView;
 
 public class ActionsManager implements ISelectionChangedListener, IMenuListener {
 
+    private final TaskView taskView;
     // Actions list
     private final Action selectProjectAction;
     private final Action refreshAction;
     private final Action saveAction;
     private final Action filterAction;
-    private final Action addTask;
     private final Action addDefect;
+    private final Action addTask;
+    private final Action addTest;
     // Actions only for context menu
     private final Action close;
     private final Action quickClose;
     private final Action signUp;
 
-    private boolean isTaskCanBeAdded = false;
-    private final TaskView taskView;
+    private Workitem selectedWorkitem;
 
     public ActionsManager(TaskView taskView, IWorkbenchPartSite site) {
         this.taskView = taskView;
@@ -39,21 +39,34 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
         saveAction = new SaveAction(taskView);
         filterAction = new FilterAction(taskView);
         addTask = new AddTaskAction(taskView);
+        addTest = new AddTestAction(taskView);
         addDefect = new AddDefectAction(taskView);
         close = new CloseAction(taskView);
         quickClose = new QuickCloseAction(taskView);
         signUp = new SignUpAction(taskView);
     }
 
-    public void addActions(IContributionManager manager) {
-        manager.add(addTask);
+    public void createToolbar(IContributionManager manager) {
         manager.add(addDefect);
+        manager.add(addTask);
+        manager.add(addTest);
         manager.add(new Separator());
         manager.add(filterAction);
         manager.add(selectProjectAction);
         manager.add(new Separator());
         manager.add(refreshAction);
         manager.add(saveAction);
+    }
+
+    private void createContextMenu(IMenuManager manager) {
+        manager.add(close);
+        manager.add(quickClose);
+        manager.add(new Separator());
+        manager.add(signUp);
+        manager.add(new Separator());
+        manager.add(addDefect);
+        manager.add(addTask);
+        manager.add(addTest);
     }
 
     /**
@@ -64,29 +77,30 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
      *            status for refresh
      */
     public void enableActions(boolean enabled, boolean refreshEnable) {
-        selectProjectAction.setEnabled(enabled);
         refreshAction.setEnabled(refreshEnable);
+
+        selectProjectAction.setEnabled(enabled);
         saveAction.setEnabled(enabled);
         filterAction.setEnabled(enabled);
-        addTask.setEnabled(enabled && canAddTask());
+
         addDefect.setEnabled(enabled);
+        addTask.setEnabled(enabled && selectedWorkitem != null);
+        addTest.setEnabled(enabled && selectedWorkitem != null);
     }
 
     public void selectionChanged(SelectionChangedEvent event) {
-        ISelection selection = event.getSelection();
-        Entity element = null;
-
-        if (selection != null && selection instanceof IStructuredSelection) {
+        final ISelection selection = event.getSelection();
+        if (selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-            element = (Entity) structuredSelection.getFirstElement();
+            selectedWorkitem = (Workitem) structuredSelection.getFirstElement();
+        } else {
+            selectedWorkitem = null;
         }
-
-        isTaskCanBeAdded = element != null;
-        updateAdditionButtons();
+        onSelectedWorkitemChange();
     }
 
     public void menuAboutToShow(IMenuManager manager) {
-        Workitem item = taskView.getCurrentWorkitem();
+        final Workitem item = taskView.getCurrentWorkitem();
         createContextMenu(manager);
         if (item != null && taskView.validRowSelected()) {
             quickClose.setEnabled(item.canQuickClose());
@@ -97,25 +111,12 @@ public class ActionsManager implements ISelectionChangedListener, IMenuListener 
             signUp.setEnabled(false);
             close.setEnabled(false);
         }
-        updateAdditionButtons();
+        onSelectedWorkitemChange();
     }
 
-    private void updateAdditionButtons() {
-        addTask.setEnabled(canAddTask());
+    private void onSelectedWorkitemChange() {
         addDefect.setEnabled(true);
-    }
-
-    private boolean canAddTask() {
-        return isTaskCanBeAdded;
-    }
-
-    private void createContextMenu(IMenuManager menuManager) {
-        menuManager.add(close);
-        menuManager.add(quickClose);
-        menuManager.add(new Separator());
-        menuManager.add(signUp);
-        menuManager.add(new Separator());
-        menuManager.add(addTask);
-        menuManager.add(addDefect);
+        addTask.setEnabled(selectedWorkitem != null);
+        addTest.setEnabled(selectedWorkitem != null);
     }
 }

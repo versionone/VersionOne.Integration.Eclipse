@@ -526,17 +526,34 @@ public class ApiDataLayer {
         efforts.remove(asset);
     }
 
-    public void commitChanges() throws DataLayerException {
+    public void commitChanges() throws DataLayerException, ValidatorException {
         checkConnection();
         commitWorkitemTree(getWorkitemTree());
     }
 
-    private void commitWorkitemTree(List<PrimaryWorkitem> list) throws DataLayerException {
-        for (PrimaryWorkitem item : list) {
-            item.commitChanges();
-            for (SecondaryWorkitem secondary : item.children) {
-                secondary.commitChanges();
+    public void commitWorkitemTree(List<PrimaryWorkitem> list) throws DataLayerException, ValidatorException {
+        final Map<Asset, List<RequiredFieldsDTO>> requiredData = new HashMap<Asset, List<RequiredFieldsDTO>>();
+        for (PrimaryWorkitem priItem : list) {
+            final List<RequiredFieldsDTO> priReq = priItem.validateRequiredFields();
+            if (priReq.isEmpty()) {
+                priItem.commitChanges();
+            } else {
+                requiredData.put(priItem.asset, priReq);
+                if (!priItem.isPersistent()) {
+                    break;
+                }
             }
+            for (SecondaryWorkitem secItem : priItem.children) {
+                final List<RequiredFieldsDTO> secReq = secItem.validateRequiredFields();
+                if (!secReq.isEmpty()) {
+                    requiredData.put(secItem.asset, secReq);
+                } else {
+                    secItem.commitChanges();
+                }
+            }
+        }
+        if (!requiredData.isEmpty()) {
+            throw new ValidatorException(requiredData, this);
         }
     }
 

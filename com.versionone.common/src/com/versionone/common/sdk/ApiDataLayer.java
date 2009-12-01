@@ -534,27 +534,27 @@ public class ApiDataLayer {
     public void commitWorkitemTree(List<PrimaryWorkitem> list) throws DataLayerException, ValidatorException {
         final Map<Asset, List<RequiredFieldsDTO>> requiredData = new HashMap<Asset, List<RequiredFieldsDTO>>();
         for (PrimaryWorkitem priItem : list) {
-            final List<RequiredFieldsDTO> priReq = priItem.validateRequiredFields();
-            if (priReq.isEmpty()) {
-                priItem.commitChanges();
-            } else {
-                requiredData.put(priItem.asset, priReq);
-                if (!priItem.isPersistent()) {
-                    break;
-                }
-            }
-            for (SecondaryWorkitem secItem : priItem.children) {
-                final List<RequiredFieldsDTO> secReq = secItem.validateRequiredFields();
-                if (!secReq.isEmpty()) {
-                    requiredData.put(secItem.asset, secReq);
-                } else {
-                    secItem.commitChanges();
+            final boolean commited = commitWorkitem(requiredData, priItem);
+            if (commited || priItem.isPersistent()) {
+                for (SecondaryWorkitem secItem : priItem.children) {
+                    commitWorkitem(requiredData, secItem);
                 }
             }
         }
         if (!requiredData.isEmpty()) {
             throw new ValidatorException(requiredData, this);
         }
+    }
+
+    private static boolean commitWorkitem(final Map<Asset, List<RequiredFieldsDTO>> requiredData, Workitem secItem)
+            throws DataLayerException, ValidatorException {
+        final List<RequiredFieldsDTO> secReq = secItem.validateRequiredFields();
+        if (!secReq.isEmpty()) {
+            requiredData.put(secItem.asset, secReq);
+            return false;
+        }
+        secItem.commitChanges();
+        return true;
     }
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {

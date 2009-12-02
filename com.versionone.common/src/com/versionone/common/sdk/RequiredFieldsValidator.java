@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.versionone.Oid;
-import com.versionone.apiclient.APIException;
 import com.versionone.apiclient.AndFilterTerm;
 import com.versionone.apiclient.Asset;
 import com.versionone.apiclient.Attribute;
@@ -103,20 +102,15 @@ class RequiredFieldsValidator {
         return unfilledFields;
     }
 
-    // TODO Need to refactor by Mikhail
-    private boolean isSingleValueAndUnfilled(Attribute attribute) throws APIException {
-        return !attribute.getDefinition().isMultiValue()
-                && ((attribute.getValue() instanceof Oid && ((Oid) attribute.getValue()).isNull()) || attribute
-                        .getValue() == null);
-    }
-
-    private boolean isMultiValueAndUnfilled(Attribute attribute) {
-        return attribute.getDefinition().isMultiValue() && attribute.getValues().length < 1;
-    }
-
     private static boolean isFilled(Attribute attribute) {
         final Object[] values = attribute.getValues();
-        return values != null && values.length > 0;
+        if (values == null || values.length == 0){
+            return false;
+        } else if (values[0] instanceof Oid){
+            return !((Oid)values[0]).isNull();
+        } else {
+            return true;
+        }
     }
 
     public Map<EntityType, List<RequiredFieldsDTO>> init() throws DataLayerException {

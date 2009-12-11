@@ -16,7 +16,7 @@ public class PrimaryWorkitem extends Workitem {
      */
     public final List<SecondaryWorkitem> children;
 
-    PrimaryWorkitem(ApiDataLayer dataLayer, Asset asset) {
+    protected PrimaryWorkitem(ApiDataLayer dataLayer, Asset asset) {
         super(dataLayer, asset);
 
         children = new ArrayList<SecondaryWorkitem>(asset.getChildren().size());

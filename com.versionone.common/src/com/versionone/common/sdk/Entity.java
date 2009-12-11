@@ -198,7 +198,7 @@ public abstract class Entity {
             throw new ParseException("Wrong newValue:" + newValue, -1);
         }
 
-        if (doubleValue != null && doubleValue < 0) {
+        if (doubleValue != null && doubleValue < 0 && propertyName != Workitem.EFFORT_PROPERTY) {
             throw new ParseException("The field cannot be negative", -1);
         }
         setPropertyInternal(propertyName, doubleValue);

@@ -15,7 +15,7 @@ public class PrimaryWorkitemMock extends PrimaryWorkitem {
     }
 
     public PrimaryWorkitemMock(ApiDataLayer dataLayer, String id, EntityType type) {
-        super(dataLayer, null);
+        super(dataLayer, new AssetMock(null));
         this.type = type;
         this.id = id == null ? "" : type.name();
     }

@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import sun.misc.Regexp;
+
 import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaModel;
@@ -298,7 +300,19 @@ public class TestModel {
         owners.add(petja);
         Assert.assertEquals(3, owners.size());
         story1.setProperty(Workitem.OWNERS_PROPERTY, owners);
-        Assert.assertEquals("Petja, Bil, Tom", story1.getPropertyAsString(Workitem.OWNERS_PROPERTY));
+        String[] expect = "Petja, Bil, Tom".split(", ");
+        String[] result = story1.getPropertyAsString(Workitem.OWNERS_PROPERTY).split(", ");
+        Assert.assertEquals(expect.length, result.length);
+        for (String name : expect) {
+            boolean found = false;
+            for (String resName : result) {
+                if (name.equals(resName)) {
+                    found = true;
+                    break;
+                }
+            }
+            Assert.assertTrue(name + " was not found", found);
+        }
     }
 
     @Test

@@ -60,6 +60,8 @@ public class ApiDataLayer {
         propertyAliases.put("DefectScope", "Scope");
         propertyAliases.put("TestScope", "Scope");
     }
+    
+    public final Map<String, EntityType> validAssets = new HashMap<String, EntityType>();    
 
     private final Map<EntityType, IAssetType> types = new HashMap<EntityType, IAssetType>(EntityType.values().length);
     /** All uncommitted Effort records */
@@ -282,7 +284,13 @@ public class ApiDataLayer {
 
             final Asset[] assets = services.retrieve(query).getAssets();
             final ArrayList<Asset> list = new ArrayList<Asset>(assets.length + 20);
-            list.addAll(Arrays.asList(assets));
+            //list.addAll(Arrays.asList(assets));
+            initValidAssets();
+            for (Asset asset : assets) {
+            	if (checkWorkitemIsValid(asset)) {
+            		list.add(asset);
+            	}
+            }
             return list;
         } catch (MetaException ex) {
             throw createAndLogException("Unable to get workitems.", ex);
@@ -354,6 +362,17 @@ public class ApiDataLayer {
         }
 
         return result;
+    }
+    
+    private void initValidAssets() {
+    	validAssets.put(Workitem.STORY_NAME, EntityType.Story);
+    	validAssets.put(Workitem.DEFECT_NAME, EntityType.Defect);
+    	validAssets.put(Workitem.TASK_NAME, EntityType.Task);
+    	validAssets.put(Workitem.TEST_NAME, EntityType.Test);
+    }
+    
+    private boolean checkWorkitemIsValid(Asset asset) {
+    	return validAssets.containsKey(asset.getAssetType().getToken());
     }
 
     private void checkConnection() throws DataLayerException {

@@ -6,7 +6,12 @@ import com.versionone.apiclient.V1Exception;
 
 public abstract class Workitem extends Entity {
 
-    public static final String OWNERS_PROPERTY = "Owners";
+	public static final String STORY_NAME = "Story";
+    public static final String DEFECT_NAME = "Defect";
+    public static final String TASK_NAME = "Task";
+    public static final String TEST_NAME = "Test";
+	
+	public static final String OWNERS_PROPERTY = "Owners";
     public static final String DETAIL_ESTIMATE_PROPERTY = "DetailEstimate";
     public static final String STATUS_PROPERTY = "Status";
     public static final String TYPE_PROPERTY = "Category";

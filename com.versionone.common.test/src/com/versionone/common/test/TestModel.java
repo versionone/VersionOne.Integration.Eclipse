@@ -59,6 +59,18 @@ public class TestModel {
     public void testGetServerInstance() {
         Assert.assertNotNull(ApiDataLayer.getInstance());
     }
+    
+    @Test
+    public void testGetTestSet() throws Exception {
+    	List<PrimaryWorkitem> primaryItems = datalayer.getWorkitemTree();    	
+    	Assert.assertEquals(11, primaryItems.size());
+    	
+    	for (PrimaryWorkitem wi : primaryItems) {
+    		if (datalayer.validAssets.containsValue(wi.getType())) {
+    			Assert.assertTrue("TestSets shouldn't be shown", false);
+    		}
+    	}
+    }
 
     @Test
     public void testGetProject() throws Exception {

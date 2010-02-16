@@ -68,7 +68,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
     public void createPartControl(Composite parent) {
         actionsManager = new ActionsManager(this, getSite());
         viewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
-        viewer.setContentProvider(new ViewContentProvider());
+        viewer.setContentProvider(new EntityContentProvider());
         viewer.addSelectionChangedListener(actionsManager);
         selectionProvider = new ProxySelectionProvider(viewer);
 

@@ -64,8 +64,8 @@ public class ProjectSelectDialog extends Dialog {
         container.setLayout(new FillLayout(SWT.VERTICAL));
         viewer = new TreeViewer(container, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
-        viewer.setContentProvider(new ViewContentProvider());
-        viewer.setInput(v1Roots.toArray(new Entity[1]));
+        viewer.setContentProvider(new EntityContentProvider());
+        viewer.setInput(v1Roots);
         viewer.setLabelProvider(new SimpleProvider(Entity.NAME_PROPERTY, false));
 
         return container;

@@ -6,7 +6,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -21,13 +20,11 @@ import com.versionone.taskview.views.TaskView;
 class ProjectAction extends Action {
 
     private final TaskView workitemView;
-    private final TreeViewer treeViewer;
     private final IWorkbenchPartSite site;
 
-    ProjectAction(TaskView workItemView, IWorkbenchPartSite iWorkbenchPartSite) {
+    ProjectAction(TaskView workItemView, IWorkbenchPartSite site) {
         this.workitemView = workItemView;
-        this.treeViewer = workItemView.getViewer();
-        this.site = iWorkbenchPartSite;
+        this.site = site;
 
         setText("Select Project");
         setToolTipText("Select Project");
@@ -56,7 +53,7 @@ class ProjectAction extends Action {
 
     private void openDialog(List<Project> projects, List<ISelectionChangedListener> listeners)
             throws DataLayerException {
-        final Shell shell = treeViewer.getControl().getShell();
+        final Shell shell = workitemView.getViewer().getControl().getShell();
         final Project project = ApiDataLayer.getInstance().getCurrentProject();
         final ProjectSelectDialog dialog = new ProjectSelectDialog(shell, projects, project);
 

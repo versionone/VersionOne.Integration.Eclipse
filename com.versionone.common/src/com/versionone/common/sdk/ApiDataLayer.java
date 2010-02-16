@@ -1,7 +1,6 @@
 package com.versionone.common.sdk;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -285,7 +284,7 @@ public class ApiDataLayer {
             final Asset[] assets = services.retrieve(query).getAssets();
             final ArrayList<Asset> list = new ArrayList<Asset>(assets.length + 20);
             //list.addAll(Arrays.asList(assets));
-            initValidAssets();
+//            initValidAssets();
             for (Asset asset : assets) {
             	if (checkWorkitemIsValid(asset)) {
             		list.add(asset);
@@ -364,15 +363,17 @@ public class ApiDataLayer {
         return result;
     }
     
-    private void initValidAssets() {
-    	validAssets.put(Workitem.STORY_NAME, EntityType.Story);
-    	validAssets.put(Workitem.DEFECT_NAME, EntityType.Defect);
-    	validAssets.put(Workitem.TASK_NAME, EntityType.Task);
-    	validAssets.put(Workitem.TEST_NAME, EntityType.Test);
-    }
+//    private void initValidAssets() {
+//    	validAssets.put(Workitem.STORY_NAME, EntityType.Story);
+//    	validAssets.put(Workitem.DEFECT_NAME, EntityType.Defect);
+//    	validAssets.put(Workitem.TASK_NAME, EntityType.Task);
+//    	validAssets.put(Workitem.TEST_NAME, EntityType.Test);
+//    }
     
     private boolean checkWorkitemIsValid(Asset asset) {
-    	return validAssets.containsKey(asset.getAssetType().getToken());
+    	return (asset.getAssetType().getToken().equals(Workitem.STORY_NAME) || asset.getAssetType().getToken().equals(Workitem.DEFECT_NAME)
+    			|| asset.getAssetType().getToken().equals(Workitem.TASK_NAME) || asset.getAssetType().getToken().equals(Workitem.TEST_NAME));
+    	//return validAssets.containsKey(asset.getAssetType().getToken());
     }
 
     private void checkConnection() throws DataLayerException {

@@ -7,8 +7,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import sun.misc.Regexp;
-
 import com.versionone.apiclient.FileAPIConnector;
 import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaModel;
@@ -63,10 +61,9 @@ public class TestModel {
     @Test
     public void testGetTestSet() throws Exception {
     	List<PrimaryWorkitem> primaryItems = datalayer.getWorkitemTree();    	
-    	Assert.assertEquals(11, primaryItems.size());
     	
-    	for (PrimaryWorkitem wi : primaryItems) {
-    		if (datalayer.validAssets.containsValue(wi.getType())) {
+    	for (PrimaryWorkitem item : primaryItems) {
+    		if (!(item.getType().equals(EntityType.Story) || item.getType().equals(EntityType.Defect))) {
     			Assert.assertTrue("TestSets shouldn't be shown", false);
     		}
     	}

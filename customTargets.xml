@@ -13,11 +13,15 @@
 	<!-- subdirectory used to create update site -->
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
 
-	<path id="svn.classpath">
-		<fileset dir="${builder}\lib">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
+	<!-- path to the svnant libraries. Usually they will be located in ANT_HOME/lib -->
+	<path id="project.classpath">
+		<pathelement location="${svnjavahl.jar}" /> 
+		<pathelement location="${svnant.jar}" />
+		<pathelement location="${svnClientAdapter.jar}" />
+	</path>  
+  
+	<!-- load the svn task -->
+	<taskdef resource="svntask.properties" classpathref="project.classpath"/>
 	
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
@@ -46,7 +50,6 @@
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
 		<property name="mapsCheckoutTag" value="HEAD"/>
-		<taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
 		<svn javahl="false">
 			<export srcurl="${maps.URL}" revision="${maps.revision}"
 				destpath="${buildDirectory}/maps" force="true"/>

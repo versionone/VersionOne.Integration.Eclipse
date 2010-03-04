@@ -218,7 +218,7 @@
 		</antcall>
 		
 		<!-- checkout the site.xml file -->
-		<svn>
+		<svn javahl="false">
 			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}" destpath="${UpdateSiteStagingLocation}" force="true"/>
 		</svn>
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
@@ -268,7 +268,7 @@
 		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
 		
-		<svn>
+		<svn javahl="false">
 			<export srcurl="${doc.URL}" revision="${doc.revision}"
 				destpath="${doc.source.dir}" force="true"/>
 		</svn>

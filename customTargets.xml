@@ -21,7 +21,7 @@
 	</path>  
   
 	<!-- load the svn task -->
-	<taskdef resource="svntask.properties" classpathref="project.classpath"/>
+	<taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
 	
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->

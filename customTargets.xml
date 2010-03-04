@@ -13,16 +13,13 @@
 	<!-- subdirectory used to create update site -->
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
 
-	<!-- path to the svnant libraries. Usually they will be located in ANT_HOME/lib -->
-	<path id="project.classpath">
-		<pathelement location="${svnjavahl.jar}" /> 
-		<pathelement location="${svnant.jar}" />
-		<pathelement location="${svnClientAdapter.jar}" />
-	</path>  
+<path id="project.classpath">
+<fileset dir="${buildDirectory}/lib">
+<include name="**/*.jar"/>
+</fileset>
+</path>
+  <taskdef resource="svntask.properties" classpathref="project.classpath"/>
   
-	<!-- load the svn task -->
-	<taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
-	
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
 	<!-- Add on <ant> task for each top level element being built. -->

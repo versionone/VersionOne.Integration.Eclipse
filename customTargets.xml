@@ -47,7 +47,7 @@
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
 		<property name="mapsCheckoutTag" value="HEAD"/>
-		<svn javahl="true">
+		<svn javahl="false">
 			<export srcurl="${maps.URL}" revision="${maps.revision}"
 				destpath="${buildDirectory}/maps" force="true"/>
 		</svn>

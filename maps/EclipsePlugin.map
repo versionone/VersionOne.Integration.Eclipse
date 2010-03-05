@@ -1,4 +1,4 @@
-feature@com.versionone.v1.feature=SVN,,https://svn.corp.versionone.net/svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.v1.feature
+feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=jerry
 plugin@com.versionone.apiclient=SVN,,https://svn.corp.versionone.net/svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.apiclient
 plugin@com.versionone.common=SVN,,https://svn.corp.versionone.net/svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.common
 plugin@com.versionone.taskview=SVN,,https://svn.corp.versionone.net/svn/1/Trunk, V1Integration/Java/eclipse/addin, com.versionone.taskview

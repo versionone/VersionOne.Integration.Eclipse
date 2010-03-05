@@ -12,9 +12,6 @@
 	<property name="doc.dir" value="${dist.dir}/doc"/>
 	<!-- subdirectory used to create update site -->
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
-
-   <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
-
   
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
@@ -43,9 +40,8 @@
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
 		<property name="mapsCheckoutTag" value="HEAD"/>
-		<svn javahl="false">
-			<export srcurl="${maps.URL}" revision="${maps.revision}"
-				destpath="${buildDirectory}/maps" force="true"/>
+		<svn>
+			<checkout url="${maps.URL}" destPath="${buildDirectory}/maps" /> 
 		</svn>
 	</target>
 
@@ -214,7 +210,7 @@
 		</antcall>
 		
 		<!-- checkout the site.xml file -->
-		<svn javahl="false">
+		<svn>
 			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}" destpath="${UpdateSiteStagingLocation}" force="true"/>
 		</svn>
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
@@ -264,7 +260,7 @@
 		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
 		
-		<svn javahl="false">
+		<svn>
 			<export srcurl="${doc.URL}" revision="${doc.revision}"
 				destpath="${doc.source.dir}" force="true"/>
 		</svn>

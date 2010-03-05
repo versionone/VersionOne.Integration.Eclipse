@@ -1,1 +1,1 @@
-feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin/com.versionone.v1.feature,path=com.versionone.v1.feature,username=Autobuild,password=autobuild1,
+feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/,path=V1Integration/Java/eclipse/addin/com.versionone.v1.feature,username=Autobuild,password=autobuild1

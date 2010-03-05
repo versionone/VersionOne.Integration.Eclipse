@@ -1,9 +1,9 @@
-feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.v1.feature,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@com.versionone.apiclient=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.apiclient,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@com.versionone.common=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.common,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@com.versionone.taskview=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.taskview,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@de.spiritlink.richhtml4eclipse=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=de.spiritlink.richhtml4eclipse,username=Autobuild,password=autobuild1,Tag=trunk
+feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.v1.feature,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@com.versionone.apiclient=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.apiclient,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@com.versionone.common=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.common,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@com.versionone.taskview=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.taskview,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@de.spiritlink.richhtml4eclipse=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=de.spiritlink.richhtml4eclipse,username=Autobuild,password=autobuild1,Tag=HEAD
 
-feature@com.versionone.v1.feature.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.v1.feature.test,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@com.versionone.common.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.common.test,username=Autobuild,password=autobuild1,Tag=trunk
-plugin@com.versionone.taskview.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.taskview.test,username=Autobuild,password=autobuild1,Tag=trunk
+feature@com.versionone.v1.feature.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.v1.feature.test,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@com.versionone.common.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.common.test,username=Autobuild,password=autobuild1,Tag=HEAD
+plugin@com.versionone.taskview.test=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk/V1Integration/Java/eclipse/addin,path=com.versionone.taskview.test,username=Autobuild,password=autobuild1,Tag=HEAD

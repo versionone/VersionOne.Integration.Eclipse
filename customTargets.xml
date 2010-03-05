@@ -13,12 +13,14 @@
 	<!-- subdirectory used to create update site -->
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
 
+	<!--
 <path id="project.classpath">
 <fileset dir="${buildDirectory}/lib">
 <include name="**/*.jar"/>
 </fileset>
 </path>
-  <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
+   <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask"/>
+   -->
   
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->

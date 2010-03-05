@@ -40,9 +40,7 @@
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
 		<property name="mapsCheckoutTag" value="HEAD"/>
-		<svn>
-			<checkout url="${maps.URL}" destPath="${buildDirectory}/maps" /> 
-		</svn>
+		<svn command="cat" url="${maps.URL}" dest="${buildDirectory}/maps/EclipsePlugin.map" /> 
 	</target>
 
 	<target name="checkLocalMaps">

@@ -1,4 +1,4 @@
-feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=Autobuild,password=autobuild1
+feature@com.versionone.v1.feature=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=Autobuild,password=autobuild1,Tag=Trunk
 plugin@com.versionone.apiclient=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=Autobuild,password=autobuild1
 plugin@com.versionone.common=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=Autobuild,password=autobuild1
 plugin@com.versionone.taskview=SVN,url=https://svn.corp.versionone.net/svn/1/Trunk,path=V1Integration/Java/eclipse/addin,username=Autobuild,password=autobuild1

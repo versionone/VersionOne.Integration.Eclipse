@@ -12,17 +12,7 @@
 	<property name="doc.dir" value="${dist.dir}/doc"/>
 	<!-- subdirectory used to create update site -->
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
-  
-	<!-- ===================================================================== -->
-	<!-- Run a given ${target} on all elements being built -->
-	<!-- Add on <ant> task for each top level element being built. -->
-	<!-- ===================================================================== -->
-	<property name="allElementsFile" value="${builder}/allElements.xml"/>
-	<import file="${allElementsFile}"/>
-	<target name="allElements">
-		<antcall target="allElementsDelegator"/>
-	</target>
-
+	
 	<!-- ===================================================================== -->
 	<!-- ===================================================================== -->
 	<target name="getBaseComponents" depends="checkLocalBase" unless="skipBase">
@@ -39,8 +29,6 @@
 	<!-- Replace values for mapsCheckoutTag as desired. -->
 	<!-- ===================================================================== -->
 	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
-		<property name="mapsCheckoutTag" value="HEAD"/>
-		<svn command="cat" url="${maps.URL}" dest="${buildDirectory}/maps/EclipsePlugin.map" /> 
 	</target>
 
 	<target name="checkLocalMaps">
@@ -48,7 +36,6 @@
 	</target>
 
 	<target name="tagMapFiles" if="tagMaps">
-		<!--		<cvs dest="${buildDirectory}/maps/${mapsRoot}" command="tag ${mapsTagTag}"/> -->
 	</target>
 
 	<!-- ===================================================================== -->
@@ -74,8 +61,25 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do before setup -->
 	<!-- ===================================================================== -->
-	<target name="preSetup"> </target>
+	<target name="preSetup"> 
+		<antcall target="FetchFeatures"/>
+		<antcall target="FetchPlugins"/>
+	</target>
 
+	<target name="FetchFeatures">
+		<svn command="export" url="${svn.root}/com.versionone.v1.feature" dest="${buildDirectory}/features/com.versionone.v1.feature" />		
+		<svn command="export" url="${svn.root}/com.versionone.v1.feature.test" dest="${buildDirectory}/features/com.versionone.v1.feature.test" />
+	</target>
+	
+	<target name="FetchPlugins">
+		<svn command="export" url="${svn.root}/com.versionone.apiclient" dest="${buildDirectory}/plugins/com.versionone.apiclient" />
+		<svn command="export" url="${svn.root}/com.versionone.common" dest="${buildDirectory}/plugins/com.versionone.common" />
+		<svn command="export" url="${svn.root}/com.versionone.common.test" dest="${buildDirectory}/plugins/com.versionone.common.test" />
+		<svn command="export" url="${svn.root}/com.versionone.taskview" dest="${buildDirectory}/plugins/com.versionone.taskview" />
+		<svn command="export" url="${svn.root}/com.versionone.taskview.test" dest="${buildDirectory}/plugins/com.versionone.taskview.test" />
+		<svn command="export" url="${svn.root}/de.spiritlink.richhtml4eclipse" dest="${buildDirectory}/plugins/de.spiritlink.richhtml4eclipse" />
+	</target>
+	
 	<!-- ===================================================================== -->
 	<!-- Steps to do after setup but before starting the build proper -->
 	<!-- ===================================================================== -->
@@ -208,9 +212,7 @@
 		</antcall>
 		
 		<!-- checkout the site.xml file -->
-		<svn>
-			<export srcurl="${updatesite.URL}" revision="${updatesite.revision}" destpath="${UpdateSiteStagingLocation}" force="true"/>
-		</svn>
+		<svn command="export" url="${updatesite.URL}" dest="${UpdateSiteStagingLocation}" />
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
 		<delete>
 			<fileset dir="${UpdateSiteStagingLocation}" includes="**/*test*"/>
@@ -257,12 +259,8 @@
 	<target name="gendoc">
 		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
-		
-		<svn>
-			<export srcurl="${doc.URL}" revision="${doc.revision}"
-				destpath="${doc.source.dir}" force="true"/>
-		</svn>
-		
+
+		<svn command="export" url="${doc.URL}" dest="${doc.source.dir}" />				
 		<delete dir="${doc.dir}/Common"/>
 		<mkdir dir="${doc.dir}/Common"/>
 		<copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>

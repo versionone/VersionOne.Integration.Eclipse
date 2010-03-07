@@ -67,17 +67,17 @@
 	</target>
 
 	<target name="FetchFeatures">
-		<svn command="export" url="${svn.root}/com.versionone.v1.feature" dest="${buildDirectory}/features/com.versionone.v1.feature" />		
-		<svn command="export" url="${svn.root}/com.versionone.v1.feature.test" dest="${buildDirectory}/features/com.versionone.v1.feature.test" />
+		<svn command="export" url="${svn.root}/com.versionone.v1.feature" dest="${buildDirectory}/features/com.versionone.v1.feature" username="${svn.username}" password="${svn.password}"/>		
+		<svn command="export" url="${svn.root}/com.versionone.v1.feature.test" dest="${buildDirectory}/features/com.versionone.v1.feature.test"  username="${svn.username}" password="${svn.password}"/>
 	</target>
 	
 	<target name="FetchPlugins">
-		<svn command="export" url="${svn.root}/com.versionone.apiclient" dest="${buildDirectory}/plugins/com.versionone.apiclient" />
-		<svn command="export" url="${svn.root}/com.versionone.common" dest="${buildDirectory}/plugins/com.versionone.common" />
-		<svn command="export" url="${svn.root}/com.versionone.common.test" dest="${buildDirectory}/plugins/com.versionone.common.test" />
-		<svn command="export" url="${svn.root}/com.versionone.taskview" dest="${buildDirectory}/plugins/com.versionone.taskview" />
-		<svn command="export" url="${svn.root}/com.versionone.taskview.test" dest="${buildDirectory}/plugins/com.versionone.taskview.test" />
-		<svn command="export" url="${svn.root}/de.spiritlink.richhtml4eclipse" dest="${buildDirectory}/plugins/de.spiritlink.richhtml4eclipse" />
+		<svn command="export" url="${svn.root}/com.versionone.apiclient" dest="${buildDirectory}/plugins/com.versionone.apiclient"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${svn.root}/com.versionone.common" dest="${buildDirectory}/plugins/com.versionone.common"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${svn.root}/com.versionone.common.test" dest="${buildDirectory}/plugins/com.versionone.common.test"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${svn.root}/com.versionone.taskview" dest="${buildDirectory}/plugins/com.versionone.taskview"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${svn.root}/com.versionone.taskview.test" dest="${buildDirectory}/plugins/com.versionone.taskview.test"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${svn.root}/de.spiritlink.richhtml4eclipse" dest="${buildDirectory}/plugins/de.spiritlink.richhtml4eclipse"  username="${svn.username}" password="${svn.password}"/>
 	</target>
 	
 	<!-- ===================================================================== -->
@@ -212,7 +212,7 @@
 		</antcall>
 		
 		<!-- checkout the site.xml file -->
-		<svn command="export" url="${updatesite.URL}" dest="${UpdateSiteStagingLocation}" />
+		<svn command="export" url="${updatesite.URL}" dest="${UpdateSiteStagingLocation}"  username="${svn.username}" password="${svn.password}"/>
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
 		<delete>
 			<fileset dir="${UpdateSiteStagingLocation}" includes="**/*test*"/>
@@ -260,7 +260,7 @@
 		<property name="doc.source.dir" value="${buildDirectory}/DocSource"/>
 		<property name="common.dir" value="${doc.source.dir}/Common"/>
 
-		<svn command="export" url="${doc.URL}" dest="${doc.source.dir}" />				
+		<svn command="export" url="${doc.URL}" dest="${doc.source.dir}"  username="${svn.username}" password="${svn.password}"/>
 		<delete dir="${doc.dir}/Common"/>
 		<mkdir dir="${doc.dir}/Common"/>
 		<copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>

@@ -14,6 +14,16 @@
 	<property name="UpdateSiteStagingLocation" value="${dist.dir}/updatesite"/>
 	
 	<!-- ===================================================================== -->
+	<!-- Run a given ${target} on all elements being built -->
+	<!-- Add on <ant> task for each top level element being built. -->
+	<!-- ===================================================================== -->
+	<property name="allElementsFile" value="${builder}/allElements.xml"/>
+	<import file="${allElementsFile}"/>
+	<target name="allElements">
+		<antcall target="allElementsDelegator"/>
+	</target>
+
+	<!-- ===================================================================== -->
 	<!-- ===================================================================== -->
 	<target name="getBaseComponents" depends="checkLocalBase" unless="skipBase">
 		<get src="${eclipseBaseURL}" dest="${buildDirectory}/../temp-base.zip"/>

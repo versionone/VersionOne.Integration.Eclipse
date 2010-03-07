@@ -222,7 +222,7 @@
 		</antcall>
 		
 		<!-- checkout the site.xml file -->
-		<svn command="export" url="${updatesite.URL}" dest="${UpdateSiteStagingLocation}"  username="${svn.username}" password="${svn.password}"/>
+		<svn command="export" url="${updatesite.URL}" dest="${UpdateSiteStagingLocation}/site.xml"  username="${svn.username}" password="${svn.password}"/>
 		<delete file="${UpdateSiteStagingLocation}/.project"/>
 		<delete>
 			<fileset dir="${UpdateSiteStagingLocation}" includes="**/*test*"/>

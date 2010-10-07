@@ -106,6 +106,7 @@ public class Activator extends AbstractUIPlugin {
         properties.put(Workitem.CHECK_QUICK_CLOSE_PROPERTY, false);
         properties.put(Workitem.CHECK_SIGNUP_PROPERTY, false);
         properties.put(Workitem.SCOPE_NAME_PROPERTY, false);
+        properties.put(Workitem.ORDER_PROPERTY, false);
 
         for (Entry<String, Boolean> entry : properties.entrySet()) {
             for (EntityType type : EntityType.values()) {

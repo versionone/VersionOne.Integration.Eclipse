@@ -23,6 +23,7 @@ public abstract class Workitem extends Entity {
     public static final String DESCRIPTION_PROPERTY = "Description";
     public static final String PARENT_NAME_PROPERTY = "Parent.Name";
     public static final String SCOPE_NAME_PROPERTY = "Scope.Name";
+    public static final String ORDER_PROPERTY = "Order";
 
     public static final String CHECK_SIGNUP_PROPERTY = "CheckQuickSignup";
     public static final String CHECK_QUICK_CLOSE_PROPERTY = "CheckQuickClose";

@@ -1,6 +1,8 @@
 package com.versionone.common.sdk;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.versionone.apiclient.APIException;
@@ -23,8 +25,23 @@ public class PrimaryWorkitem extends Workitem {
         for (Asset childAsset : asset.getChildren()) {
             if (dataLayer.isShowed(childAsset)) {
                 children.add(new SecondaryWorkitem(dataLayer, childAsset, this));
-            }
+            }            
         }
+        Comparator<Entity> comparator = new Comparator<Entity>() {
+            public int compare(Entity entity1, Entity entity2) {
+            	if (entity1.getType().equals(EntityType.Test) && entity2.getType().equals(EntityType.Task)) {
+            		return -1;            		
+            	}
+            	if (entity1.getType().equals(EntityType.Task) && entity2.getType().equals(EntityType.Test)) {
+            		return 1;            		
+            	}
+            	String value1 = entity1.getProperty(Workitem.ORDER_PROPERTY).toString();                	
+            	String value2 = entity2.getProperty(Workitem.ORDER_PROPERTY).toString();
+            	return Integer.valueOf(value1).compareTo(Integer.valueOf(value2));             
+            }
+        };
+        
+        Collections.sort(children, comparator);
     }
 
     @Override

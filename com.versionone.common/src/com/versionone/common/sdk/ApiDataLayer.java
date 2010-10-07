@@ -362,18 +362,10 @@ public class ApiDataLayer {
 
         return result;
     }
-    
-//    private void initValidAssets() {
-//    	validAssets.put(Workitem.STORY_NAME, EntityType.Story);
-//    	validAssets.put(Workitem.DEFECT_NAME, EntityType.Defect);
-//    	validAssets.put(Workitem.TASK_NAME, EntityType.Task);
-//    	validAssets.put(Workitem.TEST_NAME, EntityType.Test);
-//    }
-    
+
     private boolean checkWorkitemIsValid(Asset asset) {
     	return (asset.getAssetType().getToken().equals(Workitem.STORY_NAME) || asset.getAssetType().getToken().equals(Workitem.DEFECT_NAME)
     			|| asset.getAssetType().getToken().equals(Workitem.TASK_NAME) || asset.getAssetType().getToken().equals(Workitem.TEST_NAME));
-    	//return validAssets.containsKey(asset.getAssetType().getToken());
     }
 
     private void checkConnection() throws DataLayerException {

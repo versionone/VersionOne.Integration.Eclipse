@@ -35,9 +35,13 @@ public class PrimaryWorkitem extends Workitem {
             	if (entity1.getType().equals(EntityType.Task) && entity2.getType().equals(EntityType.Test)) {
             		return 1;            		
             	}
-            	String value1 = entity1.getProperty(Workitem.ORDER_PROPERTY).toString();                	
-            	String value2 = entity2.getProperty(Workitem.ORDER_PROPERTY).toString();
-            	return Integer.valueOf(value1).compareTo(Integer.valueOf(value2));             
+            	try {
+                    String value1 = entity1.getPropertyAsString(Workitem.ORDER_PROPERTY);
+                    String value2 = entity2.getPropertyAsString(Workitem.ORDER_PROPERTY);
+                    return Integer.valueOf(value1).compareTo(Integer.valueOf(value2));
+                } catch (IllegalArgumentException e) {
+                    return -1;
+                }           
             }
         };
         

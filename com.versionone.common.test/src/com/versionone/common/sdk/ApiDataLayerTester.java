@@ -164,6 +164,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         }
     }
     
+    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testChildrenSorting() throws Exception {
         final ApiDataLayer data = ApiDataLayer.getInstance();

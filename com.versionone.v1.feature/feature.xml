@@ -2,7 +2,7 @@
 <feature
       id="com.versionone.v1.feature"
       label="VersionOne V1: Agile Enterprise"
-      version="2.1.0"
+      version="2.1.1"
       provider-name="VersionOne">
 
    <description url="http://www.versionone.com">

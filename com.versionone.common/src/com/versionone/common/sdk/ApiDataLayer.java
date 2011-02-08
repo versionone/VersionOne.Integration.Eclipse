@@ -1,5 +1,7 @@
 package com.versionone.common.sdk;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,6 +29,7 @@ import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
 import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.OrderBy;
+import com.versionone.apiclient.ProxyProvider;
 import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
 import com.versionone.apiclient.Services;
@@ -75,10 +78,11 @@ public class ApiDataLayer {
     private boolean testConnection;
 
     public Oid memberOid;
-    private String path;
-    private String userName;
-    private String password;
-    private boolean integrated;
+    //private String path;
+    //private String userName;
+    //private String password;
+    //private boolean integrated;
+    private ConnectionSettings connectionSettings;
 
     private List<Asset> assetList;
     /** Set of attributes to be queried in Workitem requests */
@@ -134,30 +138,30 @@ public class ApiDataLayer {
         return instance;
     }
 
-    public void connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
+    public void connect(ConnectionSettings connectionSettings) throws DataLayerException {
         if (testConnection) {
             return;
         }
         isConnected = false;
-        final boolean isUpdateData = isUpdateData(path, userName, integrated);
+        this.connectionSettings = connectionSettings;
+        final boolean isUpdateData = credentialsChanged(connectionSettings);        
 
-        this.path = path;
-        this.userName = userName;
-        this.password = password;
-        this.integrated = integrated;
+        String path = connectionSettings.v1Path;
+        String username = connectionSettings.v1Username;
+        String password = connectionSettings.v1Password;
         assetList = null;
 
         try {
             if (isUpdateData) {
                 cleanConnectionData();
 
-                V1APIConnector metaConnector = new V1APIConnector(path + META_SUFFIX, userName, password);
+                V1APIConnector metaConnector = new V1APIConnector(path + META_SUFFIX, username, password);
                 metaModel = new MetaModel(metaConnector);
 
-                V1APIConnector localizerConnector = new V1APIConnector(path + LOCALAIZER_SUFFIX, userName, password);
+                V1APIConnector localizerConnector = new V1APIConnector(path + LOCALAIZER_SUFFIX, username, password);
                 localizer = new Localizer(localizerConnector);
 
-                V1APIConnector dataConnector = new V1APIConnector(path + DATA_SUFFIX, userName, password);
+                V1APIConnector dataConnector = new V1APIConnector(path + DATA_SUFFIX, username, password);
                 services = new Services(metaModel, dataConnector);
 
             }
@@ -182,13 +186,36 @@ public class ApiDataLayer {
     }
 
     // TODO Need refactor by Mikhail
-    private boolean isUpdateData(String path, String userName, boolean integrated) {
-        boolean isUserChanged = true;
-        if ((this.userName != null || integrated) && this.path != null) {
-            isUserChanged = (this.userName != null && !this.userName.equals(userName)) || integrated != this.integrated
-                    || !this.path.equals(path);
+    boolean credentialsChanged(ConnectionSettings newSettings) {
+        if (!isConnectionInitialized()) {
+            return true;
         }
-        return isUserChanged || metaModel == null || localizer == null || services == null;
+        String currentUsername = connectionSettings.v1Username;
+        String currentPath = connectionSettings.v1Path;
+        if (isProxySettingsChanged(newSettings)) {
+            return true;
+        }
+        if (currentUsername != null || newSettings.isWindowsIntegratedAuthentication) {
+            return isUserChanged(newSettings.v1Username, newSettings.isWindowsIntegratedAuthentication) || !currentPath.equals(newSettings.v1Path);
+        }
+        return true;
+    }
+
+    private boolean isProxySettingsChanged(ConnectionSettings newSettings) {
+        return newSettings.isProxyEnabled != connectionSettings.isProxyEnabled ||
+                (newSettings.proxyPassword != null && !newSettings.proxyPassword.equals(connectionSettings.proxyPassword)) ||
+                (newSettings.proxyUri != null && !newSettings.proxyUri.equals(connectionSettings.proxyUri)) ||
+                (newSettings.proxyUsername != null && !newSettings.proxyUsername.equals(connectionSettings.proxyUsername));
+    }
+
+    private boolean isUserChanged(String username, boolean integrated) {
+        return (connectionSettings.v1Username != null && !connectionSettings.v1Username.equals(username))
+                || integrated != connectionSettings.isWindowsIntegratedAuthentication;
+    }
+
+    private boolean isConnectionInitialized() {
+        return metaModel != null && localizer != null && services != null &&
+                connectionSettings != null && connectionSettings.v1Path != null;
     }
 
     private void processConfig(String path) throws ConnectionException, APIException {
@@ -225,7 +252,7 @@ public class ApiDataLayer {
      * @throws DataLayerException
      */
     public void reconnect() throws DataLayerException {
-        connect(path, userName, password, integrated);
+        connect(connectionSettings);
     }
 
     public List<Project> getProjectTree() throws DataLayerException {
@@ -337,17 +364,22 @@ public class ApiDataLayer {
         return false;
     }
 
-    public boolean checkConnection(String url, String user, String pass, boolean auth) {
+    public boolean checkConnection(ConnectionSettings settings) {
         boolean result = true;
+        String url = settings.v1Path;
+        String user = settings.v1Username;
+        String pass = settings.v1Password;
+        boolean auth = settings.isWindowsIntegratedAuthentication;
+        ProxyProvider proxy = getProxy(settings);
 
-        V1APIConnector metaConnector = new V1APIConnector(url.toString() + META_SUFFIX);
+        V1APIConnector metaConnector = new V1APIConnector(url.toString() + META_SUFFIX, proxy);
         MetaModel model = new MetaModel(metaConnector);
 
         V1APIConnector dataConnector = null;
         if (auth) {
-            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX);
+            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, proxy);
         } else {
-            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, user, pass);
+            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, user, pass, proxy);
         }
 
         Services v1Service = new Services(model, dataConnector);
@@ -361,6 +393,21 @@ public class ApiDataLayer {
         }
 
         return result;
+    }
+    
+    private ProxyProvider getProxy(ConnectionSettings settings) {
+        if (!settings.isProxyEnabled) {
+            return null;
+        }
+        
+        URI uri = null;
+        try {
+            uri = new URI(settings.proxyUri);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new ProxyProvider(uri, settings.proxyUsername, settings.proxyPassword);
     }
 
     private boolean checkWorkitemIsValid(Asset asset) {

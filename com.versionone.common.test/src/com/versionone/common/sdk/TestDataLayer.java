@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.versionone.apiclient.Asset;
+import com.versionone.apiclient.ProxyProvider;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
@@ -38,7 +39,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public boolean checkConnection(String url, String user, String pass, boolean auth) {
+    public boolean checkConnection(ConnectionSettings settings) {
         return true;
     }
 
@@ -47,7 +48,7 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public void connect(String path, String userName, String password, boolean integrated) throws DataLayerException {
+    public void connect(ConnectionSettings settings) throws DataLayerException {
     }
 
     @Override

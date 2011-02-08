@@ -51,5 +51,25 @@ public class PreferenceConstants {
      * Filter for workitem (show only assigned task or all)
      */
     public static final String P_ONLY_USER_WORKITEMS = "onlyUserworkitems";
+    
+    /**
+     * Is proxy used. 
+     */
+    public static final String P_PROXY_ENABLED = "useProxy";
+    
+    /**
+     * Username for proxy.
+     */
+    public static final String P_PROXY_USER = "proxyUsername";
+    
+    /**
+     * Password for proxy.
+     */
+    public static final String P_PROXY_PASSWORD = "proxyPassword";
+    
+    /**
+     * Uri for proxy.
+     */
+    public static final String P_PROXY_URI = "proxyUri";
 
 }

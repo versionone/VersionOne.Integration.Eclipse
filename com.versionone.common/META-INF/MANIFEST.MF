@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VersionOne Common Functionality
 Bundle-SymbolicName: com.versionone.common;singleton:=true
-Bundle-Version: 2.1.0
+Bundle-Version: 2.1.2
 Bundle-Activator: com.versionone.common.Activator
 Bundle-Vendor: VersionOne
 Bundle-ActivationPolicy: lazy
 Require-Bundle: 
  org.eclipse.ui,
  org.eclipse.core.runtime,
- com.versionone.apiclient;bundle-version="8.0.249"
+ com.versionone.apiclient;bundle-version="8.0.254"
 Export-Package: 
  com.versionone.common,
  com.versionone.common.preferences;

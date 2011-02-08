@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 import com.versionone.common.preferences.PreferenceConstants;
 import com.versionone.common.preferences.PreferencePage;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.ConnectionSettings;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -43,19 +44,23 @@ public class Activator extends AbstractUIPlugin {
      * @throws Exception
      */
     public static void connect() {
-        final IPreferenceStore pref = PreferencePage.getPreferences();
-        String path = pref.getString(PreferenceConstants.P_URL);
-        String user = pref.getString(PreferenceConstants.P_USER);
-        String password = pref.getString(PreferenceConstants.P_PASSWORD);
-        boolean auth = pref.getBoolean(PreferenceConstants.P_INTEGRATED_AUTH);
-        
-        connect(user, password, path, auth);
+        final IPreferenceStore pref = PreferencePage.getPreferences(); 
+        ConnectionSettings settings = new ConnectionSettings();
+        settings.v1Path = pref.getString(PreferenceConstants.P_URL);
+        settings.v1Username = pref.getString(PreferenceConstants.P_USER); 
+        settings.v1Password = pref.getString(PreferenceConstants.P_PASSWORD);
+        settings.isWindowsIntegratedAuthentication = pref.getBoolean(PreferenceConstants.P_INTEGRATED_AUTH);;
+        settings.isProxyEnabled = pref.getBoolean(PreferenceConstants.P_PROXY_ENABLED);
+        settings.proxyUri = pref.getString(PreferenceConstants.P_PROXY_URI);
+        settings.proxyUsername = pref.getString(PreferenceConstants.P_PROXY_USER);
+        settings.proxyPassword = pref.getString(PreferenceConstants.P_PROXY_PASSWORD);
+        connect(settings);
         ApiDataLayer.getInstance().setCurrentProjectId(pref.getString(PreferenceConstants.P_PROJECT_TOKEN));
     }
     
-    public static void connect(String user, String password, String path, boolean auth) {
+    public static void connect(ConnectionSettings settings) {
         try {
-            ApiDataLayer.getInstance().connect(path, user, password, auth);
+            ApiDataLayer.getInstance().connect(settings);
         } catch (Exception e) {
             Activator.logError(e);
         }

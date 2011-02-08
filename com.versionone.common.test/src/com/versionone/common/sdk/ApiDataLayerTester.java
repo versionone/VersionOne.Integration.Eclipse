@@ -1,6 +1,6 @@
 package com.versionone.common.sdk;
 
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,15 +15,21 @@ import static com.versionone.common.sdk.EntityType.Task;
 import static com.versionone.common.sdk.EntityType.Test;
 
 public class ApiDataLayerTester implements IntegrationalTest {
-
-    @Ignore("This test is integrational. It works with V1 server.")
+    private static ApiDataLayer data;
+    
+    @BeforeClass
+    public static void setUp() {
+        ApiDataLayer.instance = null;
+        data = ApiDataLayer.getInstance();
+    }
+    
     @Test
     public void testCreateAndGetDefect() throws Exception {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
-        data.addProperty("Name", Defect, false);
+        data.addProperty("Name", Scope, false);
         data.addProperty("Owners", Defect, true);
+        data.addProperty("Name", Defect, false);
         data.addProperty("Status", Defect, true);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        data.connect(getConnectionSettings());
         data.getWorkitemTree();
         final PrimaryWorkitem defect = data.createNewPrimaryWorkitem(Defect);
         assertEquals(0, defect.children.size());
@@ -68,14 +74,14 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertTrue(data.getWorkitemTree().contains(defect));
     }
 
-    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testCreateAndGetTask() throws Exception {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
         data.addProperty("Name", Task, false);
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        data.addProperty("Name", Scope, false);
+        data.addProperty("Timebox", Story, false);
+        data.connect(getConnectionSettings());
         final PrimaryWorkitem story = data.getWorkitemTree().get(0);
         final SecondaryWorkitem task = data.createNewSecondaryWorkitem(Task, story);
         assertEquals(story, task.parent);
@@ -121,14 +127,14 @@ public class ApiDataLayerTester implements IntegrationalTest {
         assertTrue(story2.children.contains(task));
     }
 
-    @Ignore("Intergational test")
     @Test
     public void testCreateChild() throws Exception {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
         data.addProperty("Name", Task, false);
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        data.addProperty("Name", Scope, false);
+        data.addProperty("Timebox", Story, false);
+        data.connect(getConnectionSettings());
         PrimaryWorkitem story = data.getWorkitemTree().get(0);
         final SecondaryWorkitem test = story.createChild(Test);
         assertTrue(story.children.contains(test));
@@ -164,10 +170,8 @@ public class ApiDataLayerTester implements IntegrationalTest {
         }
     }
     
-    @Ignore("This test is integrational. It works with V1 server.")
     @Test
     public void testChildrenSorting() throws Exception {
-        final ApiDataLayer data = ApiDataLayer.getInstance();
         data.addProperty("Name", Task, false);
         data.addProperty("Owners", Task, true);
         data.addProperty("Status", Task, true);
@@ -175,7 +179,7 @@ public class ApiDataLayerTester implements IntegrationalTest {
         data.addProperty("Order", Test, false);
         data.addProperty("Timebox.Name", Story, false);
         data.addProperty("Name", Scope, false);
-        data.connect(V1_PATH, V1_USER, V1_PASSWORD, false);
+        data.connect(getConnectionSettings());
         PrimaryWorkitem story = data.getWorkitemTree().get(0);
 
         final SecondaryWorkitem test = story.createChild(Test);
@@ -199,5 +203,19 @@ public class ApiDataLayerTester implements IntegrationalTest {
         } catch (IllegalArgumentException ex) {
             assertTrue("Method shouldn't throw any exception",false);
         }
+    }
+    
+    private ConnectionSettings getConnectionSettings() {
+        ConnectionSettings connectionSettings = new ConnectionSettings();
+        connectionSettings.v1Path = V1_PATH;
+        connectionSettings.v1Username = V1_USER;
+        connectionSettings.v1Password = V1_PASSWORD;
+        connectionSettings.isWindowsIntegratedAuthentication = false;
+        connectionSettings.isProxyEnabled = false;
+        connectionSettings.proxyPassword = PROXY_PASSWORD;
+        connectionSettings.proxyUri = PROXY_URI;
+        connectionSettings.proxyUsername = PROXY_USER;
+
+        return connectionSettings;
     }
 }

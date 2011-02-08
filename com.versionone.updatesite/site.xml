@@ -3,7 +3,7 @@
    <description url="http://updates.versionone.com/eclipse/v1plugin/">
       VersionOne Eclipse Plugin Integration Update
    </description>
-   <feature url="features/com.versionone.v1.feature_2.1.1.jar" id="com.versionone.v1.feature" version="2.1.1">
+   <feature url="features/com.versionone.v1.feature_2.1.2.jar" id="com.versionone.v1.feature" version="2.1.1">
       <category name="VersionOne Task View"/>
    </feature>
    <category-def name="VersionOne Task View" label="VersionOne Task View">

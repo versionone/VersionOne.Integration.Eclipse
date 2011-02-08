@@ -1,5 +1,8 @@
 package com.versionone.common.preferences;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -14,6 +17,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.ButtonFieldEditor.Validator;
 import com.versionone.common.sdk.ApiDataLayer;
+import com.versionone.common.sdk.ConnectionSettings;
 
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -24,6 +28,10 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     private ButtonFieldEditor requiresValidation;
     private BooleanFieldEditor integratedAuthEditor;
     private boolean resetConnection = false;
+    private BooleanFieldEditor useProxyEditor;
+    private StringFieldEditor proxyUriEditor;
+    private StringFieldEditor proxyUserEditor;
+    private StringFieldEditor proxyPasswordEditor;
 
     public static IPreferenceStore getPreferences() {
         return Activator.getDefault().getPreferenceStore();
@@ -69,11 +77,25 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         pwdField.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
         addField(pwdField);
         
+        useProxyEditor = new BooleanFieldEditor(PreferenceConstants.P_PROXY_ENABLED, "Use proxy", this.getFieldEditorParent());
+        addField(useProxyEditor);
+        
+        proxyUriEditor = new ProxyUrlFieldEditor(PreferenceConstants.P_PROXY_URI, "Proxy Uri:", this.getFieldEditorParent());
+        addField(proxyUriEditor);
+        
+        proxyUserEditor = new VersionOneStringFieldEditor(PreferenceConstants.P_PROXY_USER, "Proxy Username:", this.getFieldEditorParent());
+        addField(proxyUserEditor);
+        
+        proxyPasswordEditor = new VersionOneStringFieldEditor(PreferenceConstants.P_PROXY_PASSWORD, "Proxy Password:", this.getFieldEditorParent());
+        proxyPasswordEditor.getTextControl(this.getFieldEditorParent()).setEchoChar('*');
+        addField(proxyPasswordEditor);
+        
         requiresValidation = new ButtonFieldEditor(PreferenceConstants.P_REQUIRESVALIDATION, "Validate Connection",
                 new ConnectionValidator(), this.getFieldEditorParent());
         addField(requiresValidation);
 
         setControlAccess(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_ENABLED));
+        setProxyAccess(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_PROXY_ENABLED));        
     }
 
     /**
@@ -96,6 +118,19 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
         requiresValidation.setEnabled(value, this.getFieldEditorParent());
         integratedAuthEditor.setEnabled(value, this.getFieldEditorParent());
+        useProxyEditor.setEnabled(value, this.getFieldEditorParent());
+        //setProxyAccess(PreferencePage.getPreferences().getBoolean(PreferenceConstants.P_PROXY_ENABLED) && value);
+    }
+    
+    /**
+     * Determines if proxy enabled.
+     * 
+     * @param value -  proxy enable status.
+     */
+    private void setProxyAccess(boolean value) {
+        proxyPasswordEditor.setEnabled(value, this.getFieldEditorParent());
+        proxyUriEditor.setEnabled(value, this.getFieldEditorParent());
+        proxyUserEditor.setEnabled(value, this.getFieldEditorParent());                
     }
 
     /**
@@ -105,6 +140,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     protected void performDefaults() {
         super.performDefaults();
         this.setControlAccess(this.enabledEditor.getBooleanValue());
+        setProxyAccess(useProxyEditor.getBooleanValue() && enabledEditor.getBooleanValue());
         this.checkState();
     }
 
@@ -116,8 +152,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         super.propertyChange(event);
         if (event.getSource().equals(enabledEditor)) {
             setControlAccess(enabledEditor.getBooleanValue());
+            setProxyAccess(enabledEditor.getBooleanValue() && useProxyEditor.getBooleanValue());
             this.checkState();
         }
+        if (event.getSource().equals(useProxyEditor)) {
+            setProxyAccess(useProxyEditor.getBooleanValue());
+            requiresValidation.setEnabled(true, this.getFieldEditorParent());
+            this.checkState();            
+        }        
         if (event.getSource().equals(integratedAuthEditor)) {
             userEditor.loadDefault();
             pwdField.loadDefault();
@@ -175,20 +217,15 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     class ConnectionValidator implements Validator {
 
         public boolean isValid() {
-            boolean rc = true;
-
-            String url = urlEditor.getStringValue();
-            
-            rc = ApiDataLayer.getInstance().checkConnection(url, userEditor.getStringValue(), pwdField.getStringValue(), integratedAuthEditor.getBooleanValue());
-
+            boolean rc = true;            
+            rc = ApiDataLayer.getInstance().checkConnection(getConnectionSettings());
             if (rc) {
                 resetConnection = true;
             } else {
                 setErrorMessage("Validation Failed.");                
-            }
-            
+            }            
             return rc;
-        }
+        }       
     }
 
     @Override
@@ -197,8 +234,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         boolean rc = true;
         if (resetConnection) {
             try {
-                Activator.connect(userEditor.getStringValue(), pwdField.getStringValue(), 
-                        urlEditor.getStringValue(), integratedAuthEditor.getBooleanValue());
+                Activator.connect(getConnectionSettings());
                 updateMemberToken(urlEditor.getStringValue());
                 PreferencePage.getPreferences().setValue(PreferenceConstants.P_PROJECT_TOKEN, ApiDataLayer.getInstance().getCurrentProjectId());
                 resetConnection = false;
@@ -214,6 +250,19 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             rc = super.performOk();
         }
         return rc;
+    }
+    
+    private ConnectionSettings getConnectionSettings() {
+        ConnectionSettings settings = new ConnectionSettings();
+        settings.v1Path = urlEditor.getStringValue();
+        settings.v1Username = userEditor.getStringValue(); 
+        settings.v1Password = pwdField.getStringValue();
+        settings.isWindowsIntegratedAuthentication = integratedAuthEditor.getBooleanValue();
+        settings.isProxyEnabled = useProxyEditor.getBooleanValue();
+        settings.proxyUri = proxyUriEditor.getStringValue();
+        settings.proxyUsername = proxyUserEditor.getStringValue();
+        settings.proxyPassword = proxyPasswordEditor.getStringValue();
+        return settings;
     }
     
     private void updateMemberToken(String path) {
@@ -285,8 +334,37 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             
             return isValid;
         }
+    }
+    
+    private class ProxyUrlFieldEditor extends VersionOneStringFieldEditor {
+        
+        public ProxyUrlFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
+            super(pUrl, string, fieldEditorParent);
+        }
 
-    }    
+        @Override
+        protected boolean doCheckState() {
+            boolean isValid = super.doCheckState();
+            
+            if (getStringValue().length() == 0 && useProxyEditor.getBooleanValue()) {
+                errorMessage = "Proxy Uri Is a required field";
+                isValid = false;
+                requiresValidation.setEnabled(false, getFieldEditorParent());
+            } else {
+                try {
+                    new URI(getStringValue());
+                } catch (URISyntaxException e) {
+                    errorMessage = "Proxy Uri syntax error.";
+                    isValid = false;
+                }
+            }
+            
+
+            setErrorMessage(errorMessage);
+            
+            return isValid;
+        }
+    } 
     
     private class UserNameFieldEditor extends VersionOneStringFieldEditor {
         public UserNameFieldEditor(String pUrl, String string, Composite fieldEditorParent) {
@@ -307,6 +385,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             
             return isValid;
         }
-    }
+    }    
     
 }

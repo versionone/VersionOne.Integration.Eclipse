@@ -107,7 +107,7 @@ public class TestModel {
                 "0,00", "Completed", "FAST LAND 1", Task);
         validateTask(primaryItems.get(6), "D-01093", "Defect:2248", "defect 1", "0,02", "-2,00", null, "0,01", "Done",
                 null, Defect);
-        validateTask(primaryItems.get(5).children.get(1), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null,
+        validateTask(primaryItems.get(5).children.get(0), "AT-01008", "Test:2244", "test1", "0,00", "35,00", null,
                 "0,00", "Passed", "STORY33.db", Test);
     }
 

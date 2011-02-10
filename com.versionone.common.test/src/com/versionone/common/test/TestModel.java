@@ -7,10 +7,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.versionone.apiclient.FileAPIConnector;
-import com.versionone.apiclient.Localizer;
-import com.versionone.apiclient.MetaModel;
-import com.versionone.apiclient.Services;
 import com.versionone.apiclient.IV1Configuration.TrackingLevel;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.AttributeInfo;
@@ -22,6 +18,7 @@ import com.versionone.common.sdk.SecondaryWorkitem;
 import com.versionone.common.sdk.ValueId;
 import com.versionone.common.sdk.Entity;
 import com.versionone.common.sdk.EntityType;
+import com.versionone.common.sdk.VersionOneConnectorMock;
 import com.versionone.common.sdk.Workitem;
 
 import static com.versionone.common.sdk.EntityType.*;
@@ -36,13 +33,9 @@ public class TestModel {
         setDataLayerAttribute(Workitem.STATUS_PROPERTY, true);
         setDataLayerAttribute(Workitem.OWNERS_PROPERTY, true);
 
-        FileAPIConnector metaConnector = new FileAPIConnector("testdata/TestMetaData.xml", "meta.v1/");
-        FileAPIConnector dataConnector = new FileAPIConnector("testdata/TestData.xml", "rest-1.v1/");
-        FileAPIConnector localizeConnector = new FileAPIConnector("testdata/TestLocalizeData.xml", "loc.v1/");
-        MetaModel metaModel = new MetaModel(metaConnector);
-        Services services = new Services(metaModel, dataConnector);
-        Localizer localizer = new Localizer(localizeConnector);
-        datalayer.connectFotTesting(services, metaModel, localizer, TrackingLevel.Off, TrackingLevel.On);
+        VersionOneConnectorMock connector = new VersionOneConnectorMock();
+        connector.connect(null);        
+        datalayer.connectFotTesting(connector, TrackingLevel.Off, TrackingLevel.On);
     }
 
     private static void setDataLayerAttribute(String attribute, boolean isListType) {

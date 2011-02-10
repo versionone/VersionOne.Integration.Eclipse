@@ -1,7 +1,5 @@
 package com.versionone.common.sdk;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -22,18 +20,12 @@ import com.versionone.apiclient.FilterTerm;
 import com.versionone.apiclient.IAssetType;
 import com.versionone.apiclient.IAttributeDefinition;
 import com.versionone.apiclient.IFilterTerm;
-import com.versionone.apiclient.ILocalizer;
 import com.versionone.apiclient.IMetaModel;
 import com.versionone.apiclient.IServices;
-import com.versionone.apiclient.Localizer;
 import com.versionone.apiclient.MetaException;
-import com.versionone.apiclient.MetaModel;
 import com.versionone.apiclient.OrderBy;
-import com.versionone.apiclient.ProxyProvider;
 import com.versionone.apiclient.Query;
 import com.versionone.apiclient.QueryResult;
-import com.versionone.apiclient.Services;
-import com.versionone.apiclient.V1APIConnector;
 import com.versionone.apiclient.V1Configuration;
 import com.versionone.apiclient.IOperation;
 import com.versionone.apiclient.V1Exception;
@@ -43,10 +35,6 @@ import static com.versionone.common.sdk.EntityType.*;
 
 public class ApiDataLayer {
 
-    private static final String META_SUFFIX = "meta.v1/";
-    private static final String LOCALAIZER_SUFFIX = "loc.v1/";
-    private static final String DATA_SUFFIX = "rest-1.v1/";
-    private static final String CONFIG_SUFFIX = "config.v1/";
 
     private static final Map<String, String> propertyAliases = new HashMap<String, String>();
     static {
@@ -74,15 +62,9 @@ public class ApiDataLayer {
     private IAssetType effortType;
 
     protected static ApiDataLayer instance;
-    private boolean isConnected;
     private boolean testConnection;
 
     public Oid memberOid;
-    //private String path;
-    //private String userName;
-    //private String password;
-    //private boolean integrated;
-    private ConnectionSettings connectionSettings;
 
     private List<Asset> assetList;
     /** Set of attributes to be queried in Workitem requests */
@@ -92,14 +74,9 @@ public class ApiDataLayer {
     private boolean trackEffort;
     public final EffortTrackingLevel trackingLevel = new EffortTrackingLevel();
 
-    private IMetaModel metaModel;
-    private IServices services;
-    private ILocalizer localizer;
-
-    RequiredFieldsValidator requiredFieldsValidator;
-
     private String currentProjectId;
     private boolean showAllTasks = true;
+    private VersionOneConnector connector = new VersionOneConnector();
 
     protected ApiDataLayer() {
         addProperty("Schedule.EarliestActiveTimebox", Scope, false);
@@ -108,15 +85,13 @@ public class ApiDataLayer {
     /**
      * Special method ONLY for testing.
      */
-    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTrackingLevel,
+    public void connectFotTesting(VersionOneConnector connector, Object storyTrackingLevel,
             Object defectTrackingLevel) throws Exception {
-        this.metaModel = (IMetaModel) metaModel;
-        this.services = (IServices) services;
-        this.localizer = (ILocalizer) localizer;
-
+        this.connector = connector;
+        
         if (storyTrackingLevel != null && defectTrackingLevel != null) {
             trackEffort = true;
-            effortType = this.metaModel.getAssetType("Actual");
+            effortType = connector.getMetaModel().getAssetType("Actual");
             trackingLevel.clear();
             trackingLevel.addPrimaryTypeLevel(Story, (TrackingLevel) storyTrackingLevel);
             trackingLevel.addPrimaryTypeLevel(Defect, (TrackingLevel) defectTrackingLevel);
@@ -125,10 +100,9 @@ public class ApiDataLayer {
         }
 
         initTypes();
-        testConnection = isConnected = true;
-        memberOid = this.services.getLoggedIn();
+        testConnection = true;
+        memberOid = connector.getServices().getLoggedIn();
         listPropertyValues = getListPropertyValues();
-        requiredFieldsValidator = new RequiredFieldsValidator(this.metaModel, this.services);
     }
 
     public static ApiDataLayer getInstance() {
@@ -141,42 +115,22 @@ public class ApiDataLayer {
     public void connect(ConnectionSettings connectionSettings) throws DataLayerException {
         if (testConnection) {
             return;
-        }
-        isConnected = false;
-        this.connectionSettings = connectionSettings;
-        final boolean isUpdateData = credentialsChanged(connectionSettings);        
-
-        String path = connectionSettings.v1Path;
-        String username = connectionSettings.v1Username;
-        String password = connectionSettings.v1Password;
+        }        
+        final boolean credentialsChanged = connector.credentialsChanged(connectionSettings);        
         assetList = null;
 
         try {
-            if (isUpdateData) {
+            connector.connect(connectionSettings);
+            if (credentialsChanged) {
                 cleanConnectionData();
-
-                V1APIConnector metaConnector = new V1APIConnector(path + META_SUFFIX, username, password);
-                metaModel = new MetaModel(metaConnector);
-
-                V1APIConnector localizerConnector = new V1APIConnector(path + LOCALAIZER_SUFFIX, username, password);
-                localizer = new Localizer(localizerConnector);
-
-                V1APIConnector dataConnector = new V1APIConnector(path + DATA_SUFFIX, username, password);
-                services = new Services(metaModel, dataConnector);
-
             }
             if (types.isEmpty()) {
                 initTypes();
             }
-            processConfig(path);
-
-            memberOid = services.getLoggedIn();
+            processConfig();
+            memberOid = connector.getServices().getLoggedIn();
             listPropertyValues = getListPropertyValues();
-            isConnected = true;
             updateCurrentProjectId();
-            requiredFieldsValidator = new RequiredFieldsValidator(metaModel, services);
-            requiredFieldsValidator.init();
-
             return;
         } catch (MetaException e) {
             throw createAndLogException("Cannot connect to V1 server.", e);
@@ -185,45 +139,13 @@ public class ApiDataLayer {
         }
     }
 
-    // TODO Need refactor by Mikhail
-    boolean credentialsChanged(ConnectionSettings newSettings) {
-        if (!isConnectionInitialized()) {
-            return true;
-        }
-        String currentUsername = connectionSettings.v1Username;
-        String currentPath = connectionSettings.v1Path;
-        if (isProxySettingsChanged(newSettings)) {
-            return true;
-        }
-        if (currentUsername != null || newSettings.isWindowsIntegratedAuthentication) {
-            return isUserChanged(newSettings.v1Username, newSettings.isWindowsIntegratedAuthentication) || !currentPath.equals(newSettings.v1Path);
-        }
-        return true;
-    }
 
-    private boolean isProxySettingsChanged(ConnectionSettings newSettings) {
-        return newSettings.isProxyEnabled != connectionSettings.isProxyEnabled ||
-                (newSettings.proxyPassword != null && !newSettings.proxyPassword.equals(connectionSettings.proxyPassword)) ||
-                (newSettings.proxyUri != null && !newSettings.proxyUri.equals(connectionSettings.proxyUri)) ||
-                (newSettings.proxyUsername != null && !newSettings.proxyUsername.equals(connectionSettings.proxyUsername));
-    }
-
-    private boolean isUserChanged(String username, boolean integrated) {
-        return (connectionSettings.v1Username != null && !connectionSettings.v1Username.equals(username))
-                || integrated != connectionSettings.isWindowsIntegratedAuthentication;
-    }
-
-    private boolean isConnectionInitialized() {
-        return metaModel != null && localizer != null && services != null &&
-                connectionSettings != null && connectionSettings.v1Path != null;
-    }
-
-    private void processConfig(String path) throws ConnectionException, APIException {
-        V1Configuration v1Config = new V1Configuration(new V1APIConnector(path + CONFIG_SUFFIX));
+    private void processConfig() throws ConnectionException, APIException {
+        V1Configuration v1Config = connector.getConfiguration();
 
         trackEffort = v1Config.isEffortTracking();
         if (trackEffort) {
-            effortType = metaModel.getAssetType("Actual");
+            effortType = connector.getMetaModel().getAssetType("Actual");
         }
 
         trackingLevel.clear();
@@ -239,6 +161,7 @@ public class ApiDataLayer {
     }
 
     private void initTypes() {
+        IMetaModel metaModel = connector.getMetaModel();
         for (EntityType type : EntityType.values()) {
             types.put(type, metaModel.getAssetType(type.name()));
         }
@@ -252,7 +175,11 @@ public class ApiDataLayer {
      * @throws DataLayerException
      */
     public void reconnect() throws DataLayerException {
-        connect(connectionSettings);
+        connector.reconnect();
+    }
+    
+    List<RequiredFieldsDTO> validate(Asset asset) {
+        return connector.getRequiredFieldsValidator().validate(asset);
     }
 
     public List<Project> getProjectTree() throws DataLayerException {
@@ -265,7 +192,7 @@ public class ApiDataLayer {
             scopeQuery.setFilter(stateTerm);
             // clear all definitions used in previous queries
             addSelection(scopeQuery, Scope);
-            final QueryResult result = services.retrieve(scopeQuery);
+            final QueryResult result = connector.getServices().retrieve(scopeQuery);
             final List<Project> roots = new ArrayList<Project>(result.getAssets().length);
             for (Asset oneAsset : result.getAssets()) {
                 roots.add(new Project(this, oneAsset));
@@ -308,7 +235,7 @@ public class ApiDataLayer {
             query.getOrderBy().majorSort(primaryWorkitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
             query.getOrderBy().minorSort(workitemType.getDefaultOrderBy(), OrderBy.Order.Ascending);
 
-            final Asset[] assets = services.retrieve(query).getAssets();
+            final Asset[] assets = connector.getServices().retrieve(query).getAssets();
             final ArrayList<Asset> list = new ArrayList<Asset>(assets.length + 20);
             //list.addAll(Arrays.asList(assets));
 //            initValidAssets();
@@ -364,50 +291,8 @@ public class ApiDataLayer {
         return false;
     }
 
-    public boolean checkConnection(ConnectionSettings settings) {
-        boolean result = true;
-        String url = settings.v1Path;
-        String user = settings.v1Username;
-        String pass = settings.v1Password;
-        boolean auth = settings.isWindowsIntegratedAuthentication;
-        ProxyProvider proxy = getProxy(settings);
-
-        V1APIConnector metaConnector = new V1APIConnector(url.toString() + META_SUFFIX, proxy);
-        MetaModel model = new MetaModel(metaConnector);
-
-        V1APIConnector dataConnector = null;
-        if (auth) {
-            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, proxy);
-        } else {
-            dataConnector = new V1APIConnector(url.toString() + DATA_SUFFIX, user, pass, proxy);
-        }
-
-        Services v1Service = new Services(model, dataConnector);
-
-        try {
-            v1Service.getLoggedIn();
-        } catch (V1Exception e) {
-            result = false;
-        } catch (MetaException e) {
-            result = false;
-        }
-
-        return result;
-    }
-    
-    private ProxyProvider getProxy(ConnectionSettings settings) {
-        if (!settings.isProxyEnabled) {
-            return null;
-        }
-        
-        URI uri = null;
-        try {
-            uri = new URI(settings.proxyUri);
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return new ProxyProvider(uri, settings.proxyUsername, settings.proxyPassword);
+    public boolean checkConnection(ConnectionSettings settings) throws ConnectionException {
+        return connector.verifyConnection(settings);
     }
 
     private boolean checkWorkitemIsValid(Asset asset) {
@@ -416,9 +301,9 @@ public class ApiDataLayer {
     }
 
     private void checkConnection() throws DataLayerException {
-        if (!isConnected) {
+        if (!connector.isConnected()) {
             reconnect();
-            if (!isConnected) {
+            if (!connector.isConnected()) {
                 throw createAndLogException("Connection is not set.");
             }
         }
@@ -452,11 +337,12 @@ public class ApiDataLayer {
                 }
             }
         }
-        if (requiredFieldsValidator.getFields(type) == null) {
+        RequiredFieldsValidator validator = connector.getRequiredFieldsValidator();
+        if (validator.getFields(type) == null) {
             return;
         }
 
-        for (RequiredFieldsDTO field : requiredFieldsValidator.getFields(type)) {
+        for (RequiredFieldsDTO field : validator.getFields(type)) {
             try {
                 query.getSelection().add(types.get(type).getAttributeDefinition(field.name));
             } catch (MetaException e) {
@@ -505,7 +391,7 @@ public class ApiDataLayer {
     }
 
     PropertyValues queryPropertyValues(String propertyName) throws V1Exception, MetaException {
-        IAssetType assetType = metaModel.getAssetType(propertyName);
+        IAssetType assetType = connector.getMetaModel().getAssetType(propertyName);
         IAttributeDefinition nameDef = assetType.getAttributeDefinition(Entity.NAME_PROPERTY);
         IAttributeDefinition inactiveDef = null;
 
@@ -526,7 +412,7 @@ public class ApiDataLayer {
 
         final PropertyValues res = new PropertyValues();
         res.add(new ValueId());
-        for (Asset asset : services.retrieve(query).getAssets()) {
+        for (Asset asset : connector.getServices().retrieve(query).getAssets()) {
             String name = (String) asset.getAttribute(nameDef).getValue();
             res.add(new ValueId(asset.getOid(), name));
         }
@@ -566,12 +452,13 @@ public class ApiDataLayer {
     }
 
     void commitAsset(Asset asset) throws V1Exception {
-        services.save(asset);
+        connector.getServices().save(asset);
         commitEffort(asset);
     }
 
-    private void commitEffort(Asset asset) throws V1Exception {
+    private void commitEffort(Asset asset) throws V1Exception {        
         if (efforts.containsKey(asset)) {
+            IServices services = connector.getServices();
             Asset effort = services.createNew(effortType, asset.getOid());
             effort.setAttributeValue(effortType.getAttributeDefinition("Value"), efforts.get(asset));
             effort.setAttributeValue(effortType.getAttributeDefinition("Date"), new Date());
@@ -617,7 +504,7 @@ public class ApiDataLayer {
     }
 
     void executeOperation(Asset asset, IOperation operation) throws V1Exception {
-        services.executeOperation(operation, asset.getOid());
+        connector.getServices().executeOperation(operation, asset.getOid());
     }
 
     boolean isAssetClosed(Asset asset) {
@@ -647,7 +534,7 @@ public class ApiDataLayer {
             final Query query = new Query(oldAsset.getOid().getMomentless(), false);
             addSelection(query, workitem.getType());
             query.getSelection().add(stateDef);
-            final Asset[] queryRes = services.retrieve(query).getAssets();
+            final Asset[] queryRes = connector.getServices().retrieve(query).getAssets();
             assert queryRes.length == 1;
             final Asset newAsset = queryRes[0];
 
@@ -718,7 +605,7 @@ public class ApiDataLayer {
 
         QueryResult result = null;
         try {
-            result = services.retrieve(query);
+            result = connector.getServices().retrieve(query);
         } catch (Exception ex) {
         }
 
@@ -739,9 +626,9 @@ public class ApiDataLayer {
 
     private boolean isProjectExist(String id) {
         try {
-            final Query query = new Query(Oid.fromToken(id, metaModel));
+            final Query query = new Query(Oid.fromToken(id, connector.getMetaModel()));
             addSelection(query, Scope);
-            final QueryResult result = services.retrieve(query);
+            final QueryResult result = connector.getServices().retrieve(query);
             return result.getTotalAvaliable() > 0;
         } catch (Exception ex) {
             return false;
@@ -749,18 +636,18 @@ public class ApiDataLayer {
     }
 
     private Project queryProject(String id) throws DataLayerException {
-        if (!isConnected || id == null || id.equals("")) {
+        if (!connector.isConnected() || id == null || id.equals("")) {
             return null;
         }
 
         try {
-            final Query query = new Query(Oid.fromToken(id, metaModel));
+            final Query query = new Query(Oid.fromToken(id, connector.getMetaModel()));
             addSelection(query, Scope);
-            final Asset[] result = services.retrieve(query).getAssets();
+            final Asset[] result = connector.getServices().retrieve(query).getAssets();
             assert result.length == 1;
             return new Project(this, result[0]);
         } catch (MetaException ex) {
-            isConnected = false;
+            connector.setDisconnected();
             throw createAndLogException("Unable to get projects", ex);
         } catch (Exception ex) {
             throw createAndLogException("Unable to get projects", ex);
@@ -768,7 +655,7 @@ public class ApiDataLayer {
     }
 
     public String localizerResolve(String key) {
-        return localizer.resolve(key);
+        return connector.getLocalizer().resolve(key);
     }
 
     /**

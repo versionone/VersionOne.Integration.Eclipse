@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.versionone.apiclient.ConnectionException;
 import com.versionone.common.Activator;
 import com.versionone.common.preferences.ButtonFieldEditor.Validator;
 import com.versionone.common.sdk.ApiDataLayer;
@@ -217,13 +218,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     class ConnectionValidator implements Validator {
 
         public boolean isValid() {
-            boolean rc = true;            
-            rc = ApiDataLayer.getInstance().checkConnection(getConnectionSettings());
-            if (rc) {
-                resetConnection = true;
-            } else {
-                setErrorMessage("Validation Failed.");                
-            }            
+            boolean rc = true;
+            try {
+                rc = ApiDataLayer.getInstance().checkConnection(getConnectionSettings());
+                if (rc) {
+                    resetConnection = true;
+                } else {
+                    setErrorMessage("Validation Failed.");                
+                }            
+            } catch (ConnectionException ex) {
+                setErrorMessage(ex.getMessage());
+            }
             return rc;
         }       
     }

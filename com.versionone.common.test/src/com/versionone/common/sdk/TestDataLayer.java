@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.versionone.apiclient.Asset;
-import com.versionone.apiclient.ProxyProvider;
 import com.versionone.common.sdk.ApiDataLayer;
 import com.versionone.common.sdk.DataLayerException;
 import com.versionone.common.sdk.PropertyValues;
@@ -52,8 +51,8 @@ public class TestDataLayer extends ApiDataLayer {
     }
 
     @Override
-    public void connectFotTesting(Object services, Object metaModel, Object localizer, Object storyTL, Object defectTL)
-            throws Exception {
+    public void connectFotTesting(VersionOneConnector connector, Object storyTrackingLevel,
+            Object defectTrackingLevel) throws Exception {
     }
 
     @Override

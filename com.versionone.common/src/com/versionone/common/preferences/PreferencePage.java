@@ -169,12 +169,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             requiresValidation.setEnabled(true, this.getFieldEditorParent());
             this.checkState();
         } else if (event.getProperty().equals(FieldEditor.VALUE)) {
-            if ((event.getSource().equals(userEditor)) || (event.getSource().equals(pwdField))
-                    || (event.getSource().equals(urlEditor))) {
+            if (isEditor(event.getSource())) {
                 requiresValidation.setEnabled(true, this.getFieldEditorParent());
             }
             this.checkState();
         }
+    }
+    
+    private boolean isEditor(Object source) {
+        return (source.equals(userEditor)) || (source.equals(pwdField)) ||
+               (source.equals(urlEditor)) || (source.equals(proxyUriEditor)) ||
+               (source.equals(proxyUserEditor)) || (source.equals(proxyPasswordEditor)) ;
     }
 
     /**

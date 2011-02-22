@@ -279,11 +279,10 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         String userToken = ApiDataLayer.getInstance().getCurrentMemberToken();
 
         String currentOid = PreferencePage.getPreferences().getString(PreferenceConstants.P_MEMBER_TOKEN);
-        if (userToken != null && !currentOid.equals(userToken + ":" + path)) {
-            PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, userToken + ":" + path);
-        }
-
-        
+        String memberToken = userToken + ":" + path;
+        if (userToken != null && !currentOid.equals(memberToken)) {
+            PreferencePage.getPreferences().setValue(PreferenceConstants.P_MEMBER_TOKEN, memberToken);
+        }        
     }
 
     @Override

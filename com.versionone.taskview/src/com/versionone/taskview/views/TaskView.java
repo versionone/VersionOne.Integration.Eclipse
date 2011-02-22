@@ -92,7 +92,7 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
                 createColumns();
             }
             setProviders();
-        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN)) {
+        } else if (property.equals(PreferenceConstants.P_MEMBER_TOKEN) || isProxyProperty(property)) {
             ApiDataLayer.getInstance().updateCurrentProjectId();
             setupEffortColumns();
         } else if (property.equals(PreferenceConstants.P_ONLY_USER_WORKITEMS)) {
@@ -100,6 +100,11 @@ public class TaskView extends ViewPart implements IPropertyChangeListener {
             viewer.refresh();
         }
 
+    }
+
+    private boolean isProxyProperty(String property) {
+        return property.equals(PreferenceConstants.P_PROXY_ENABLED) || property.equals(PreferenceConstants.P_PROXY_URI) ||
+                property.equals(PreferenceConstants.P_PROXY_PASSWORD) || property.equals(PreferenceConstants.P_PROXY_USER);
     }
 
     public boolean validRowSelected() {
